@@ -6,4 +6,4 @@ hour = total // (60 * 60)
 minute = (total - hour * 60 * 60) // 60
 second = total % (60 * 60) % 60
 
-print(f"[{hour:02d}: {minute:02d}: {second:02d}]")
+print(f"[{hour:02d}:{minute:02d}:{second:02d}]")
