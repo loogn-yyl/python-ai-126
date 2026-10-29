@@ -8,4 +8,4 @@ else:
     nums = [int(x) for x in s.split(",")]
     print(f"最大值: {max(nums)}")
     print(f"最小值: {min(nums)}")
-    print(f"平均值: {sum(nums) / len(nums)}")
+    print(f"平均值: {sum(nums) / len(nums):.1f}")
