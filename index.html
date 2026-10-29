@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python AI 学习包索引</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --amber:#d97706; --amber-l:#fffbeb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:40px 16px 80px}
+  .wrap{max-width:880px;margin:0 auto}
+  h1{font-size:24px;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+  h2{font-size:15px;color:var(--primary-d);margin:28px 0 12px;
+     padding-bottom:8px;border-bottom:2px solid var(--primary-l)}
+  .grid{display:grid;gap:12px}
+  a.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:12px;
+         padding:18px 22px;text-decoration:none;color:inherit;transition:.15s}
+  a.card:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(37,99,235,.1);transform:translateY(-1px)}
+  .row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .tag{background:var(--primary);color:#fff;font-size:11.5px;padding:2px 9px;border-radius:5px;
+       letter-spacing:.5px;flex-shrink:0}
+  .tag.done{background:var(--green)}
+  .tag.next{background:var(--amber)}
+  .t{font-size:16px;font-weight:700;color:#0f172a}
+  .kw{font-size:13px;color:var(--muted);margin-top:6px}
+  .path{font-size:12px;color:#94a3b8;margin-top:8px;
+        font-family:"SF Mono",Consolas,monospace}
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);
+        padding:13px 17px;border-radius:8px;font-size:13.5px;margin:16px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Python AI 应用开发 · 学习包索引</h1>
+<p class="sub">126 天计划 · 第 1 周（D001–D007）已全部备好，都在 <code style="background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:12.5px">daily-learn/</code> 里</p>
+
+<h2>第 1 周 · Python 语法速通（C 视角对照）</h2>
+<div class="grid">
+
+  <a class="card" href="daily-learn/D001_学习包_变量与类型.html">
+    <div class="row">
+      <span class="tag done">DAY 001</span>
+      <span class="t">变量与类型</span>
+    </div>
+    <div class="kw">变量 · int / float / str / bool · 类型转换 · input 与 print · f-string 基础</div>
+    <div class="path">daily-learn/D001_学习包_变量与类型.html</div>
+  </a>
+
+  <a class="card" href="daily-learn/D002_学习包_字符串与切片.html">
+    <div class="row">
+      <span class="tag done">DAY 002</span>
+      <span class="t">字符串与切片</span>
+    </div>
+    <div class="kw">不可变序列 · 切片 s[start:stop:step] · 方法速查 · f-string 格式控制 · 编码 UTF-8</div>
+    <div class="path">daily-learn/D002_学习包_字符串与切片.html</div>
+  </a>
+
+  <a class="card" href="daily-learn/D003_学习包_列表元组字典集合.html">
+    <div class="row">
+      <span class="tag next">DAY 003</span>
+      <span class="t">列表、元组、字典、集合</span>
+    </div>
+    <div class="kw">引用与拷贝 · 列表推导式 · 元组解包 · dict.get · 集合运算 · 选型与复杂度</div>
+    <div class="path">daily-learn/D003_学习包_列表元组字典集合.html</div>
+  </a>
+
+  <a class="card" href="daily-learn/D004_学习包_流程控制与循环.html">
+    <div class="row">
+      <span class="tag">DAY 004</span>
+      <span class="t">流程控制与循环</span>
+    </div>
+    <div class="kw">if / while / for · enumerate / zip · break / continue / for-else · 5 个 C 风格改写 · 九九乘法表</div>
+    <div class="path">daily-learn/D004_学习包_流程控制与循环.html</div>
+  </a>
+
+  <a class="card" href="daily-learn/D005_学习包_函数模块与包.html">
+    <div class="row">
+      <span class="tag">DAY 005</span>
+      <span class="t">函数、模块与包</span>
+    </div>
+    <div class="kw">def / return · 默认参数的坑 · *args / **kwargs · LEGB · lambda · import · __main__</div>
+    <div class="path">daily-learn/D005_学习包_函数模块与包.html</div>
+  </a>
+
+  <a class="card" href="daily-learn/D006_学习包_异常处理与文件读写.html">
+    <div class="row">
+      <span class="tag">DAY 006</span>
+      <span class="t">异常处理与文件读写</span>
+    </div>
+    <div class="kw">try / except / finally · raise · 自定义异常 · with · CSV · JSON · 成绩统计脚本</div>
+    <div class="path">daily-learn/D006_学习包_异常处理与文件读写.html</div>
+  </a>
+
+  <a class="card" href="daily-learn/D007_学习包_周复盘与通讯录v1.html">
+    <div class="row">
+      <span class="tag" style="background:#16a34a">DAY 007</span>
+      <span class="t">周复盘 + 通讯录 v1</span>
+    </div>
+    <div class="kw">第 1 周知识地图 · 10 条自测 · 完整项目 · JSON 持久化 · Git 首次提交 · README</div>
+    <div class="path">daily-learn/D007_学习包_周复盘与通讯录v1.html</div>
+  </a>
+
+</div>
+
+<h2>规划与辅助文档</h2>
+<div class="grid">
+
+  <a class="card" href="Python_AI应用开发学习规划.html">
+    <div class="row"><span class="t" style="font-size:15px">18 周总体规划</span></div>
+    <div class="kw">8 个阶段 · 3 个里程碑 · 4 条纪律</div>
+  </a>
+
+  <a class="card" href="PythonAI_126天逐日清单.html">
+    <div class="row"><span class="t" style="font-size:15px">126 天逐日清单</span></div>
+    <div class="kw">每天「学什么 + 产出什么」，带勾选框和进度条</div>
+  </a>
+
+  <a class="card" href="Mac新手环境配置指南.html">
+    <div class="row"><span class="t" style="font-size:15px">Mac 新手环境配置指南</span></div>
+    <div class="kw">0–10 步保姆级流程 · 六种 Homebrew 方案 · 附录 F 安装路径 / G 邮件客户端 · 报错速查</div>
+  </a>
+
+  <a class="card" href="Brew常用指令.md">
+    <div class="row"><span class="t" style="font-size:15px">Brew 常用指令速查（Markdown）</span></div>
+    <div class="kw">formula vs cask · 12 类命令 · leaves/deps/uses 依赖排查 · 五条纪律</div>
+  </a>
+
+  <a class="card" href="Git常用指令.md">
+    <div class="row"><span class="t" style="font-size:15px">Git 常用指令速查（Markdown）</span></div>
+    <div class="kw">四区模型 · 撤销对照表 · reflog 救命 · 冲突处理 · 每日 push 流程 · 报错速查</div>
+  </a>
+
+  <a class="card" href="GitHub_注册与每日上传指南.html">
+    <div class="row"><span class="t" style="font-size:15px">GitHub 注册与每日上传</span></div>
+    <div class="kw">注册 6 步 · 强制 2FA · SSH 免密（含 443 备用） · 每日 push · Pages 发布</div>
+  </a>
+
+  <a class="card" href="学习进度_已完成清单.html">
+    <div class="row"><span class="t" style="font-size:15px">学习进度 · 已完成清单</span></div>
+    <div class="kw">环境配置明细 · D001/D002 逐文件状态 · 待办 5 项 · 8 阶段进度</div>
+  </a>
+
+</div>
+
+<div class="note">
+  <b>目录约定：</b>所有学习包统一放在 <code style="background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:12.5px">daily-learn/</code> 文件夹里，按 D001–D007 顺序命名。
+  第 1 周已全部备好；第 2 周起（D008 以后）按周继续补，同样放这个文件夹，不再建子目录。
+</div>
+
+</div>
+</body>
+</html>
