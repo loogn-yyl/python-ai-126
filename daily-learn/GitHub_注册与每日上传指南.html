@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub 注册与每日学习上传 · 保姆级步骤</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:880px;margin:0 auto}
+
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:36px;margin-bottom:22px}
+  header h1{font-size:26px;margin-bottom:8px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:20px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);
+        padding:14px 18px;border-radius:8px;font-size:14px;margin:18px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);
+        padding:14px 18px;border-radius:8px;font-size:14px;margin:18px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);
+        padding:14px 18px;border-radius:8px;font-size:14px;margin:18px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);
+        padding:14px 18px;border-radius:8px;font-size:14px;margin:18px 0}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:18px}
+  .stephead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .stepno{background:var(--primary);color:#fff;width:32px;height:32px;border-radius:9px;
+          display:inline-flex;align-items:center;justify-content:center;
+          font-weight:700;font-size:15px;flex-shrink:0}
+  h2{font-size:19px;color:var(--text)}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:14px;padding-left:44px}
+  h3{font-size:15.5px;margin:22px 0 8px;color:var(--primary-d)}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  b{color:#0f172a}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:16px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+      line-height:1.7;white-space:pre}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;
+          font-size:12.5px;line-height:1.65}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.25);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+
+  .kbd{display:inline-block;background:#f1f5f9;border:1px solid #cbd5e1;
+       border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:12.5px;
+       font-family:"SF Mono",Consolas,monospace;color:#334155}
+  .tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;
+       font-weight:600;vertical-align:middle}
+  .t-must{background:var(--red-l);color:var(--red)}
+  .t-opt{background:var(--primary-l);color:var(--primary-d)}
+  .t-ok{background:var(--green-l);color:var(--green)}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:26px;line-height:2}
+  @media(max-width:640px){
+    section{padding:20px}
+    .sub{padding-left:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>GitHub 注册与每日学习上传</h1>
+  <p>从零注册到每天一条 <code style="background:rgba(255,255,255,.2);padding:1px 6px;border-radius:4px">git push</code>，按顺序做，一步不跳。</p>
+  <div class="hmeta">
+    <span>适用于 macOS</span>
+    <span>7 个阶段</span>
+    <span>约 30 分钟一次性配置</span>
+    <span>之后每天 15 秒</span>
+  </div>
+</header>
+
+<section style="padding:22px 30px">
+  <h2 style="font-size:16px;margin-bottom:12px">你的账号信息 <span class="tag t-ok">注册已完成</span></h2>
+  <table style="margin:0">
+    <tr><th style="width:26%">项目</th><th>值</th></tr>
+    <tr><td>GitHub 用户名</td><td><b>loogn-yyl</b></td></tr>
+    <tr><td>主页</td><td><code class="inline">https://github.com/loogn-yyl</code></td></tr>
+    <tr><td>代码目录</td><td><code class="inline">~/python-learn</code>（内含 day01、day02）</td></tr>
+    <tr><td>仓库名</td><td><code class="inline">python-ai-126</code></td></tr>
+    <tr><td>仓库地址</td><td><code class="inline">git@github.com:loogn-yyl/python-ai-126.git</code></td></tr>
+  </table>
+  <div class="note" style="margin-bottom:0">
+    这五项以后会反复用到。<b>仓库地址那一行尤其重要</b>，配 SSH 免密和改 remote 时都要用。
+  </div>
+</section>
+
+<div class="danger">
+  <b>开始前一条铁律：全程用英文输入法。</b><br>
+  你在配 Homebrew 时踩过的坑——<code class="inline">--</code> 变成 <code class="inline">——</code>、引号变成全角 <code class="inline">“ ”</code>、粘贴混入不可见字符——在这里会重演，而且后果更严重：<b>密码里混进全角字符，你看着一模一样，但登录永远失败，且无法自查。</b><br>
+  注册时按一下 <span class="kbd">Caps Lock</span> 旁边的输入法切换，看到候选词条消失再动手。
+</div>
+
+<!-- ================= 阶段 0 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">0</span><h2>先确认你的网络能不能用 GitHub</h2></div>
+  <div class="sub">2 分钟 · 不通就别往下做，否则会在注册中途卡死</div>
+
+  <p>你之前的环境已经证明：<code class="inline">raw.githubusercontent.com</code> 和国内几个镜像站在你这个网络下是被拦的，<code class="inline">gitee.com</code> 可用。GitHub 主站的情况需要单独测，因为它和子域名走的是不同线路。</p>
+
+  <h3>测法一：浏览器</h3>
+  <p>用 Safari 打开 <code class="inline">https://github.com</code>，对照下表判断：</p>
+  <table>
+    <tr><th style="width:38%">看到什么</th><th>含义</th><th style="width:24%">怎么办</th></tr>
+    <tr><td>正常首页，图片图标都完整</td><td>主站和 CDN 都通</td><td>直接进阶段 1</td></tr>
+    <tr><td>一直转圈，最后「无法连接服务器」</td><td>主站被拦</td><td>换网络（手机热点）再试</td></tr>
+    <tr><td>文字出来了但排版乱、图标是方块、按钮点不动</td><td>主站通，资源 CDN 被拦，<b>注册会失败</b></td><td>换热点，或看阶段 6 的备用方案</td></tr>
+    <tr><td>提示「此连接非私人连接」证书错误</td><td>有中间设备在拦 HTTPS</td><td>换网络</td></tr>
+  </table>
+
+  <h3>测法二：终端（更准）</h3>
+  <p>打开「终端」，粘贴下面这行。注意是 <b>GET</b> 方式，不是之前那个会误报 403 的 <code class="inline">curl -I</code>：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>curl -s -o /dev/null -w "%{http_code}\n" https://github.com</pre></div>
+  <table>
+    <tr><th style="width:24%">返回</th><th>含义</th></tr>
+    <tr><td><code class="inline">200</code></td><td>通，可以继续</td></tr>
+    <tr><td><code class="inline">301</code> / <code class="inline">302</code></td><td>通，只是跳转，也正常</td></tr>
+    <tr><td><code class="inline">000</code></td><td><b>没通</b>，连接被切断。换网络</td></tr>
+    <tr><td>卡住十几秒才结束</td><td>半通，注册页很可能加载不出人机验证，建议换热点</td></tr>
+  </table>
+
+  <div class="warn">
+    <b>关于 403：</b>如果返回 403，别急着判定被墙——403 是「服务器收到了请求但拒绝」，说明<b>网络是通的</b>，只是这个路径不允许。换浏览器重试即可。
+  </div>
+
+  <div class="ok">
+    <b>判定标准：</b>浏览器能完整打开首页 + 终端返回 200，两项都满足再往下走。
+  </div>
+</section>
+
+<!-- ================= 阶段 1 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">1</span><h2>注册账号</h2></div>
+  <div class="sub">约 5 分钟 · 6 个填写项，第 5 项最容易卡</div>
+
+  <h3>① 打开注册页</h3>
+  <p>Safari 地址栏输入（直接敲，不要从搜索结果点，避免进钓鱼站）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>https://github.com/signup</pre></div>
+
+  <h3>② 填邮箱</h3>
+  <p>用你<b>长期在用、随时能收到邮件</b>的邮箱。QQ 邮箱、163、Gmail、Outlook 都行。</p>
+  <div class="warn">
+    <b>用 QQ 邮箱注意：</b>GitHub 的验证邮件有时会进「垃圾邮件」文件夹，收不到先去那里翻一遍，别急着重新发送（短时间内重复发送会被限流，要等 10 分钟）。
+  </div>
+
+  <h3>③ 设密码</h3>
+  <p>GitHub 的硬性要求，满足<b>其中一条</b>即可：</p>
+  <table>
+    <tr><th style="width:50%">规则</th><th>举例</th></tr>
+    <tr><td><b>至少 15 个字符</b>，任意组合</td><td><code class="inline">mypythonday2026ok</code></td></tr>
+    <tr><td>或 <b>至少 8 个字符</b>，且同时含小写字母和数字</td><td><code class="inline">learn2026py</code></td></tr>
+  </table>
+  <div class="danger">
+    <b>两条禁令：</b><br>
+    <b>① 不能和你其他网站用同一个密码。</b>GitHub 会拿你的密码去比对公开的泄露库（HaveIBeenPwned），只要在别处泄露过，它会直接拒绝，即使你从没用过。<br>
+    <b>② 密码里的每个字符都必须是英文字符。</b>别用中文输入法敲标点，别复制带空格的内容。
+  </div>
+  <div class="note">
+    <b>建议：</b>写在纸上或存到备忘录，<b>记下来</b>。这是你唯一需要记的密码，第 3 阶段会用 SSH 免掉之后所有的密码输入。
+  </div>
+
+  <h3>④ 设用户名</h3>
+  <p>这个会成为你的主页地址 <code class="inline">https://github.com/loogn-yyl</code>，也会出现在每次推送的记录里。</p>
+  <table>
+    <tr><th style="width:46%">规则</th><th>说明</th></tr>
+    <tr><td>只能用小写/大写字母、数字、单个连字符 <code class="inline">-</code></td><td>中文、下划线 <code class="inline">_</code>、空格、点 全都不行</td></tr>
+    <tr><td>不能以连字符开头或结尾</td><td><code class="inline">-abc</code> ✗、<code class="inline">abc-</code> ✗、<code class="inline">a-b</code> ✓</td></tr>
+    <tr><td>已被占用就不能用</td><td>填完会实时提示，绿勾可用</td></tr>
+  </table>
+  <div class="note">
+    <b>取名建议：</b>拼音 + 数字，全小写，短一点。比如 <code class="inline">chenlearn</code>、<code class="inline">py126</code>、<code class="inline">loogn-dev</code>。<br>
+    别用带年份的（<code class="inline">chen2026</code>），明年看着就别扭；也别用纯数字。<br>
+    <b>改名的代价：</b>注册后可以改，GitHub 会把旧地址重定向到新地址，但旧名字会被释放——可能被别人抢注。
+  </div>
+
+  <h3>⑤ 完成人机验证</h3>
+  <p>会弹出一个小窗，让你做拼图、旋转图片、或者点击指定图形。<b>这是国内注册 GitHub 的第一大卡点。</b></p>
+  <table>
+    <tr><th style="width:44%">现象</th><th>处理办法</th></tr>
+    <tr><td>小窗一直空着 / 一直转圈</td><td>等 20 秒。还不动 → 刷新页面重来（刷新不会丢已填内容）</td></tr>
+    <tr><td>提示验证失败，反复重试都不行</td><td>换网络最快：用手机开热点，Mac 连热点重做</td></tr>
+    <tr><td>图形加载出来了但点不动</td><td>Safari 设置 → 隐私 → 关掉「阻止跨站跟踪」，刷新</td></tr>
+    <tr><td>装了广告拦截插件</td><td>对 github.com 关闭拦截，或换无插件的 Safari 窗口</td></tr>
+  </table>
+  <div class="ok">
+    <b>如果连续 30 分钟都过不了人机验证</b>，走这条路：注册页顶部有 <b>Continue with Google</b> / <b>Continue with Apple</b>。用已有的 Google 账号或 Apple ID 一键注册，能直接跳过这个人机验证环节，之后照样可以设密码登录。前提是你得有其中之一。
+  </div>
+
+  <h3>⑥ 查收验证码邮件</h3>
+  <p>提交后会往你邮箱发一封 8 位数字的验证码。填进去，账号即创建成功。</p>
+  <p>没收到就依次检查：垃圾邮件 → 邮件客户端是否拦截了 <code class="inline">noreply@github.com</code> → 等 10 分钟再重发。</p>
+</section>
+
+<!-- ================= 阶段 2 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">2</span><h2>注册后立刻做的两件事</h2></div>
+  <div class="sub">约 10 分钟 · 第二件现在是强制的，不做会用不了仓库</div>
+
+  <h3>① 验证邮箱 <span class="tag t-must">必须</span></h3>
+  <p>注册完会另发一封「Please verify your email address」。点里面的按钮。<b>不验证的话，之后推送会一直被拒。</b></p>
+  <p>万一关掉了：登录后点右上角头像 → <b>Settings</b> → 左侧 <b>Emails</b> → 找到未验证的邮箱 → <b>Resend verification email</b>。</p>
+
+  <h3>② 开启两步验证 2FA <span class="tag t-must">必须</span></h3>
+  <div class="danger">
+    <b>GitHub 已从 2026 年 9 月 2 日起对所有用户强制 2FA。</b>没开启的账号，创建仓库、推送代码这些操作都会被限制。现在注册完基本会直接被引导去设置，别跳过。
+  </div>
+
+  <p><b>验证码从哪来：按你的设备对号入座。</b></p>
+  <table>
+    <tr><th style="width:28%">你的设备</th><th style="width:31%">装什么</th><th>说明</th></tr>
+    <tr>
+      <td><b>iPhone</b></td>
+      <td>系统自带「密码」App<br><span class="tag t-ok">不用装</span></td>
+      <td><code class="inline">设置 → 密码</code>里就能加验证码，iCloud 钥匙串自动同步，换机不丢，Mac 上也能直接看</td>
+    </tr>
+    <tr>
+      <td><b>鸿蒙 NEXT</b><br><span style="color:#64748b;font-size:12.5px">HarmonyOS 5.x / 6.x / 7.x</span></td>
+      <td>应用市场搜<br><b>「离线验证器」</b></td>
+      <td>鸿蒙原生应用，免费无广告。完全离线生成验证码，支持扫码 / 手动输密钥、生物识别应用锁、加密导出备份。<b>搜不到就换搜「2FA验证器-工具」</b>，也是鸿蒙原生</td>
+    </tr>
+    <tr>
+      <td><b>鸿蒙 4.x 及以下</b><br><span style="color:#64748b;font-size:12.5px">仍兼容安卓 APK</span></td>
+      <td><b>Microsoft Authenticator</b></td>
+      <td>直接装安卓版就行，免费、免注册账号</td>
+    </tr>
+    <tr>
+      <td><b>其他安卓</b></td>
+      <td><b>Microsoft Authenticator</b></td>
+      <td>同上。iOS 版能备份到 iCloud，但<b>不能跨系统恢复</b>——iPhone 备份还原不到安卓</td>
+    </tr>
+    <tr>
+      <td><b>只用 Mac</b><br><span style="color:#64748b;font-size:12.5px">或想做双保险</span></td>
+      <td>Mac 自带「密码」App</td>
+      <td>macOS 14 及以上可用。<b>你这台是 macOS 27.0.1，肯定支持。</b>写代码时不用掏手机，直接在 Mac 上看码</td>
+    </tr>
+  </table>
+
+  <div class="warn">
+    <b>怎么确认自己是不是鸿蒙 NEXT：</b>打开 <code class="inline">设置 → 关于手机</code>，看「HarmonyOS 版本」。<br>
+    显示 <b>5.x / 6.x / 7.x</b>，或名称里带 <b>NEXT</b> → 纯血鸿蒙，<b>装不了安卓 APK</b>，用「离线验证器」。<br>
+    显示 <b>4.x</b> → 还兼容安卓，装 Microsoft Authenticator。<br>
+    <span style="color:#dc2626"><b>本机已确认：HarmonyOS 7.0.0.111 SP12 → 属于前一种，只能装鸿蒙原生应用。</b></span>
+  </div>
+
+  <div class="danger">
+    <b>鸿蒙用户最常踩的三个坑：</b><br>
+    <b>① 搜 Google Authenticator</b> —— 它依赖谷歌服务框架，鸿蒙 NEXT 上根本装不了，装上了也跑不起来。<br>
+    <b>② 搜 Microsoft Authenticator</b> —— 微软没出鸿蒙原生版，在 NEXT 的应用市场里搜不到。<br>
+    <b>③ 用「密码保险箱」凑合</b> —— 那是华为的密码自动填充功能，负责存账号密码，<b>不负责生成 GitHub 要的 6 位动态码</b>。两者是不同东西。
+  </div>
+
+  <div class="ok">
+    <b>一句话结论：</b>iPhone 用系统「密码」App；鸿蒙 NEXT 装「离线验证器」；鸿蒙 4.x 和普通安卓装 Microsoft Authenticator。全都免费、都不用注册账号。
+  </div>
+
+  <h3>在 Mac 上操作，怎么扫码</h3>
+  <div class="warn">
+    <b>二维码显示在你面前的 Mac 屏幕上，Mac 扫不了自己。</b>两条路：<br>
+    <b>① 用手机扫：</b>iPhone 打开「密码」App → 右下角 <b>+</b> → <b>扫描二维码</b>。鸿蒙打开「离线验证器」，空列表页面中间就有蓝色大按钮 <b>扫描二维码</b>（已实测界面）；第一次点会问相机权限，选<b>允许</b>。对准 Mac 屏幕，距离 20–30 厘米，<b>先把 Mac 亮度调到最高</b>，手机稍微侧一点避开屏幕反光。<br>
+    <b>② 手动输密钥（扫码失败时用）：</b>GitHub 二维码下面有一行 <b>enter this text code</b>，点开是一串字母数字（Base32，通常 32 位）。复制它，需要传到手机上粘进去——推荐用<b>微信「文件传输助手」</b>发一段文本给自己，手机上复制。在验证器里点右下角蓝色 <b>+</b> → 选<b>手动输入</b>，发行方填 <code class="inline">GitHub</code>，账户填 <code class="inline">loogn-yyl</code>。<br>
+    <span style="color:#dc2626"><b>不要照着屏幕一个字一个字手打这串密钥</b>——Base32 里 0/O、1/I/l 极易看错，错一位验证码就永远对不上，而且报错时不会告诉你「密钥错了」，只会说「验证码无效」。</span>
+  </div>
+
+  <p><b>操作路径：</b></p>
+  <ol>
+    <li>点右上角头像 → <b>Settings</b></li>
+    <li>左侧栏 → <b>Password and authentication</b></li>
+    <li>找到 <b>Two-factor authentication</b> → 点 <b>Enable two-factor authentication</b></li>
+    <li>选 <b>Set up using an app</b>（不要选 SMS，中国手机号经常收不到）</li>
+    <li>页面出现二维码 + 一串密钥，按上面的方法存进你的 App</li>
+    <li>App 里那 6 位数字 30 秒变一次。填进 GitHub 页面 → <b>Enable</b></li>
+  </ol>
+
+  <div class="danger">
+    <b>⚠️ 关键一步，千万别跳过：保存恢复码（Recovery codes）。</b><br>
+    GitHub 会给你一组 16 个一次性代码。这是<b>手机丢了、App 删了、换手机没迁移</b>时唯一的救生索。<br>
+    <b>怎么存：</b>点 <b>Download</b> 存成 txt，再打印一份或抄到纸上，和密码放一起。<b>不要只存在手机相册里</b>——手机没了就一起没了。<br>
+    <b>丢了会怎样：</b>GitHub 官方原文写得很直白——一旦你丢失全部双因素凭证和恢复方式，<b>就永久失去该账号的访问权，GitHub 支持也无法帮你恢复</b>。这不是吓唬人，是明确写在文档里的政策。
+  </div>
+
+  <div class="ok">
+    <b>日常体验：</b>之后从浏览器登录时，输完密码会让你填 6 位码。而从终端推送走的是第 3 阶段的 SSH 密钥，<b>不需要填这个码</b>，所以不会天天烦你。<br>
+    <b>想更省事：</b>配好 TOTP 之后，可以在同一页面加一个 <b>Passkey</b>（用 Mac 的 Touch ID）。Passkey 能同时满足密码和 2FA，一次指纹就登录，连码都不用看。但它只能当便利手段，<b>不能替代恢复码</b>——设备丢了就没了。
+  </div>
+
+  <h3>验证器本身也要备份（鸿蒙用户必做）</h3>
+  <p>「离线验证器」这类应用的优点是<b>数据只在你手机上，不上传任何服务器</b>；代价是<b>卸载或换机时数据不会自动跟过去</b>。所以配好 GitHub 之后要立刻做一次导出。</p>
+  <p>在 App 里：右上角<b>齿轮（设置）</b> → 找<b>导出 / 备份</b> → 设置一个导出密码 → 选保存位置。</p>
+
+  <div class="danger">
+    <b>两个必须知道的点：</b><br>
+    <b>① 导出文件里有你的验证密钥，等于账号的半个钥匙。</b>存到你能控制的地方（Mac 本地、你自己的加密盘），<b>不要发微信、不要传公共网盘、不要存聊天记录</b>。设置了密码就一定要记住那个密码，忘了这个备份等于没有。<br>
+    <b>② 这类小应用有「重装丢数据」的风险。</b>该应用 2026 年 9 月的更新说明里写过「原版本证书信息丢失，需备份数据后卸载旧版再装新版」——意思是开发者换过应用签名，老用户被迫走一次卸载重装。<b>没有备份的话，那一次就得回到 GitHub 逐个解绑重配。</b>
+  </div>
+
+  <div class="note">
+    <b>三层保险的正确含义：</b><br>
+    <b>①</b> 手机验证器 —— 日常取码；<b>②</b> Mac「密码」App 里存同一个密钥 —— 手机不在身边时用；<b>③</b> GitHub 恢复码（txt + 纸质） —— 前两个都失效时的最后手段。<br>
+    三层任意两层同时失效，账号还能进；<b>三层全失效，账号就没了</b>。所以别把①和②放在同一个会一起消失的地方，也别把③只存在手机相册里。
+  </div>
+</section>
+
+<!-- ================= 阶段 3 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">3</span><h2>配置 Git 身份和 SSH 密钥</h2></div>
+  <div class="sub">约 10 分钟 · 一次性做完，之后永久免密推送</div>
+
+  <p>这一步的目的：让 Mac 上的 Git 能证明「我是我」，从而<b>不用每次推送都输密码或令牌</b>。</p>
+
+  <div class="note">
+    <b>为什么不用密码推送？</b>GitHub 已经完全移除了 Git 的密码认证。现在走 HTTPS 必须用「个人访问令牌（PAT）」，那个令牌又长又难记，还容易泄露。<b>SSH 密钥更简单也更安全</b>，本指南全程用 SSH，不碰令牌。
+  </div>
+
+  <h3>① 告诉 Git 你是谁</h3>
+  <p>这两条会写进每一次提交记录，用你自己的信息替换。用户名建议用拼音或英文（不想公开真名就用昵称），邮箱<b>必须</b>是你注册 GitHub 的那个邮箱。</p>
+  <div class="codebox"><button class="copy">复制</button><pre>git config --global user.name "loogn-yyl"
+git config --global user.email "你的邮箱@example.com"
+git config --global init.defaultBranch main</pre></div>
+
+  <p>验证一下写进去了：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>git config --global --list</pre></div>
+
+  <h3>② 生成 SSH 密钥</h3>
+  <p>先看有没有旧的，避免覆盖：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>ls -la ~/.ssh</pre></div>
+  <p>如果列出了 <code class="inline">id_ed25519</code> 和 <code class="inline">id_ed25519.pub</code>，说明已经有了，跳到第 ③ 步。如果提示 <code class="inline">No such file or directory</code>，继续：</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>ssh-keygen -t ed25519 -C "你的邮箱@example.com"</pre></div>
+
+  <p>接下来会连问三个问题，<b>全部直接按回车</b>：</p>
+  <table>
+    <tr><th style="width:52%">提示</th><th>怎么答</th></tr>
+    <tr><td><code class="inline">Enter file in which to save the key</code></td><td>直接回车（用默认路径）</td></tr>
+    <tr><td><code class="inline">Enter passphrase</code></td><td>直接回车（留空，以后推送不用输密码）</td></tr>
+    <tr><td><code class="inline">Enter same passphrase again</code></td><td>直接回车</td></tr>
+  </table>
+
+  <p>成功后会显示一个彩色方块图案（randomart），类似这样，说明生成完了：</p>
+  <div class="codebox"><button class="copy">复制</button><pre class="out">+--[ED25519 256]--+
+|      .o+o.      |
+|     . +o=o      |
+|    . + *+.      |
+|     = B = .     |
++----[SHA256]-----+</pre></div>
+
+  <h3>③ 把公钥复制到剪贴板</h3>
+  <p>Mac 有 <code class="inline">pbcopy</code>，一条命令直接进剪贴板，不用手动选中复制（避免复制漏字符）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>pbcopy &lt; ~/.ssh/id_ed25519.pub</pre></div>
+  <p>想先看看内容对不对，可以先 <code class="inline">cat ~/.ssh/id_ed25519.pub</code>。它应该是<b>一整行</b>，以 <code class="inline">ssh-ed25519</code> 开头，以你的邮箱结尾。</p>
+
+  <div class="danger">
+    <b>记住这条：只复制 <code class="inline">.pub</code> 结尾的那个（公钥）。</b><br>
+    没有 <code class="inline">.pub</code> 的 <code class="inline">id_ed25519</code> 是私钥，<b>绝对不能发给任何人、不能上传到任何地方</b>。它相当于你家钥匙。
+  </div>
+
+  <h3>④ 粘贴到 GitHub</h3>
+  <ol>
+    <li>浏览器里登录 GitHub，点右上角头像 → <b>Settings</b></li>
+    <li>左侧栏 → <b>SSH and GPG keys</b></li>
+    <li>点绿色按钮 <b>New SSH key</b></li>
+    <li><b>Title</b> 填个能认出来的名字，比如 <code class="inline">macbook-2026</code></li>
+    <li><b>Key type</b> 保持 <code class="inline">Authentication Key</code></li>
+    <li><b>Key</b> 框里按 <span class="kbd">Command</span>+<span class="kbd">V</span> 粘贴</li>
+    <li>点 <b>Add SSH key</b>。可能要再输一次密码 + 6 位验证码确认</li>
+  </ol>
+
+  <h3>⑤ 测试连通</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>ssh -T git@github.com</pre></div>
+
+  <p>第一次连会问一句，输入 <code class="inline">yes</code> 再回车（不是 <code class="inline">y</code>，要打全）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre class="out">The authenticity of host 'github.com (20.205.243.166)' can't be established.
+ED25519 key fingerprint is SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU.
+Are you sure you want to continue connecting (yes/no/[fingerprint])?</pre></div>
+
+  <div class="ok">
+    <b>看到这句就是成功了：</b>
+  </div>
+  <div class="codebox"><button class="copy">复制</button><pre class="out">Hi loogn-yyl! You've successfully authenticated, but GitHub does not provide shell access.</pre></div>
+  <p>「does not provide shell access」不是错误，是正常提示——意思是「认证通过了，但 GitHub 不提供远程 shell」，你不用管。</p>
+
+  <h3>⑥ 如果卡住或超时</h3>
+  <table>
+    <tr><th style="width:40%">现象</th><th>含义与处理</th></tr>
+    <tr><td>卡住 30 秒以上，最后 <code class="inline">Connection timed out</code></td><td>22 端口被拦，<b>国内很常见</b>。做下面的 443 方案</td></tr>
+    <tr><td><code class="inline">Permission denied (publickey)</code></td><td>公钥没正确粘贴，或粘的是私钥。回第 ③ 步重来</td></tr>
+    <tr><td><code class="inline">Connection reset by peer</code></td><td>连接被切断，先试 443 方案，不行换网络</td></tr>
+  </table>
+
+  <p><b>443 端口方案（22 不通就走这条）：</b>用 nano 编辑配置文件：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>nano ~/.ssh/config</pre></div>
+  <p>把下面四行贴进去（<b>注意缩进是两个空格</b>，缩进错了不生效）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>Host github.com
+  HostName ssh.github.com
+  Port 443
+  User git</pre></div>
+  <p>保存退出：<span class="kbd">Control</span>+<span class="kbd">O</span> → 回车 → <span class="kbd">Control</span>+<span class="kbd">X</span>。然后重新测：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>ssh -T git@github.com</pre></div>
+  <div class="note">
+    <b>这两行的意思：</b>当你连 <code class="inline">github.com</code> 时，实际连到 <code class="inline">ssh.github.com</code> 的 <b>443 端口</b>。443 是 HTTPS 的端口，基本上不被拦。功能完全一样，只是走了另一条通道。
+  </div>
+</section>
+
+<!-- ================= 阶段 4 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">4</span><h2>建仓库，把已有学习内容传上去</h2></div>
+  <div class="sub">约 5 分钟 · 你现在已经有 day01、day02 的代码，正好一次全传</div>
+
+  <h3>① 网页上创建空仓库</h3>
+  <ol>
+    <li>登录后点右上角 <b>+</b> → <b>New repository</b>，或直接开 <code class="inline">https://github.com/new</code></li>
+    <li><b>Repository name</b> 填 <code class="inline">python-ai-126</code>（建议就用这个，一眼看出是什么）</li>
+    <li><b>Description</b> 可选，填 <code class="inline">126 天从 C 到 Python AI 应用开发</code></li>
+    <li>选 <b>Public</b> 或 <b>Private</b>（见下方说明）</li>
+    <li><b>下面三个勾选项全部不要勾</b>——不要 README、不要 .gitignore、不要 License</li>
+    <li>点 <b>Create repository</b></li>
+  </ol>
+
+  <table>
+    <tr><th style="width:16%">可见性</th><th>什么时候选</th></tr>
+    <tr><td><b>Public</b></td><td>想让别人看到，当成学习记录对外展示。免费版无限制，<b>也是开 GitHub Pages 的前提</b></td></tr>
+    <tr><td><b>Private</b></td><td>只给自己看。之后想公开，在 Settings → General → 最下方 <b>Change visibility</b> 一键切换（Public → Private 也行，双向都能改）</td></tr>
+  </table>
+
+  <div class="danger">
+    <b>为什么三个勾选项都不能勾？</b>勾了 README 或 .gitignore，GitHub 会<b>先给你创建一次提交</b>。这时你本地再推就会报 <code class="inline">rejected — fetch first</code> 的冲突，还得额外做合并。<b>空仓库最省事。</b>
+  </div>
+
+  <h3>② 进到你的代码目录</h3>
+  <p>你的代码在 <code class="inline">~/python-learn</code>，里面是 <code class="inline">day01</code>、<code class="inline">day02</code>。先确认一下：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+ls</pre></div>
+  <p>应该列出 <code class="inline">day01  day02</code>。对上了就直接进第 ③ 步。</p>
+  <div class="note">
+    <b>以后要是换了目录：</b>用 <code class="inline">mdfind -name "p1_reverse.py"</code> 秒查（Spotlight 查询，直接打印完整路径），去掉最后那段文件名就是目录。下面所有命令里的 <code class="inline">~/python-learn</code> 换成新路径即可。
+  </div>
+
+  <h3>③ 建 .gitignore（重要）</h3>
+  <p>有些文件不该上传：Mac 的隐藏缓存、Python 的编译产物。先建一个忽略清单：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+nano .gitignore</pre></div>
+  <p>贴入以下内容，然后 <span class="kbd">Control</span>+<span class="kbd">O</span> 回车、<span class="kbd">Control</span>+<span class="kbd">X</span> 退出：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+.idea/</pre></div>
+  <table>
+    <tr><th style="width:30%">条目</th><th>为什么忽略</th></tr>
+    <tr><td><code class="inline">__pycache__/</code></td><td>Python 自动生成的字节码缓存，每次运行都变，传上去只会让提交记录变脏</td></tr>
+    <tr><td><code class="inline">*.pyc</code></td><td>同上，单个缓存文件</td></tr>
+    <tr><td><code class="inline">.DS_Store</code></td><td>Finder 记录文件夹图标位置的隐藏文件，纯垃圾</td></tr>
+    <tr><td><code class="inline">.vscode/</code> <code class="inline">.idea/</code></td><td>编辑器个人配置，跟代码无关</td></tr>
+  </table>
+
+  <h3>④ 初始化并首次上传</h3>
+  <p>逐条执行，一条一条来，<b>别一次全粘</b>（你之前遇到过「Too many arguments」，就是多条命令粘连导致的）。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn</pre></div>
+  <div class="codebox"><button class="copy">复制</button><pre>git init</pre></div>
+  <div class="codebox"><button class="copy">复制</button><pre>git add .</pre></div>
+  <div class="codebox"><button class="copy">复制</button><pre>git commit -m "第 1 周：D001-D007 学习记录"</pre></div>
+  <div class="codebox"><button class="copy">复制</button><pre>git branch -M main</pre></div>
+
+  <p>下面这条<b>必须换成你自己的用户名</b>，其余照抄：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>git remote add origin git@github.com:loogn-yyl/python-ai-126.git</pre></div>
+
+  <div class="codebox"><button class="copy">复制</button><pre>git push -u origin main</pre></div>
+
+  <div class="ok">
+    <b>成功的标志：</b>终端输出里有一行形如 <code class="inline">* [new branch] main -&gt; main</code>，最后是 <code class="inline">branch 'main' set up to track 'origin/main'</code>。这时刷新网页，代码已经在了。
+  </div>
+
+  <h3>⑤ 补一个 README</h3>
+  <p>仓库首页会自动显示 <code class="inline">README.md</code> 的内容。建一个，写上你每天在做什么：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+nano README.md</pre></div>
+  <p>内容示例：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># Python AI 应用开发 · 126 天
+
+有 C 基础，每天 4 小时，从语法到 AI 应用。
+
+## 进度
+
+- [x] D001 变量与类型
+- [x] D002 字符串与切片
+- [x] D003 列表、元组、字典、集合
+- [x] D004 流程控制与循环
+- [x] D005 函数、模块与包
+- [x] D006 异常处理与文件读写
+- [x] D007 周复盘与通讯录 v1
+- [ ] D008 类与对象
+
+## 目录
+
+| 目录 | 内容 |
+|---|---|
+| day01/ | 变量、类型、基础运算 |
+| day02/ | 字符串、切片、格式化 |</pre></div>
+  <p>保存退出后推上去：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>git add .
+git commit -m "add README"
+git push</pre></div>
+</section>
+
+<!-- ================= 阶段 5 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">5</span><h2>每天上传的固定套路</h2></div>
+  <div class="sub">配好之后每天只要 15 秒</div>
+
+  <p>这才是你真正要长期用的东西。每天学完，在终端执行三步：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+git add .
+git commit -m "D008: 类与对象"</pre></div>
+  <div class="codebox"><button class="copy">复制</button><pre>git push</pre></div>
+
+  <div class="note">
+    <b>提交信息（-m 后面那句）的写法：</b>「第几天 + 学了什么」。比如 <code class="inline">D008: 类与对象</code>、<code class="inline">D009: 继承与多态</code>。<br>
+    这不是形式主义——三个月后你翻记录时，<code class="inline">update</code>、<code class="inline">修改</code> 这种信息等于没写，而 <code class="inline">D008: 类与对象</code> 一眼就能定位。
+  </div>
+
+  <h3>省事的做法：加一个快捷命令 <span class="tag t-opt">可选</span></h3>
+  <p>你已经会改 <code class="inline">.zshrc</code> 了。加一个函数，以后一句话完成上传：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>nano ~/.zshrc</pre></div>
+  <p>在文件末尾追加：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>gl() {
+  cd ~/python-learn || return
+  git add .
+  git commit -m "${1:-学习记录 $(date +%m-%d)}"
+  git push
+}</pre></div>
+  <p>保存退出，让配置生效：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>source ~/.zshrc</pre></div>
+  <p>以后每天只要一行：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>gl "D008: 类与对象"</pre></div>
+  <p>不带参数的话，提交信息会自动变成「学习记录 10-29」。</p>
+
+  <div class="warn">
+    <b>如果 <code class="inline">gl</code> 提示 command not found：</b><br>
+    ① 确认 <code class="inline">source ~/.zshrc</code> 执行过；<br>
+    ② 确认函数体的大括号是<b>独立成行</b>的（<code class="inline">gl() {</code> 后面必须换行，不能写成 <code class="inline">gl() { cd ...; }</code>）；<br>
+    ③ 执行 <code class="inline">which gl</code> 看看有没有识别到。
+  </div>
+
+  <h3>每天的学习内容该放哪</h3>
+  <p>沿用你现在的结构就行，每天都建一个 <code class="inline">dayNN/</code>：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>python-ai-126/
+├── README.md
+├── .gitignore
+├── day01/
+│   ├── calculator.py
+│   ├── circle.py
+│   └── day01-note.md
+├── day02/
+└── day03/</pre></div>
+  <p>笔记（<code class="inline">dayNN-note.md</code>）也一起传。<b>笔记比代码更能体现你学过</b>，而且以后再回来看，代码会忘，笔记里的坑记得住。</p>
+</section>
+
+<!-- ================= 可选：GitHub Pages ================= -->
+<section>
+  <div class="stephead"><span class="stepno">✦</span><h2>可选：把学习包变成能在线打开的网页</h2></div>
+  <div class="sub">约 5 分钟 · 做完之后手机上也能翻学习包</div>
+
+  <p>你手上已经有 7 份 HTML 学习包和一份索引页。GitHub 提供免费的静态网页托管（GitHub Pages），<b>把你的 HTML 传上去，就能用一个网址打开</b>，不用再在 Mac 上找文件双击。</p>
+
+  <div class="warn">
+    <b>两个前提：</b>① 仓库必须是 <b>Public</b>（免费版的 Pages 不支持私有仓库）；② 想好内容是否愿意公开——学习包本身没有敏感信息，可以放心。
+  </div>
+
+  <h3>① 把学习包传进仓库</h3>
+  <p>先把 <code class="inline">daily-learn/</code> 文件夹和索引页放到 Mac 的桌面上（从你现在看到这些文件的地方下载/拷过来）。假设它们叫 <code class="inline">daily-learn</code> 和 <code class="inline">index.html</code>：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>cp -R ~/Desktop/daily-learn ~/python-learn/
+cp ~/Desktop/index.html ~/python-learn/index.html</pre></div>
+
+  <div class="note">
+    <b>为什么改名成 <code class="inline">index.html</code>？</b>网站打开时默认找这个名字作为首页。你那份索引页本来就是入口，改名正好。<br>
+    <b>如果这步报「No such file」</b>，说明文件不在桌面或名字不一样。用 <code class="inline">ls ~/Desktop</code> 看看实际名字，或者在 Finder 里直接把文件夹拖到桌面。
+  </div>
+
+  <p>然后提交推送：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+git add .
+git commit -m "add daily-learn 学习包与索引页"
+git push</pre></div>
+
+  <div class="warn">
+    <b>传 7 份 HTML 大概 200KB，几秒就完。</b>如果 <code class="inline">git push</code> 卡住超过 1 分钟，多半是网络问题，不是文件太大——按阶段 6 的排查表处理。
+  </div>
+
+  <h3>② 打开 Pages</h3>
+  <ol>
+    <li>进仓库页面 → <b>Settings</b>（顶部标签栏最后一个）</li>
+    <li>左侧栏 → <b>Pages</b></li>
+    <li><b>Source</b> 选 <b>Deploy from a branch</b></li>
+    <li><b>Branch</b> 选 <code class="inline">main</code>，目录选 <code class="inline">/ (root)</code></li>
+    <li>点 <b>Save</b></li>
+  </ol>
+  <p>等 1–2 分钟，刷新这个页面，顶部会出现你的网址：</p>
+  <div class="codebox"><button class="copy">复制</button><pre class="out">https://loogn-yyl.github.io/python-ai-126/</pre></div>
+  <p>打开这个地址，就能看到学习包索引页，点进去看每一天。手机上照样能看，排版会自适应。</p>
+
+  <div class="warn">
+    <b>国内访问 <code class="inline">github.io</code> 可能不稳定</b>，有时快有时打不开。这不影响你本地学习和推送，只是这个「在线预览」的便利可能时有时无。如果你发现打不开，别怀疑是配置错了——先换网络试试。
+  </div>
+
+  <div class="ok">
+    <b>额外好处：</b>以后每加一天学习包，只要 <code class="inline">git push</code>，网页会自动更新，不用再手动传。等于顺便有了一个自动同步的学习站点。
+  </div>
+
+  <h3>③ 配套文档也要传，否则 7 张卡片点开是 404</h3>
+  <p>这一节是<b>实测踩出来的</b>：站点开起来后，索引页上「第 1 周」的 7 张卡片都能点开，但「规划与辅助文档」那 7 张全部报 <code class="inline">404 File not found</code>。</p>
+  <p>原因很简单：索引页里的卡片是<b>相对路径链接</b>，只要仓库根目录没有那个文件，点开就是 404。学习包在 <code class="inline">daily-learn/</code> 里所以没事，配套文档在根目录，就没传上去。</p>
+
+  <p><b>要补的 8 个文件，分两个位置放</b>（<b>只有 <code class="inline">index.html</code> 必须在根目录</b>，其余 7 份一律放 <code class="inline">daily-learn/</code>）：</p>
+  <table>
+    <tr><th style="width:16%">放哪里</th><th style="width:44%">文件名</th><th>是什么</th></tr>
+    <tr><td><b>仓库根目录</b></td><td><code class="inline">index.html</code></td><td>索引页本身。首页必须是这个名字、必须在这个位置，移到子文件夹站点就打不开了</td></tr>
+    <tr><td rowspan="7"><b><code class="inline">daily-learn/</code></b></td><td><code class="inline">Python_AI应用开发学习规划.html</code></td><td>18 周总体规划</td></tr>
+    <tr><td><code class="inline">PythonAI_126天逐日清单.html</code></td><td>126 天逐日清单</td></tr>
+    <tr><td><code class="inline">Mac新手环境配置指南.html</code></td><td>环境配置保姆级流程</td></tr>
+    <tr><td><code class="inline">Brew常用指令.html</code></td><td>Homebrew 速查</td></tr>
+    <tr><td><code class="inline">Git常用指令.html</code></td><td>Git 速查</td></tr>
+    <tr><td><code class="inline">GitHub_注册与每日上传指南.html</code></td><td>就是本页</td></tr>
+    <tr><td><code class="inline">学习进度_已完成清单.html</code></td><td>进度清单</td></tr>
+  </table>
+
+  <p><b>为什么不干脆全放根目录？</b>因为那样根目录会同时堆着 <code class="inline">day01/</code>、<code class="inline">day02/</code> 和 8 个散落的 html 文件，一天两天还行，一个月后就分不清哪些是「教材」哪些是「我的代码」。现在约定很清楚：</p>
+  <ul>
+    <li><code class="inline">dayNN/</code> = 你自己写的作业</li>
+    <li><code class="inline">daily-learn/</code> = 全部教材与文档</li>
+    <li>根目录 = 只放 <code class="inline">index.html</code>、<code class="inline">README.md</code>、<code class="inline">.gitignore</code> 三样</li>
+  </ul>
+
+  <p>上传方式：浏览器打开 <code class="inline">github.com/loogn-yyl/python-ai-126</code> → <b>Add file</b> → <b>Upload files</b> → 把 <code class="inline">index.html</code> 和 <code class="inline">daily-learn</code> 文件夹一起拖进去 → <b>Commit changes</b>。总共约 470KB，拖文件夹时 GitHub 会自动保留子目录结构。</p>
+
+  <div class="note">
+    <b>页面里链接要跟着改。</b>文件一挪位置，所有相对路径都得同步：根目录的 <code class="inline">index.html</code> 里，卡片链接变成 <code class="inline">daily-learn/xxx.html</code>；<code class="inline">daily-learn/</code> 里的文档要回首页，就得写 <code class="inline">../index.html</code>。<br>
+    这是静态网站最常见的坑：<b>文件移动了、链接没跟着动，页面看上去正常，一点就 404。</b>
+  </div>
+
+  <div class="warn">
+    <b>为什么那两份「速查表」从 .md 变成了 .html？</b><br>
+    GitHub Pages 后台跑的是 Jekyll，它会把仓库里的 <code class="inline">.md</code> 文件<b>编译成 .html 再发布</b>。结果是 <code class="inline">Git常用指令.md</code> 这个地址在线上是 404，只有 <code class="inline">Git常用指令.html</code> 能打开。<br>
+    更麻烦的是：如果 <code class="inline">Git常用指令.md</code> 和 <code class="inline">Git常用指令.html</code> <b>同时</b>放在仓库里，编译产物会撞名，覆盖掉你手写的那份。<br>
+    为了本地双击和线上访问<b>行为完全一致</b>，这两份已重新排版成单文件 HTML，扩展名统一成 <code class="inline">.html</code>。以后往这个站点加文档，一律用 <code class="inline">.html</code>，<b>别把 .md 传上仓库</b>。
+  </div>
+
+  <h3>④ 验收方法</h3>
+  <ol>
+    <li>手机或另一台设备打开 <code class="inline">https://loogn-yyl.github.io/python-ai-126/</code></li>
+    <li><b>14 张卡片逐个点一遍</b>，每一张都要能打开</li>
+    <li>点 <code class="inline">daily-learn/</code> 里的任意一份学习包，图文完整、代码块有「复制」按钮</li>
+  </ol>
+  <p>推送后站点重建要 <b>1–2 分钟</b>，这段时间打开可能还是旧内容或 404，等一会儿再刷新。浏览器有缓存时按 <code class="inline">Command + Shift + R</code> 强制刷新。</p>
+</section>
+
+<!-- ================= 阶段 6 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">6</span><h2>报错速查</h2></div>
+  <div class="sub">遇到问题先在这里找，找不到再问我</div>
+
+  <table>
+    <tr><th style="width:34%">报错</th><th>原因</th><th style="width:28%">怎么修</th></tr>
+    <tr>
+      <td><code class="inline">Permission denied (publickey)</code></td>
+      <td>公钥没加进 GitHub，或加错了（加成了私钥）</td>
+      <td>重做阶段 3 的 ③④，确认粘的是 <code class="inline">.pub</code> 内容</td>
+    </tr>
+    <tr>
+      <td><code class="inline">Connection timed out</code></td>
+      <td>22 端口被拦</td>
+      <td>做阶段 3 的 ⑥，改走 443</td>
+    </tr>
+    <tr>
+      <td><code class="inline">Repository not found</code></td>
+      <td>仓库名写错、用户名写错，或仓库是 Private 且没权限</td>
+      <td>回网页复制仓库的真实地址核对</td>
+    </tr>
+    <tr>
+      <td><code class="inline">rejected — fetch first</code><br>或 <code class="inline">non-fast-forward</code></td>
+      <td>GitHub 上已有你本地没有的提交（通常是建仓库时勾了 README）</td>
+      <td>执行 <code class="inline">git pull --rebase origin main</code> 再 <code class="inline">git push</code></td>
+    </tr>
+    <tr>
+      <td><code class="inline">nothing to commit, working tree clean</code></td>
+      <td>没有变化，或上次已经提交过</td>
+      <td>不是错误，无需处理</td>
+    </tr>
+    <tr>
+      <td><code class="inline">Please tell me who you are</code></td>
+      <td>没配 user.name / user.email</td>
+      <td>回阶段 3 的 ①</td>
+    </tr>
+    <tr>
+      <td><code class="inline">Support for password authentication was removed</code></td>
+      <td>你在用 HTTPS 地址推送</td>
+      <td>把 remote 改成 SSH 地址，见下方</td>
+    </tr>
+    <tr>
+      <td><code class="inline">fatal: not a git repository</code></td>
+      <td>当前目录不对，或没 <code class="inline">git init</code></td>
+      <td>先 <code class="inline">cd</code> 到正确目录，确认 <code class="inline">ls -a</code> 里有 <code class="inline">.git</code></td>
+    </tr>
+  </table>
+
+  <h3>把 HTTPS 地址改成 SSH</h3>
+  <p>如果你不小心用了 <code class="inline">https://github.com/...</code> 的地址：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>git remote -v</pre></div>
+  <p>看到 <code class="inline">https://</code> 开头的话，替换成 SSH：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>git remote set-url origin git@github.com:loogn-yyl/python-ai-126.git</pre></div>
+  <p>再 <code class="inline">git remote -v</code> 确认变成了 <code class="inline">git@github.com:</code> 开头。</p>
+
+  <h3>实在推不上去时的备选</h3>
+  <div class="note">
+    <b>方案 A：换网络。</b>手机热点是最有效的招，比任何配置改动都快。<br>
+    <b>方案 B：网页上传。</b>GitHub 仓库页面 → <b>Add file</b> → <b>Upload files</b>，可以直接拖文件夹进去。缺点是不能自动化，每天手动拖很烦，但能保证内容不丢。<br>
+    <b>方案 C：先存 Gitee。</b>你之前验证过 gitee.com 在你这里可用。先在 Gitee 建仓库存着，等 GitHub 通道恢复了再迁。缺点是两边要维护。
+  </div>
+</section>
+
+<!-- ================= 附录 ================= -->
+<section>
+  <div class="stephead"><span class="stepno">✦</span><h2>命令速查卡</h2></div>
+  <div class="sub">复制走，贴在显示器边上</div>
+
+  <table>
+    <tr><th style="width:44%">命令</th><th>作用</th></tr>
+    <tr><td><code class="inline">cd ~/python-learn</code></td><td>进代码目录</td></tr>
+    <tr><td><code class="inline">git status</code></td><td>看哪些文件改了、有没有提交</td></tr>
+    <tr><td><code class="inline">git add .</code></td><td>把当前目录所有改动加进待提交</td></tr>
+    <tr><td><code class="inline">git commit -m "说明"</code></td><td>提交，写清改了什么</td></tr>
+    <tr><td><code class="inline">git push</code></td><td>推到 GitHub</td></tr>
+    <tr><td><code class="inline">git log --oneline</code></td><td>看历史提交，一行一条</td></tr>
+    <tr><td><code class="inline">git diff</code></td><td>看这次具体改了哪几行</td></tr>
+    <tr><td><code class="inline">git remote -v</code></td><td>看仓库地址是 SSH 还是 HTTPS</td></tr>
+    <tr><td><code class="inline">ssh -T git@github.com</code></td><td>测密钥还通不通</td></tr>
+    <tr><td><code class="inline">pbcopy &lt; ~/.ssh/id_ed25519.pub</code></td><td>复制公钥到剪贴板</td></tr>
+    <tr><td><code class="inline">open ~/python-learn</code></td><td>用 Finder 打开代码目录</td></tr>
+  </table>
+
+  <div class="ok">
+    <b>一次配置，长期有效。</b>阶段 0–4 做完之后，你需要的就只有阶段 5 的那三行。SSH 密钥不会过期，除非你换了电脑或者手动删了 <code class="inline">~/.ssh</code>。
+  </div>
+
+  <div class="warn">
+    <b>一条长期提醒：</b>私钥 <code class="inline">~/.ssh/id_ed25519</code> 相当于家门钥匙。<b>不要发给任何人，不要上传到任何仓库，不要贴进聊天窗口。</b>如果不小心泄露了，立刻去 GitHub → Settings → SSH and GPG keys 把那个 key 删掉，然后重新生成一对。
+  </div>
+</section>
+
+<footer>
+  GitHub 注册与每日上传指南 · 2026-10-29<br>
+  配套：Mac 新手环境配置指南 · Python AI 应用开发学习规划 · daily-learn 学习包
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var pre = btn.nextElementSibling;
+    var text = pre.innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      setTimeout(function(){ btn.textContent = old; }, 1400);
+    }).catch(function(){
+      btn.textContent = '复制失败';
+      setTimeout(function(){ btn.textContent = '复制'; }, 1400);
+    });
+  });
+});
+</script>
+</body>
+</html>

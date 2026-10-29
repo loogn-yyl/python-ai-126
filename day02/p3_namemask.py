@@ -2,4 +2,7 @@
 
 name =input("请输入姓名: ")
 
-print(name[0] + "*" * (len(name) - 2) + name[-1])
+if len(name) < 3:
+	print(name)
+else:
+	print(name[0] + "*" * (len(name) - 2) + name[-1])

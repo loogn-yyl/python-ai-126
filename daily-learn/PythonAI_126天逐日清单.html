@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python AI 应用开发 · 126 天逐日清单</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --orange:#ea580c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.65;padding:32px 16px 80px}
+  .wrap{max-width:1000px;margin:0 auto}
+
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:32px 36px;margin-bottom:24px}
+  header h1{font-size:26px;margin-bottom:8px}
+  header p{opacity:.92;font-size:14px}
+  .hmeta{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.16);padding:6px 14px;border-radius:20px}
+
+  .progress-box{background:var(--card);border:1px solid var(--border);border-radius:12px;
+                padding:18px 24px;margin-bottom:24px;position:sticky;top:0;z-index:20;
+                box-shadow:0 2px 12px rgba(0,0,0,.05)}
+  .ptop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px}
+  .ptop b{color:var(--primary);font-size:16px}
+  .pbar{height:10px;background:#e8eefb;border-radius:6px;overflow:hidden}
+  .pfill{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#0ea5e9);
+         border-radius:6px;transition:width .35s}
+  .pbtns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .pbtns button{border:1px solid var(--border);background:#fff;color:var(--muted);
+                padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;
+                font-family:inherit;transition:.2s}
+  .pbtns button:hover{border-color:var(--primary);color:var(--primary)}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);
+          background:var(--card);border:1px solid var(--border);border-radius:12px;
+          padding:16px 22px;margin-bottom:24px}
+  .legend b{color:var(--text)}
+
+  details.week{background:var(--card);border:1px solid var(--border);border-radius:12px;
+               margin-bottom:14px;overflow:hidden}
+  details.week>summary{cursor:pointer;padding:16px 22px;display:flex;align-items:center;
+                       gap:14px;list-style:none;user-select:none}
+  details.week>summary::-webkit-details-marker{display:none}
+  details.week>summary:hover{background:#fafcff}
+  .wnum{background:var(--primary);color:#fff;min-width:52px;height:28px;border-radius:8px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  .wtitle{font-weight:700;font-size:15px;flex:1}
+  .wtag{font-size:12px;padding:2px 10px;border-radius:12px;background:var(--primary-l);color:var(--primary)}
+  .wprog{font-size:12px;color:var(--muted);min-width:56px;text-align:right}
+  .arrow{color:#94a3b8;font-size:12px;transition:.2s}
+  details[open] .arrow{transform:rotate(90deg)}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{background:var(--primary-l);color:var(--primary-d);font-size:12.5px;
+     padding:8px 10px;text-align:left;font-weight:700}
+  td{border-top:1px solid var(--border);padding:10px;vertical-align:top}
+  tr.done td{background:var(--green-l)}
+  tr.done .task{text-decoration:line-through;color:#94a3b8}
+  .day{color:var(--muted);font-size:12px;white-space:nowrap;font-weight:600}
+  .task{width:46%}
+  .out{width:40%;color:#475569}
+  .ck{width:38px;text-align:center}
+  .ck input{width:16px;height:16px;cursor:pointer;accent-color:#16a34a}
+  .out::before{content:"📦 ";font-size:11px;opacity:.7}
+  .milestone td{background:var(--purple-l)!important;border-top:2px solid var(--purple)}
+  .milestone .task{color:var(--purple);font-weight:700;text-decoration:none!important}
+
+  .stagebar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;font-size:12.5px}
+  .stagebar div{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px}
+  .stagebar div b{color:var(--primary)}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:28px;line-height:2}
+  @media(max-width:640px){
+    .task,.out{width:auto;display:block}
+    td{padding:8px}
+    header{padding:24px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>📋 Python AI 应用开发 · 126 天逐日清单</h1>
+  <p>按王道课程大纲拆解 · 每天 4 小时 · 每格均标注「当天下班时可交付的产出」</p>
+  <div class="hmeta">
+    <span>🗓 18 周 / 126 天</span>
+    <span>⏱ 每日 4h</span>
+    <span>📦 126 个产出物</span>
+    <span>🏁 3 个里程碑</span>
+  </div>
+</header>
+
+<div class="progress-box">
+  <div class="ptop">
+    <span>总体进度</span>
+    <span><b id="pnum">0</b> / 126 天</span>
+  </div>
+  <div class="pbar"><div class="pfill" id="pfill"></div></div>
+  <div class="pbtns">
+    <button onclick="expandAll(true)">展开全部</button>
+    <button onclick="expandAll(false)">收起全部</button>
+    <button onclick="resetAll()">清空勾选</button>
+  </div>
+</div>
+
+<div class="legend">
+  <span><b>每日节奏：</b>1h 学新知识 → 2h 动手编码 → 1h 复盘笔记</span>
+  <span><b>周日：</b>2h 本周串联复盘 + 2h 自由补漏</span>
+  <span><b>规则：</b>没有产出物 = 这天没学</span>
+</div>
+
+<div class="stagebar">
+  <div><b>阶段一</b> 基础（W1–W3）</div>
+  <div><b>阶段二</b> 工程服务（W4–W6）</div>
+  <div><b>阶段三</b> 数据与 AI 基础（W7）</div>
+  <div><b>阶段四</b> RAG 全栈（W8–W10）</div>
+  <div><b>阶段五</b> Agent 实战（W11–W13）</div>
+  <div><b>阶段六</b> 开源（W14）</div>
+  <div><b>阶段七</b> 算法（W15–W17）</div>
+  <div><b>阶段八</b> 求职（W18）</div>
+</div>
+
+<details class="week" open>
+<summary><span class="wnum">W1</span><span class="wtitle">Python 语法速通（C 视角对照）</span><span class="wtag">阶段一</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D001</td><td class="task">环境搭建（Python 3.12、VS Code、venv 虚拟环境、pip 换源）；交互式解释器；变量与基本类型（int/float/str/bool/None）；input/print 与 f-string</td><td class="out">本机环境跑通 + 3 个脚本（温度转换、BMI 计算、单位换算）</td><td class="ck"><input type="checkbox" data-k="d1"></td></tr>
+<tr><td class="day">D002</td><td class="task">运算符与优先级；字符串：切片、f-string 格式化、split/join/strip/replace/find；编码问题（UTF-8 vs GBK）</td><td class="out">8 道字符串练习代码 + C 与 Python 字符串差异笔记</td><td class="ck"><input type="checkbox" data-k="d2"></td></tr>
+<tr><td class="day">D003</td><td class="task">列表、元组、字典、集合：增删改查、常用方法、可变与不可变对象、浅拷贝与深拷贝</td><td class="out">词频统计脚本（读 txt 输出 Top10 词）</td><td class="ck"><input type="checkbox" data-k="d3"></td></tr>
+<tr><td class="day">D004</td><td class="task">流程控制：if/elif/else、for/while、range/enumerate/zip、break/continue/for-else；列表推导式与生成式</td><td class="out">5 个 C 风格 for 循环的 Pythonic 重写 + 九九乘法表</td><td class="ck"><input type="checkbox" data-k="d4"></td></tr>
+<tr><td class="day">D005</td><td class="task">函数：def、默认参数、*args/**kwargs、多返回值、作用域 LEGB、lambda；模块与包、import 机制、if __name__ == "__main__"</td><td class="out">自建 utils.py 工具模块 + 调用方脚本</td><td class="ck"><input type="checkbox" data-k="d5"></td></tr>
+<tr><td class="day">D006</td><td class="task">异常处理（try/except/else/finally、raise、自定义异常）；with 语句与 txt/csv/json 文件读写</td><td class="out">CSV 成绩统计脚本（异常安全、自动生成汇总文件）</td><td class="ck"><input type="checkbox" data-k="d6"></td></tr>
+<tr><td class="day">D007</td><td class="task">周复盘（2h）+ 小项目：命令行通讯录 v1（字典存储 + JSON 持久化 + 菜单循环）</td><td class="out">GitHub 首个仓库 + 首个 commit + README</td><td class="ck"><input type="checkbox" data-k="d7"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W2</span><span class="wtitle">面向对象与 Python 进阶特性</span><span class="wtag">阶段一</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D008</td><td class="task">类与对象：__init__、self、实例属性/方法、类属性与类方法</td><td class="out">通讯录 v2：用 Contact 类重构</td><td class="ck"><input type="checkbox" data-k="d8"></td></tr>
+<tr><td class="day">D009</td><td class="task">继承与多态：super()、方法重写、抽象基类 abc、MRO 查找顺序</td><td class="out">Shape 基类 + Circle/Rect/Triangle 三个子类</td><td class="ck"><input type="checkbox" data-k="d9"></td></tr>
+<tr><td class="day">D010</td><td class="task">魔法方法：__str__/__repr__/__len__/__eq__/__lt__/__call__；@property、@staticmethod、@classmethod</td><td class="out">可排序、可比较、可打印的 Book 类</td><td class="ck"><input type="checkbox" data-k="d10"></td></tr>
+<tr><td class="day">D011</td><td class="task">dataclass、Enum 枚举、类型注解 typing、Optional/Union、结合 Pydantic 预览</td><td class="out">用 dataclass 重写 Book 并补齐类型注解</td><td class="ck"><input type="checkbox" data-k="d11"></td></tr>
+<tr><td class="day">D012</td><td class="task">迭代器与生成器：__iter__/__next__、yield、惰性求值、itertools 常用工具</td><td class="out">大文件逐行读取生成器 + 斐波那契无限生成器</td><td class="ck"><input type="checkbox" data-k="d12"></td></tr>
+<tr><td class="day">D013</td><td class="task">闭包原理、装饰器（函数装饰器、带参装饰器、functools.wraps、类装饰器）</td><td class="out">timer / retry / log 三个自写装饰器</td><td class="ck"><input type="checkbox" data-k="d13"></td></tr>
+<tr><td class="day">D014</td><td class="task">周复盘（2h）+ 小项目：通讯录 v3（OOP + 装饰器日志 + pytest 单元测试入门）</td><td class="out">带测试的完整项目，测试覆盖率截图</td><td class="ck"><input type="checkbox" data-k="d14"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W3</span><span class="wtitle">正则 · 网络 · 异步并发</span><span class="wtag">阶段一</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D015</td><td class="task">正则表达式：re 模块、match/search/findall/sub、分组与命名分组、贪婪 vs 非贪婪</td><td class="out">从日志文件中提取 IP / 时间 / 状态码的脚本</td><td class="ck"><input type="checkbox" data-k="d15"></td></tr>
+<tr><td class="day">D016</td><td class="task">正则实战 + 文本处理：多行匹配、csv/json 混合处理、编码转换</td><td class="out">Nginx 访问日志分析报告（Top10 IP、Top10 URL）</td><td class="ck"><input type="checkbox" data-k="d16"></td></tr>
+<tr><td class="day">D017</td><td class="task">网络编程：TCP/IP 与 HTTP 协议、socket 编程（对比 C 的 socket API）、requests 库</td><td class="out">requests 版网页抓取脚本（抓标题 + 保存结果）</td><td class="ck"><input type="checkbox" data-k="d17"></td></tr>
+<tr><td class="day">D018</td><td class="task">异步编程：协程、async/await、asyncio.gather、事件循环、GIL 是什么</td><td class="out">同步 vs 异步抓取 10 个 URL 的耗时对比脚本</td><td class="ck"><input type="checkbox" data-k="d18"></td></tr>
+<tr><td class="day">D019</td><td class="task">并发编程：threading、multiprocessing、concurrent.futures 线程池/进程池、适用场景判断</td><td class="out">多线程批量下载器小脚本</td><td class="ck"><input type="checkbox" data-k="d19"></td></tr>
+<tr><td class="day">D020</td><td class="task">综合练习：把日志分析工具改造成异步版本 + argparse 命令行参数 + 日志模块 logging</td><td class="out">可命令行调用的日志分析工具 v1</td><td class="ck"><input type="checkbox" data-k="d20"></td></tr>
+<tr><td class="day">D021</td><td class="task">阶段复盘（2h）：整理三周笔记，画 Python 知识地图；作品集目录整理</td><td class="out">阶段一总结笔记 + 作品集目录（4 个项目链接）</td><td class="ck"><input type="checkbox" data-k="d21"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W4</span><span class="wtitle">Linux 与 Git 工程习惯</span><span class="wtag">阶段二</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D022</td><td class="task">WSL2 或虚拟机装 Linux；目录结构；基础命令 ls/cd/cp/mv/rm/find/grep/head/tail</td><td class="out">20 条命令实操记录（含 find+grep 组合查询）</td><td class="ck"><input type="checkbox" data-k="d22"></td></tr>
+<tr><td class="day">D023</td><td class="task">用户与权限（chmod/chown）、vim 基础操作、管道与重定向、tar 压缩、ssh 远程登录</td><td class="out">5 组常用 Shell 命令组合 + vim 速查小抄</td><td class="ck"><input type="checkbox" data-k="d23"></td></tr>
+<tr><td class="day">D024</td><td class="task">Shell 脚本：变量、条件判断、循环、函数、crontab 定时任务</td><td class="out">一键备份脚本 backup.sh（自动打包 + 清理旧文件）</td><td class="ck"><input type="checkbox" data-k="d24"></td></tr>
+<tr><td class="day">D025</td><td class="task">Git 基础：init/add/commit/log/diff、.gitignore、分支创建与合并、冲突手工解决</td><td class="out">完整演练一个含分支合并与冲突的本地仓库</td><td class="ck"><input type="checkbox" data-k="d25"></td></tr>
+<tr><td class="day">D026</td><td class="task">Git 进阶：remote、push/pull、Pull Request 流程、tag 版本、rebase 基础；GitHub Profile 与 README</td><td class="out">把前 3 周 4 个项目全部上传并整理成作品集</td><td class="ck"><input type="checkbox" data-k="d26"></td></tr>
+<tr><td class="day">D027</td><td class="task">服务器入门：云服务器或本地虚拟机、ssh 部署、nginx 托管静态页面、安全组端口</td><td class="out">一个静态页面能通过公网 IP 访问</td><td class="ck"><input type="checkbox" data-k="d27"></td></tr>
+<tr><td class="day">D028</td><td class="task">周复盘（2h）：整理 Linux 与 Git 速查表</td><td class="out">linux-cheatsheet.md + git-workflow.md 两份笔记</td><td class="ck"><input type="checkbox" data-k="d28"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W5</span><span class="wtitle">SQL 与 Redis</span><span class="wtag">阶段二</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D029</td><td class="task">MySQL 安装、数据库设计三范式、数据类型、DDL 建表与约束</td><td class="out">学生管理系统的表结构设计 + 建表 SQL</td><td class="ck"><input type="checkbox" data-k="d29"></td></tr>
+<tr><td class="day">D030</td><td class="task">DML：insert/update/delete；单表查询、where、order by、limit、like、in</td><td class="out">20 条查询练习题及答案 SQL 文件</td><td class="ck"><input type="checkbox" data-k="d30"></td></tr>
+<tr><td class="day">D031</td><td class="task">多表：inner/left/right join、子查询、group by/having、聚合函数、union</td><td class="out">5 条复杂统计查询（含多表关联 + 分组）</td><td class="ck"><input type="checkbox" data-k="d31"></td></tr>
+<tr><td class="day">D032</td><td class="task">索引原理（B+树）、explain 执行计划、事务 ACID、隔离级别与锁</td><td class="out">索引优化前后耗时对比实验记录</td><td class="ck"><input type="checkbox" data-k="d32"></td></tr>
+<tr><td class="day">D033</td><td class="task">Python 操作 MySQL：pymysql 原生写法、SQLAlchemy ORM 基础（模型、会话、查询）</td><td class="out">用 ORM 完成一套 CRUD 脚本</td><td class="ck"><input type="checkbox" data-k="d33"></td></tr>
+<tr><td class="day">D034</td><td class="task">Redis：安装、五种数据结构、TTL 过期、缓存穿透/击穿/雪崩的概念与应对</td><td class="out">给查询接口加 Redis 缓存的 Demo（含穿透保护）</td><td class="ck"><input type="checkbox" data-k="d34"></td></tr>
+<tr><td class="day">D035</td><td class="task">周复盘（2h）+ 小项目：MySQL + Redis 的"带缓存的数据服务"</td><td class="out">database-service 项目仓库（含 ER 图）</td><td class="ck"><input type="checkbox" data-k="d35"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W6</span><span class="wtitle">Docker 与 FastAPI 工程化</span><span class="wtag">阶段二</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D036</td><td class="task">Docker 原理（镜像/容器/仓库）、安装、run/ps/images/logs/exec/rm、端口映射</td><td class="out">用容器跑通 MySQL + Redis 并成功连接</td><td class="ck"><input type="checkbox" data-k="d36"></td></tr>
+<tr><td class="day">D037</td><td class="task">Dockerfile 编写、构建镜像、多阶段构建、数据卷挂载</td><td class="out">把自己的 Python 脚本打包成镜像并运行</td><td class="ck"><input type="checkbox" data-k="d37"></td></tr>
+<tr><td class="day">D038</td><td class="task">docker-compose：多容器编排、自定义网络、环境变量、依赖顺序</td><td class="out">compose 一键启动 MySQL+Redis+应用</td><td class="ck"><input type="checkbox" data-k="d38"></td></tr>
+<tr><td class="day">D039</td><td class="task">FastAPI 入门：路由、路径/查询参数、Pydantic 请求响应模型、自动生成的 Swagger 文档</td><td class="out">第一个 CRUD API（内存存储）</td><td class="ck"><input type="checkbox" data-k="d39"></td></tr>
+<tr><td class="day">D040</td><td class="task">FastAPI 进阶：依赖注入、中间件、全局异常处理、分层结构（router/service/model/schema）</td><td class="out">分层目录结构的 API 项目骨架</td><td class="ck"><input type="checkbox" data-k="d40"></td></tr>
+<tr><td class="day">D041</td><td class="task">FastAPI 连接 MySQL（SQLAlchemy）异步接口、JWT 鉴权基础、CORS</td><td class="out">带注册登录和 token 校验的 API</td><td class="ck"><input type="checkbox" data-k="d41"></td></tr>
+<tr><td class="day">D042</td><td class="task">阶段项目：待办事项 API（FastAPI + MySQL + Docker 部署 + 接口文档）</td><td class="out">公网可访问的项目 + Swagger 文档截图</td><td class="ck"><input type="checkbox" data-k="d42"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W7</span><span class="wtitle">NumPy / Pandas 与低代码 AI 应用</span><span class="wtag">阶段三</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D043</td><td class="task">Jupyter Notebook 环境与快捷键；NumPy 数组创建、索引切片、形状变换</td><td class="out">20 道 NumPy 操作练习 notebook</td><td class="ck"><input type="checkbox" data-k="d43"></td></tr>
+<tr><td class="day">D044</td><td class="task">NumPy 进阶：广播机制、矩阵运算、统计函数、随机数、向量化性能对比</td><td class="out">用 NumPy 实现图像灰度化（对比 for 循环耗时）</td><td class="ck"><input type="checkbox" data-k="d44"></td></tr>
+<tr><td class="day">D045</td><td class="task">Pandas 入门：Series/DataFrame、读写 csv/excel、行列选择、布尔过滤</td><td class="out">加载真实数据集并完成 10 组筛选查询</td><td class="ck"><input type="checkbox" data-k="d45"></td></tr>
+<tr><td class="day">D046</td><td class="task">Pandas 进阶：缺失值处理、apply/map、groupby、merge、pivot_table</td><td class="out">一份数据清洗报告 notebook（清洗前后对比）</td><td class="ck"><input type="checkbox" data-k="d46"></td></tr>
+<tr><td class="day">D047</td><td class="task">Pandas 实战：完整数据分析案例（销售/用户行为数据）</td><td class="out">分析 notebook + 5 条可写进简历的业务结论</td><td class="ck"><input type="checkbox" data-k="d47"></td></tr>
+<tr><td class="day">D048</td><td class="task">Coze / Dify 平台：知识库搭建、工作流编排、变量与节点、发布渠道</td><td class="out">上线的问答机器人链接（含知识库文档）</td><td class="ck"><input type="checkbox" data-k="d48"></td></tr>
+<tr><td class="day">D049</td><td class="task">里程碑检查（2h）：盘点 3 个作品；简历框架初稿</td><td class="out">🏁 作品集页面 + 简历 v0.1</td><td class="ck"><input type="checkbox" data-k="d49"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W8</span><span class="wtitle">LangChain 与大模型应用入门</span><span class="wtag">阶段四</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D050</td><td class="task">大模型基础：Token、上下文窗口、温度参数；OpenAI 兼容接口、国产模型 API（DeepSeek/通义）、费用与限流</td><td class="out">调用 3 家不同模型 API 的统一封装脚本</td><td class="ck"><input type="checkbox" data-k="d50"></td></tr>
+<tr><td class="day">D051</td><td class="task">Prompt 工程：角色设定、Few-shot、思维链 CoT、结构化 JSON 输出、防注入</td><td class="out">10 个可复用 Prompt 模板库（markdown）</td><td class="ck"><input type="checkbox" data-k="d51"></td></tr>
+<tr><td class="day">D052</td><td class="task">LangChain 入门：Model I/O、PromptTemplate、OutputParser、LCEL 管道语法</td><td class="out">多步骤 Chain Demo（提取→判断→生成）</td><td class="ck"><input type="checkbox" data-k="d52"></td></tr>
+<tr><td class="day">D053</td><td class="task">LangChain Memory：对话历史管理、摘要记忆、窗口记忆、多轮上下文</td><td class="out">命令行多轮聊天机器人（保留上下文）</td><td class="ck"><input type="checkbox" data-k="d53"></td></tr>
+<tr><td class="day">D054</td><td class="task">文档处理：Document Loader（PDF/Word/Markdown）、TextSplitter 切分策略与参数</td><td class="out">把 3 份 PDF 切分成 chunks 并统计长度分布</td><td class="ck"><input type="checkbox" data-k="d54"></td></tr>
+<tr><td class="day">D055</td><td class="task">Embedding 原理：向量化、余弦相似度、语义检索 vs 关键词检索</td><td class="out">不用框架手写一个语义检索 Demo（30 行内）</td><td class="ck"><input type="checkbox" data-k="d55"></td></tr>
+<tr><td class="day">D056</td><td class="task">周复盘（2h）+ 手写最小 RAG：加载→切分→向量化→检索→拼 Prompt→回答</td><td class="out">minimal-rag.py + RAG 流程手绘图</td><td class="ck"><input type="checkbox" data-k="d56"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W9</span><span class="wtitle">向量数据库 · RAG 进阶 · Function Calling / MCP</span><span class="wtag">阶段四</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D057</td><td class="task">向量数据库基础：FAISS 安装与使用、索引类型（Flat/IVF/HNSW）、增删改查</td><td class="out">FAISS 版语义检索服务（含性能测试）</td><td class="ck"><input type="checkbox" data-k="d57"></td></tr>
+<tr><td class="day">D058</td><td class="task">Chroma / Milvus：Docker 部署、collection 管理、元数据过滤、持久化</td><td class="out">Chroma 版本地知识库（支持按来源过滤）</td><td class="ck"><input type="checkbox" data-k="d58"></td></tr>
+<tr><td class="day">D059</td><td class="task">RAG 完整链路串讲：加载→切分→嵌入→存储→检索→Prompt 拼装→生成，每步参数含义</td><td class="out">LangChain 版完整 RAG 问答（可命令行交互）</td><td class="ck"><input type="checkbox" data-k="d59"></td></tr>
+<tr><td class="day">D060</td><td class="task">RAG 进阶一：切分策略对比（固定长度/按语义/父子文档）、多路召回、rerank 重排序</td><td class="out">3 种切分策略的检索效果对比表</td><td class="ck"><input type="checkbox" data-k="d60"></td></tr>
+<tr><td class="day">D061</td><td class="task">RAG 进阶二：查询改写、HyDE、混合检索（BM25+向量）、评估指标（命中率/召回率/MRR）</td><td class="out">20 条测试集 + 自动打分脚本</td><td class="ck"><input type="checkbox" data-k="d61"></td></tr>
+<tr><td class="day">D062</td><td class="task">Function Calling 原理与实现；MCP 协议概念、Skill 机制、工具注册与调用</td><td class="out">让模型调用本地函数（天气/计算器/查数据库）</td><td class="ck"><input type="checkbox" data-k="d62"></td></tr>
+<tr><td class="day">D063</td><td class="task">周复盘（2h）：整理 RAG 知识地图与踩坑清单</td><td class="out">RAG 学习笔记（可直接发技术博客）</td><td class="ck"><input type="checkbox" data-k="d63"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W10</span><span class="wtitle">LangGraph / Graph RAG 与 RAG 项目上线</span><span class="wtag">阶段四 · 里程碑</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D064</td><td class="task">LangGraph 基础：State 定义、Node、Edge、条件路由</td><td class="out">一个简单状态机 Agent（含分支判断）</td><td class="ck"><input type="checkbox" data-k="d64"></td></tr>
+<tr><td class="day">D065</td><td class="task">LangGraph 进阶：循环与反思、人工介入、checkpointer 持久化、多节点协作</td><td class="out">带自我反思循环的问答图</td><td class="ck"><input type="checkbox" data-k="d65"></td></tr>
+<tr><td class="day">D066</td><td class="task">Agent 原理：ReAct、Plan-Execute、工具选择策略、终止条件设计</td><td class="out">不用框架手写一个 ReAct Agent（打印思考过程）</td><td class="ck"><input type="checkbox" data-k="d66"></td></tr>
+<tr><td class="day">D067</td><td class="task">Graph RAG：知识图谱抽取、实体关系建模、图检索与子图召回</td><td class="out">小型 Graph RAG Demo（含图谱可视化截图）</td><td class="ck"><input type="checkbox" data-k="d67"></td></tr>
+<tr><td class="day">D068</td><td class="task">RAG 项目设计：选题、需求梳理、技术选型、架构图、数据准备方案</td><td class="out">项目设计文档 + 架构图（draw.io/Excalidraw）</td><td class="ck"><input type="checkbox" data-k="d68"></td></tr>
+<tr><td class="day">D069</td><td class="task">RAG 项目开发（一）：文件上传、解析、入库、检索、对话全流程打通</td><td class="out">本地可运行的后端服务（Swagger 可测）</td><td class="ck"><input type="checkbox" data-k="d69"></td></tr>
+<tr><td class="day">D070</td><td class="task">RAG 项目上线：Streamlit/前端页面 + Docker 部署 + 公网访问 + README 编写</td><td class="out">🏁 项目一上线：公网链接 + 完整仓库 + 演示 GIF</td><td class="ck"><input type="checkbox" data-k="d70"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W11</span><span class="wtitle">Rasa 框架与意图识别工程</span><span class="wtag">阶段五</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D071</td><td class="task">Rasa 安装与环境、项目目录结构、nlu.yml / stories.yml / domain.yml / config.yml 各管什么</td><td class="out">跑通官方 demo 机器人（命令行对话成功）</td><td class="ck"><input type="checkbox" data-k="d71"></td></tr>
+<tr><td class="day">D072</td><td class="task">Rasa NLU：意图与实体标注、训练、交叉验证评估、DIET 架构原理</td><td class="out">自定义 10 个意图的 NLU 模型 + 评估报告</td><td class="ck"><input type="checkbox" data-k="d72"></td></tr>
+<tr><td class="day">D073</td><td class="task">对话管理：stories、rules、slots 槽位、forms 表单、response 变体</td><td class="out">多轮表单填槽机器人（订票场景）</td><td class="ck"><input type="checkbox" data-k="d73"></td></tr>
+<tr><td class="day">D074</td><td class="task">自定义 Action、调用外部 API 与数据库、channel 接入（REST/网页组件）</td><td class="out">能查数据库的客服机器人（可网页对话）</td><td class="ck"><input type="checkbox" data-k="d74"></td></tr>
+<tr><td class="day">D075</td><td class="task">特征工程优化：文本特征、同义词扩展、正则实体、训练数据增强</td><td class="out">意图识别准确率提升的前后对比数据</td><td class="ck"><input type="checkbox" data-k="d75"></td></tr>
+<tr><td class="day">D076</td><td class="task">DIET 多任务学习架构精读；与传统 NLU（规则/分类器）方案对比</td><td class="out">架构对比笔记 + 适用场景结论</td><td class="ck"><input type="checkbox" data-k="d76"></td></tr>
+<tr><td class="day">D077</td><td class="task">周复盘（2h）：整理 Rasa 项目代码与文档</td><td class="out">rasa-bot 项目仓库（README 含对话截图）</td><td class="ck"><input type="checkbox" data-k="d77"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W12</span><span class="wtitle">统一网关与多智能体编排调度</span><span class="wtag">阶段五</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D078</td><td class="task">多智能体概念：主从/辩论/流水线三种协作模式、通信协议、何时该拆多 Agent</td><td class="out">3 种协作模式对比图 + 选型判断清单</td><td class="ck"><input type="checkbox" data-k="d78"></td></tr>
+<tr><td class="day">D079</td><td class="task">统一网关设计：API 网关职责、鉴权、限流、模型路由、调用日志与计费统计</td><td class="out">FastAPI 版 LLM 统一网关（多模型可切换）</td><td class="ck"><input type="checkbox" data-k="d79"></td></tr>
+<tr><td class="day">D080</td><td class="task">多智能体框架：AutoGen / CrewAI 入门，角色定义与任务分发</td><td class="out">双 Agent 协作 Demo（研究员 + 写作员）</td><td class="ck"><input type="checkbox" data-k="d80"></td></tr>
+<tr><td class="day">D081</td><td class="task">任务调度与编排：任务分解、依赖管理、并行执行、失败重试与超时控制</td><td class="out">带重试与超时的任务编排器</td><td class="ck"><input type="checkbox" data-k="d81"></td></tr>
+<tr><td class="day">D082</td><td class="task">记忆与状态：短期/长期记忆、共享黑板、上下文压缩策略</td><td class="out">可完成多步任务的 Agent（含记忆持久化）</td><td class="ck"><input type="checkbox" data-k="d82"></td></tr>
+<tr><td class="day">D083</td><td class="task">成本与性能优化：结果缓存、小模型分流、并发控制、流式输出</td><td class="out">优化前后 token 成本与响应耗时对比表</td><td class="ck"><input type="checkbox" data-k="d83"></td></tr>
+<tr><td class="day">D084</td><td class="task">周复盘（2h）：输出多智能体架构设计文档 v1</td><td class="out">架构设计文档（可直接用于下周项目）</td><td class="ck"><input type="checkbox" data-k="d84"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W13</span><span class="wtitle">行业智能体项目实战上线</span><span class="wtag">阶段五 · 里程碑</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D085</td><td class="task">项目选题与需求分析（医疗智能体 或 金融/电商多智能体，二选一做深）、行业痛点调研</td><td class="out">需求文档 + 竞品分析（3 个同类产品对比）</td><td class="ck"><input type="checkbox" data-k="d85"></td></tr>
+<tr><td class="day">D086</td><td class="task">数据与知识库准备：行业语料收集、结构化数据入库、清洗与标注</td><td class="out">数据集 + 行业知识库（≥500 条 chunks）</td><td class="ck"><input type="checkbox" data-k="d86"></td></tr>
+<tr><td class="day">D087</td><td class="task">核心 Agent 开发：意图识别 + 检索 + 工具调用 + 答案生成</td><td class="out">可运行的主流程（命令行可测）</td><td class="ck"><input type="checkbox" data-k="d87"></td></tr>
+<tr><td class="day">D088</td><td class="task">多智能体编排实现：规划 Agent、检索 Agent、审核 Agent 的分工与串联</td><td class="out">多 Agent 协作链路（打印完整调用链日志）</td><td class="ck"><input type="checkbox" data-k="d88"></td></tr>
+<tr><td class="day">D089</td><td class="task">交互层与工程化：前端页面/Streamlit、API 封装、鉴权、错误提示</td><td class="out">可演示的 Web 界面</td><td class="ck"><input type="checkbox" data-k="d89"></td></tr>
+<tr><td class="day">D090</td><td class="task">部署上线：Docker 打包、云服务器部署、域名与 HTTPS、日志排查</td><td class="out">公网可访问的在线系统</td><td class="ck"><input type="checkbox" data-k="d90"></td></tr>
+<tr><td class="day">D091</td><td class="task">项目收尾：技术文档、架构图、演示视频、复盘总结</td><td class="out">🏁 项目二上线：仓库 + 演示视频 + 架构文档（简历级）</td><td class="ck"><input type="checkbox" data-k="d91"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W14</span><span class="wtitle">开源智能体源码实战</span><span class="wtag">阶段六</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D092</td><td class="task">开源智能体生态概览、GitHub 项目筛选方法、高效读源码的四个切入点</td><td class="out">3 个项目 star + 阅读路线笔记</td><td class="ck"><input type="checkbox" data-k="d92"></td></tr>
+<tr><td class="day">D093</td><td class="task">OpenClaw 源码：目录结构、核心模块划分、启动流程与配置</td><td class="out">架构脑图（模块 + 依赖关系）</td><td class="ck"><input type="checkbox" data-k="d93"></td></tr>
+<tr><td class="day">D094</td><td class="task">OpenClaw 二次开发：本地跑通、改一个可感知的小功能（改 Prompt/加工具）</td><td class="out">本地可运行的 fork 仓库（改动已提交）</td><td class="ck"><input type="checkbox" data-k="d94"></td></tr>
+<tr><td class="day">D095</td><td class="task">Hermes 源码精读：Agent 主循环、工具注册机制、上下文管理</td><td class="out">核心流程时序图</td><td class="ck"><input type="checkbox" data-k="d95"></td></tr>
+<tr><td class="day">D096</td><td class="task">Harness 源码精读，并与 OpenClaw、Hermes 做架构横向对比</td><td class="out">三者对比表（架构/优势/适用场景）</td><td class="ck"><input type="checkbox" data-k="d96"></td></tr>
+<tr><td class="day">D097</td><td class="task">参与开源：给项目提一个 PR（修文档/修 bug）或写一篇源码分析文章</td><td class="out">一次 PR 记录 或 一篇已发布的技术文章</td><td class="ck"><input type="checkbox" data-k="d97"></td></tr>
+<tr><td class="day">D098</td><td class="task">周复盘（2h）：沉淀开源阅读方法论</td><td class="out">「如何读一个 Agent 项目源码」笔记</td><td class="ck"><input type="checkbox" data-k="d98"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W15</span><span class="wtitle">机器学习算法与 scikit-learn</span><span class="wtag">阶段七</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D099</td><td class="task">ML 全景：监督/无监督、训练/验证/测试集划分、过拟合与欠拟合、偏差方差</td><td class="out">机器学习概念脑图 + sklearn 环境就绪</td><td class="ck"><input type="checkbox" data-k="d99"></td></tr>
+<tr><td class="day">D100</td><td class="task">线性回归与逻辑回归：损失函数、梯度下降原理、sklearn 实现</td><td class="out">房价预测 + 二分类实战两个 notebook</td><td class="ck"><input type="checkbox" data-k="d100"></td></tr>
+<tr><td class="day">D101</td><td class="task">KNN、决策树、随机森林：原理、参数调优、特征重要性</td><td class="out">三个模型在同一数据集上的对比实验</td><td class="ck"><input type="checkbox" data-k="d101"></td></tr>
+<tr><td class="day">D102</td><td class="task">特征工程：标准化/归一化、类别编码、特征选择、交叉验证、网格搜索</td><td class="out">Pipeline 版标准训练流程代码</td><td class="ck"><input type="checkbox" data-k="d102"></td></tr>
+<tr><td class="day">D103</td><td class="task">模型评估：混淆矩阵、精确率/召回率/F1、ROC-AUC、回归指标 MAE/RMSE</td><td class="out">完整评估报告 notebook（含曲线图）</td><td class="ck"><input type="checkbox" data-k="d103"></td></tr>
+<tr><td class="day">D104</td><td class="task">无监督：KMeans 聚类、PCA 降维、肘部法与轮廓系数</td><td class="out">用户分群案例（含降维可视化）</td><td class="ck"><input type="checkbox" data-k="d104"></td></tr>
+<tr><td class="day">D105</td><td class="task">周复盘（2h）+ 端到端 ML 小项目（含模型保存与 FastAPI 部署）</td><td class="out">ML 预测服务仓库（接口可调用）</td><td class="ck"><input type="checkbox" data-k="d105"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W16</span><span class="wtitle">PyTorch 与 Transformer 原理</span><span class="wtag">阶段七</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D106</td><td class="task">PyTorch 基础：Tensor 操作、自动求导 autograd、CPU/GPU 切换、DataLoader</td><td class="out">Tensor 与自动求导练习 notebook</td><td class="ck"><input type="checkbox" data-k="d106"></td></tr>
+<tr><td class="day">D107</td><td class="task">神经网络基础：nn.Module、损失函数、优化器、完整训练循环与验证</td><td class="out">手写 MLP 完成 MNIST 分类（准确率 &gt; 95%）</td><td class="ck"><input type="checkbox" data-k="d107"></td></tr>
+<tr><td class="day">D108</td><td class="task">CNN 与 RNN 概览；过拟合应对（Dropout、BN、早停、数据增强）</td><td class="out">CNN 版 MNIST（准确率 &gt; 98%）+ 训练曲线</td><td class="ck"><input type="checkbox" data-k="d108"></td></tr>
+<tr><td class="day">D109</td><td class="task">Transformer 精读（一）：Self-Attention、QKV 矩阵、缩放点积注意力、多头机制</td><td class="out">手写 Scaled Dot-Product Attention + 多头实现</td><td class="ck"><input type="checkbox" data-k="d109"></td></tr>
+<tr><td class="day">D110</td><td class="task">Transformer 精读（二）：位置编码、残差连接、LayerNorm、FFN、Encoder/Decoder 整体结构</td><td class="out">完整可运行的 Transformer Block 代码</td><td class="ck"><input type="checkbox" data-k="d110"></td></tr>
+<tr><td class="day">D111</td><td class="task">BERT 与 GPT 对比：Encoder-only vs Decoder-only、预训练任务、HuggingFace 初探</td><td class="out">用 transformers 跑通 BERT 文本分类</td><td class="ck"><input type="checkbox" data-k="d111"></td></tr>
+<tr><td class="day">D112</td><td class="task">周复盘（2h）：手绘 Transformer 结构图并讲解录制</td><td class="out">一篇 Transformer 原理笔记 + 3 分钟讲解音频</td><td class="ck"><input type="checkbox" data-k="d112"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W17</span><span class="wtitle">HuggingFace 与 LoRA / PEFT 微调实战</span><span class="wtag">阶段七</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D113</td><td class="task">HuggingFace 生态：transformers / datasets / tokenizers / accelerate / Hub 使用</td><td class="out">下载并本地加载一个开源小模型（如 Qwen-0.5B）</td><td class="ck"><input type="checkbox" data-k="d113"></td></tr>
+<tr><td class="day">D114</td><td class="task">Tokenizer 原理与实操、数据集构建与格式转换（instruction/input/output）</td><td class="out">自建 500 条指令微调数据集（json）</td><td class="ck"><input type="checkbox" data-k="d114"></td></tr>
+<tr><td class="day">D115</td><td class="task">微调原理：全参微调 vs PEFT、LoRA 的数学原理（低秩分解）、QLoRA 量化</td><td class="out">LoRA 原理解释笔记（能讲清 r 和 alpha 含义）</td><td class="ck"><input type="checkbox" data-k="d115"></td></tr>
+<tr><td class="day">D116</td><td class="task">LoRA 微调实战（一）：环境配置、训练脚本、超参数设置、显存估算</td><td class="out">跑通训练流程（loss 正常下降）</td><td class="ck"><input type="checkbox" data-k="d116"></td></tr>
+<tr><td class="day">D117</td><td class="task">LoRA 微调实战（二）：训练监控、loss 曲线分析、推理测试、合并权重</td><td class="out">微调后模型 + 微调前后效果对比样例</td><td class="ck"><input type="checkbox" data-k="d117"></td></tr>
+<tr><td class="day">D118</td><td class="task">模型部署：Ollama / vLLM 本地部署、量化（GGUF/AWQ）、暴露 OpenAI 兼容 API</td><td class="out">本地模型 API 服务（可被前面项目调用）</td><td class="ck"><input type="checkbox" data-k="d118"></td></tr>
+<tr><td class="day">D119</td><td class="task">周复盘（2h）：整理微调实验报告</td><td class="out">🏁 微调实验报告 + 模型上传 Hub/网盘</td><td class="ck"><input type="checkbox" data-k="d119"></td></tr>
+</table>
+</details>
+
+<details class="week">
+<summary><span class="wnum">W18</span><span class="wtitle">面试就业冲刺</span><span class="wtag">阶段八</span><span class="wprog">0/7</span><span class="arrow">▶</span></summary>
+<table>
+<tr><th>天</th><th>学习内容</th><th>当日产出</th><th></th></tr>
+<tr><td class="day">D120</td><td class="task">简历定稿：3 个项目用 STAR 法则包装、量化结果、关键词优化（RAG/Agent/微调）</td><td class="out">简历 v1.0（PDF，一页）</td><td class="ck"><input type="checkbox" data-k="d120"></td></tr>
+<tr><td class="day">D121</td><td class="task">八股（一）：Python 基础、GIL、内存管理、深浅拷贝、并发模型、FastAPI 相关</td><td class="out">50 道高频题答案笔记</td><td class="ck"><input type="checkbox" data-k="d121"></td></tr>
+<tr><td class="day">D122</td><td class="task">八股（二）：RAG 场景题、Agent 设计题、Transformer 原理题、微调选型题</td><td class="out">30 道 AI 应用场景题答案笔记</td><td class="ck"><input type="checkbox" data-k="d122"></td></tr>
+<tr><td class="day">D123</td><td class="task">手撕代码：数组/字符串/哈希/链表常考题 + 现场白板写 RAG 流程伪代码</td><td class="out">20 道手撕题可运行代码</td><td class="ck"><input type="checkbox" data-k="d123"></td></tr>
+<tr><td class="day">D124</td><td class="task">模拟面试（一）：AI 辅助模拟面试，全程录音，回听找问题</td><td class="out">面试复盘报告 + 改进清单</td><td class="ck"><input type="checkbox" data-k="d124"></td></tr>
+<tr><td class="day">D125</td><td class="task">模拟面试（二）：项目深挖追问演练（为什么这样切分？召回率多少？怎么优化？）</td><td class="out">项目 Q&amp;A 手册（每项目 15 问）</td><td class="ck"><input type="checkbox" data-k="d125"></td></tr>
+<tr><td class="day">D126</td><td class="task">投递机制：渠道选择（BOSS/拉勾/内推）、投递节奏、面试复盘模板、心态管理</td><td class="out">投递跟踪表 + 每周复盘模板</td><td class="ck"><input type="checkbox" data-k="d126"></td></tr>
+</table>
+</details>
+
+<footer>
+  <p>💾 勾选状态自动保存在本机浏览器，关闭页面不会丢失</p>
+  <p>建议每完成一天，就在当天笔记里附上那个「产出物」——126 天后这就是你的作品集</p>
+</footer>
+
+</div>
+<script>
+const KEY = 'pyai-plan-126';
+let state = JSON.parse(localStorage.getItem(KEY) || '{}');
+
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+function refresh(){
+  let done = 0, total = 0;
+  document.querySelectorAll('details.week').forEach(w=>{
+    const boxes = w.querySelectorAll('input[type=checkbox]');
+    let wd = 0;
+    boxes.forEach(b=>{ total++; if(state[b.dataset.k]) wd++; });
+    done += wd;
+    const p = w.querySelector('.wprog');
+    if(p) p.textContent = wd + '/' + boxes.length;
+  });
+  document.getElementById('pnum').textContent = done;
+  document.getElementById('pfill').style.width = (done/total*100) + '%';
+}
+
+document.querySelectorAll('input[type=checkbox]').forEach(b=>{
+  if(state[b.dataset.k]){ b.checked = true; b.closest('tr').classList.add('done'); }
+  b.addEventListener('change', ()=>{
+    state[b.dataset.k] = b.checked;
+    b.closest('tr').classList.toggle('done', b.checked);
+    save(); refresh();
+  });
+});
+
+function expandAll(open){
+  document.querySelectorAll('details.week').forEach(d=> d.open = open);
+}
+function resetAll(){
+  if(!confirm('确定清空所有勾选记录？')) return;
+  state = {}; save();
+  document.querySelectorAll('input[type=checkbox]').forEach(b=>{
+    b.checked = false; b.closest('tr').classList.remove('done');
+  });
+  refresh();
+}
+refresh();
+</script>
+</body>
+</html>
