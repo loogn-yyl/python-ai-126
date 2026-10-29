@@ -293,19 +293,20 @@ print(f"{'商品':&lt;6}{'数量':&gt;4}{'单价':&gt;8}")
 print("-" * 18)
 for name, qty, price in rows:
     print(f"{name:&lt;6}{qty:&gt;4}{price:&gt;8.1f}")</pre></div>
-  <div class="codebox light"><button class="copy">复制</button><pre class="out">商品    数量    单价
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">商品      数量      单价
 ------------------
-苹果     3   12.5
-香蕉    10    4.0
-西瓜     1   30.0</pre></div>
+苹果       3    12.5
+香蕉      10     4.0
+西瓜       1    30.0</pre></div>
 
   <div class="danger">
-    <b>⚠️ 发现了吗：数字没有和"数量""单价"对齐。</b>这不是你写错了，是<b>中文比英文宽</b>造成的。<br><br>
+    <b>⚠️ 发现了吗：数字没有和「数量」「单价」对齐，横线也短了一截。</b>这不是你写错了，是<b>中文比英文宽</b>造成的。<br><br>
     宽度参数 <code class="inline">{:&lt;6}</code> 里的 <code class="inline">6</code> 数的是<b>字符个数</b>，屏幕上占多少格子它不管。一个汉字算 <b>1 个字符</b>，但显示时占 <b>2 格</b>（等于两个英文字母宽）。<br><br>
     <b>算一下就明白了：</b><br>
-    · 表头 <code class="inline">{'数量':&gt;4}</code> → 2 个汉字已占满 4 个字符位，不再补空格 → 屏幕实际宽度 <b>2 + 4 = 6 格</b><br>
-    · 数据 <code class="inline">{3:&gt;4}</code> → 补 3 个空格 + 1 个数字 → 屏幕宽度 <b>4 格</b><br>
-    两者差 2 格，所以后面的列整体左移了。
+    · 表头 <code class="inline">{'数量':&gt;4}</code> → 「数量」是 <b>2 个字符</b>，宽度 4 所以补 <b>2</b> 个空格 → 屏幕宽度 = 4（汉字）+ 2（空格）= <b>6 格</b><br>
+    · 数据 <code class="inline">{3:&gt;4}</code> → 「3」是 <b>1 个字符</b>，补 <b>3</b> 个空格 → 屏幕宽度 = 1 + 3 = <b>4 格</b><br>
+    这一列差 2 格。单价列同样差 2 格。累计下来：<b>表头 24 格，数据 20 格，横线只有 18 格</b>——三行三个宽度，所以全歪了。<br><br>
+    <b>规律记这一句：</b>表头单元格里有 N 个汉字，宽度参数就要写「目标格数 − N」。比如想让「数量」占 4 格，写 <code class="inline">{'数量':&gt;2}</code>，因为 4 − 2 = 2。
   </div>
 
   <h3>解法一：含中文的表格，宽度按"显示宽度"算</h3>
@@ -335,11 +336,32 @@ for name, qty, price in rows:
 香蕉        10     4.0
 西瓜         1    30.0</pre></div>
 
-  <h3>解法二：偷懒但够用</h3>
-  <p>中文表头不参与宽度控制，手动补空格；或者干脆用英文表头：</p>
-  <div class="codebox"><button class="copy">复制</button><pre>print(f"{'name':&lt;8}{'qty':&gt;5}{'price':&gt;8}")
+  <h3>解法二：手算表头宽度（这道题用这个就够）</h3>
+  <p>数据行一个字符都不用改，只把表头的三个宽度参数按「目标格数 − 汉字个数」改掉，横线长度补到 20：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>rows = [("苹果", 3, 12.5), ("香蕉", 10, 4.0), ("西瓜", 1, 30.0)]
+
+print(f"{'商品':&lt;6}{'数量':&gt;2}{'单价':&gt;6}")
+print("-" * 20)
 for name, qty, price in rows:
-    print(f"{name:&lt;8}{qty:&gt;5}{price:&gt;8.1f}")</pre></div>
+    print(f"{name:&lt;6}{qty:&gt;4}{price:&gt;8.1f}")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">商品    数量    单价
+--------------------
+苹果       3    12.5
+香蕉      10     4.0
+西瓜       1    30.0</pre></div>
+
+  <div class="ok">
+    <b>三个参数是怎么算出来的：</b><br>
+    · <code class="inline">{'商品':&lt;6}</code> → 目标 8 格，8 − 2 = <b>6</b>（正好和原来的 <code class="inline">{name:&lt;6}</code> 一致，所以这一列本来就是对的）<br>
+    · <code class="inline">{'数量':&gt;2}</code> → 目标 4 格，4 − 2 = <b>2</b><br>
+    · <code class="inline">{'单价':&gt;6}</code> → 目标 8 格，8 − 2 = <b>6</b><br>
+    · 横线 <code class="inline">"-" * 20</code> → 8 + 4 + 8 = <b>20</b> 格<br><br>
+    <b>为什么 <code class="inline">商品</code> 不用改：</b>它左边对齐（<code class="inline">&lt;</code>），汉字右边空出来的部分本来就只是空格，视觉上两端都齐；右对齐的中文表头才会顶到边界，这是最容易踩的反直觉点。
+  </div>
+
+  <div class="warn">
+    <b>⚠️ 别用「英文表头 + 中文数据」混着来。</b>像 <code class="inline">print(f"{'name':&lt;8}")</code> 配 <code class="inline">f"{name:&lt;8}"</code>（name 是「苹果」），表头占 8 格、数据占 10 格，照样歪。要么两边都用中文并手算宽度，要么两边都用英文。
+  </div>
 
   <div class="ok">
     <b>什么时候需要在意：</b>自己调试时随便对齐就行；但后面做数据报表、CLI 工具输出，或者给业务方看的终端表格，中文对齐就必须处理——面试里"怎么打印对齐的中文表格"也是常见问题。
