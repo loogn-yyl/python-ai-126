@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D004 学习包 · 流程控制与循环</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:20px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">DAY 004 · 第 1 周</div>
+  <h1>流程控制与循环</h1>
+  <p>今天你会发现自己写 C 的习惯有一半要改。不是语法变难了，是 Python 把「按下标数数」这件事整个拿掉了。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：5 个改写 + 九九乘法表 + 8 道练习</span>
+    <span>🔁 承接 D003</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+  <div class="timeline">
+    <div class="tl"><b>第 1 小时</b><span>读 1–3 节：if / while / for</span></div>
+    <div class="tl"><b>第 2 小时</b><span>读 4–6 节：enumerate / zip / break / 推导式</span></div>
+    <div class="tl"><b>第 3 小时</b><span>第 7 节的 5 个改写（今天重点）</span></div>
+    <div class="tl"><b>第 4 小时</b><span>九九乘法表 + 练习 + 笔记</span></div>
+  </div>
+  <div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day04
+cd ~/python-learn/day04</pre></div>
+  <div class="warn">
+    <b>今天的目标不是「学会写循环」</b>——你在 C 里早就会了。目标是<b>改掉 C 的循环习惯</b>。<br>
+    先记住一句话：<b>Python 里几乎不需要 <code class="inline">for (i = 0; i &lt; n; i++)</code></b>。看到自己在数下标，就该警觉。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>if / elif / else：括号没了，冒号来了</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>score = 85
+
+if score &gt;= 90:
+    grade = "A"
+elif score &gt;= 80:
+    grade = "B"
+else:
+    grade = "C"
+
+print(grade)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">B</pre></div>
+
+  <table>
+    <tr><th></th><th>C</th><th>Python</th></tr>
+    <tr><td>条件</td><td><code>if (score &gt;= 90)</code> 括号必需</td><td><code>if score &gt;= 90:</code> 括号可有可无，冒号必需</td></tr>
+    <tr><td>块标记</td><td><code>{ }</code></td><td><b>缩进</b>（4 个空格）</td></tr>
+    <tr><td>否则如果</td><td><code>else if</code></td><td><code>elif</code></td></tr>
+    <tr><td>逻辑运算</td><td><code>&amp;&amp;</code> <code>||</code> <code>!</code></td><td><code>and</code> <code>or</code> <code>not</code></td></tr>
+  </table>
+
+  <div class="danger">
+    <b>⚠️ 缩进不是排版，是语法。</b>C 里你缩进多少行都无所谓，Python 里缩进错了程序逻辑就错了——而且很多时候<b>不报错</b>，只是结果不对，比报错更难查。<br><br>
+    VS Code 里按 <code class="inline">Tab</code> 会自动转成 4 个空格。<b>千万别混用 Tab 和空格</b>，混了会报 <code class="inline">IndentationError</code>。macOS 上建议在 VS Code 设置里搜 <code class="inline">insert spaces</code>，确认开着。
+  </div>
+
+  <h3 class="purple">Python 特有：不用写 <code class="inline">&gt; 0</code>、<code class="inline">!= ""</code>、<code class="inline">!= NULL</code></h3>
+  <p>Python 里任何值都能直接当条件用，有一套「什么是假」的规则。这条 C 里没有，用熟了能省很多字。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>for v in [0, 1, "", "a", [], [0], {}, None]:
+    print(f"{repr(v):&gt;8} -&gt; {bool(v)}")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">       0 -&gt; False
+       1 -&gt; True
+      '' -&gt; False
+     'a' -&gt; True
+      [] -&gt; False
+     [0] -&gt; True
+      {} -&gt; False
+    None -&gt; False</pre></div>
+
+  <div class="ok">
+    <b>「假」的只有这些：</b><code class="inline">0</code>、<code class="inline">0.0</code>、<code class="inline">""</code>（空字符串）、<code class="inline">[]</code>（空列表）、<code class="inline">{}</code>（空字典）、<code class="inline">set()</code>、<code class="inline">None</code>、<code class="inline">False</code>。<br>
+    <b>其它一切都是真</b>——注意 <code class="inline">[0]</code> 是<b>真</b>，因为列表不空；<code class="inline">"0"</code> 也是真，因为字符串不空。
+  </div>
+
+  <p>所以下面两种写法完全等价，写右边：</p>
+  <table>
+    <tr><th>C 习惯写法</th><th>Python 写法</th></tr>
+    <tr><td><code>if len(nums) &gt; 0:</code></td><td><code>if nums:</code></td></tr>
+    <tr><td><code>if s != "":</code></td><td><code>if s:</code></td></tr>
+    <tr><td><code>if p != NULL:</code></td><td><code>if p is not None:</code></td></tr>
+    <tr><td><code>if flag == true:</code></td><td><code>if flag:</code></td></tr>
+  </table>
+
+  <div class="warn">
+    <b>⚠️ 但要注意 <code class="inline">None</code> 和 <code class="inline">0</code> 是不同的假。</b>如果一个函数可能返回 <code class="inline">0</code>（有效值）也可能返回 <code class="inline">None</code>（失败），用 <code class="inline">if result:</code> 会把「结果真的是 0」误判成失败。这种情况必须写 <code class="inline">if result is not None:</code>。
+  </div>
+
+  <h3>判断相等：== 和 is 别混</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>a = [1, 2]
+b = [1, 2]
+
+print(a == b)      # 值一样吗？
+print(a is b)      # 是同一个对象吗？
+
+c = a
+print(a is c)      # 同一个对象</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">True
+False
+True</pre></div>
+  <div class="note">
+    <b><code class="inline">==</code> 比值，<code class="inline">is</code> 比身份（内存地址）。</b>日常判断一律用 <code class="inline">==</code>；只有和 <code class="inline">None</code> 比较时才用 <code class="inline">is</code>（写 <code class="inline">x is None</code>，这是 Python 惯例）。D003 学的「赋值是指针」在这里体现出来了——<code class="inline">c = a</code> 让两者是同一个对象。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>while：和 C 几乎一样</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>n = 3
+while n &gt; 0:
+    print(n)
+    n -= 1
+print("发射")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">3
+2
+1
+发射</pre></div>
+
+  <table>
+    <tr><th></th><th>C</th><th>Python</th></tr>
+    <tr><td>自增</td><td><code>n++</code></td><td><b>没有 <code>++</code></b>，写 <code>n += 1</code></td></tr>
+    <tr><td>自减</td><td><code>n--</code></td><td><b>没有 <code>--</code></b>，写 <code>n -= 1</code></td></tr>
+    <tr><td>死循环</td><td><code>while(1)</code></td><td><code>while True:</code></td></tr>
+    <tr><td>do-while</td><td><code>do { } while();</code></td><td><b>没有</b>，用 <code>while True: ... break</code></td></tr>
+  </table>
+
+  <div class="danger">
+    <b>⚠️ <code class="inline">n++</code> 在 Python 里不会自增，而且不报错。</b><br>
+    <code class="inline">n++</code> 会被解析成 <code class="inline">n + (+n)</code>，算出来等于 <code class="inline">n</code>，<b>结果没赋给任何变量</b>，等于什么都没做。写进循环里就是死循环。<br>
+    这是 C 程序员转 Python 最容易踩的第一个坑。<b>看到 <code class="inline">while</code> 不动了，先检查有没有 <code class="inline">++</code>。</b>
+  </div>
+
+  <h3>用 while 写「不知道要循环几次」的场景</h3>
+  <div class="codebox"><button class="copy">复制</button><pre># 反复让用户输入，直到输入 q 为止
+# 这里用列表模拟输入，真实程序里换成 input()
+inputs = ["3", "7", "q"]
+total = 0
+i = 0
+
+while True:
+    s = inputs[i]
+    i += 1
+    if s == "q":
+        break
+    total += int(s)
+
+print("累加结果:", total)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">累加结果: 10</pre></div>
+  <div class="note">
+    <b><code class="inline">for</code> 用来「遍历已知的东西」，<code class="inline">while</code> 用来「不知道要转几次」。</b>菜单循环、等待输入、重试机制——这些用 <code class="inline">while True</code> + <code class="inline">break</code> 写最清楚。以后 D007 的通讯录项目就是这么写的。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>for 循环：不数下标，数东西</h2>
+  <p>这是今天最重要的一节。C 的 <code class="inline">for</code> 是「计数器 + 条件 + 步进」，Python 的 <code class="inline">for</code> 是「把一堆东西挨个拿出来」。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>fruits = ["苹果", "香蕉", "西瓜"]
+
+# Python 的 for：直接遍历元素
+for f in fruits:
+    print(f)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">苹果
+香蕉
+西瓜</pre></div>
+
+  <div class="danger">
+    <b>⚠️ 千万不要写成 <code class="inline">for i in range(len(fruits))</code> 然后再 <code class="inline">fruits[i]</code>。</b><br>
+    能跑，但这是把 C 的习惯硬搬过来。<b>只有当「真的需要下标」时才用 range(len(...))</b>，需要下标的时候更该用第 4 节的 <code class="inline">enumerate</code>。
+  </div>
+
+  <h3>range：生成一串数字</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>print(list(range(5)))          # 0,1,2,3,4（不含 5！）
+print(list(range(2, 6)))       # 2,3,4,5
+print(list(range(0, 10, 3)))   # 0,3,6,9  第三个参数是步长
+print(list(range(5, 0, -1)))   # 5,4,3,2,1  步长为负可以倒着走</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[0, 1, 2, 3, 4]
+[2, 3, 4, 5]
+[0, 3, 6, 9]
+[5, 4, 3, 2, 1]</pre></div>
+
+  <div class="warn">
+    <b>⚠️ <code class="inline">range(n)</code> 是「左闭右开」：从 0 开始，到 n 之前停。</b>所以 <code class="inline">range(5)</code> 给你 <b>5 个数</b>（0 到 4），不是 6 个。<br>
+    这条和切片规则完全一致（D002 的 <code class="inline">s[0:5]</code> 也不含 5）。<b>记住一次，两处通用。</b>
+  </div>
+
+  <table>
+    <tr><th>C 写法</th><th>Python 写法</th><th>说明</th></tr>
+    <tr><td><code>for (i=0; i&lt;10; i++)</code></td><td><code>for i in range(10):</code></td><td>0 到 9</td></tr>
+    <tr><td><code>for (i=1; i&lt;=10; i++)</code></td><td><code>for i in range(1, 11):</code></td><td>1 到 10，注意要写 11</td></tr>
+    <tr><td><code>for (i=0; i&lt;n; i+=2)</code></td><td><code>for i in range(0, n, 2):</code></td><td>步长 2</td></tr>
+    <tr><td><code>for (i=n-1; i&gt;=0; i--)</code></td><td><code>for i in range(n-1, -1, -1):</code></td><td>倒序，注意三个 -1</td></tr>
+    <tr><td><code>for (x : arr)</code> 遍历数组</td><td><code>for x in arr:</code></td><td><b>最常用</b>，不碰下标</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">4</span>enumerate 和 zip：C 里得自己写的东西</h2>
+
+  <h3>enumerate：同时拿下标和元素</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>fruits = ["苹果", "香蕉", "西瓜"]
+
+for i, f in enumerate(fruits, start=1):
+    print(f"{i}. {f}")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">1. 苹果
+2. 香蕉
+3. 西瓜</pre></div>
+
+  <div class="ok">
+    <b>C 里要写：</b><code class="inline">for (int i = 0; i &lt; n; i++) printf("%d. %s", i+1, arr[i]);</code><br>
+    <b>Python 一行：</b><code class="inline">for i, f in enumerate(fruits, start=1)</code><br><br>
+    <code class="inline">start=1</code> 可以省略（默认从 0 开始）。这条替代了 90% 需要「带序号打印」的场景，也是以后写报表、排名、菜单的标配。
+  </div>
+
+  <h3>zip：并排遍历两个列表</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>names = ["张三", "李四"]
+ages = [18, 20]
+
+for n, a in zip(names, ages):
+    print(n, a)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">张三 18
+李四 20</pre></div>
+
+  <div class="warn">
+    <b>⚠️ zip 以最短的那个为准。</b>两个列表长度不一样时，多的部分直接丢掉，<b>不报错</b>。<br>
+    <code class="inline">zip([1,2,3], ["a","b"])</code> 只会得到 2 对。数据长度对不上却静默丢数据，是排查起来很痛苦的那种 bug——用 zip 前先确认两个列表一样长。
+  </div>
+
+  <div class="purple">
+    <b>这两个函数为什么重要：</b>它们在 C 里没有对应物，因为 C 只有数组和下标。Python 把「按下标访问」这件苦力活收走了，你只需要说「我要同时遍历这两个东西」，剩下的它做。<b>这就是「Pythonic」的核心——描述意图，而不是描述步骤。</b>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>break / continue / for-else</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>for x in [1, 3, 5, 8, 9]:
+    if x % 2 == 0:
+        print("找到第一个偶数:", x)
+        break
+else:
+    print("一个偶数都没有")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">找到第一个偶数: 8</pre></div>
+
+  <div class="danger">
+    <b>⚠️ <code class="inline">for</code> 后面的 <code class="inline">else</code> 不是「否则」。</b>
+    它的意思是<b>「循环正常跑完了，没被 break 打断」</b>。<br><br>
+    这是 Python 独有语法，C 里没有对应物。上面的代码：找到偶数时 <code class="inline">break</code> 跳出去了，<code class="inline">else</code> 就不执行；如果整个列表都没偶数，循环自然结束，<code class="inline">else</code> 才执行。<br><br>
+    <b>用不用得上：</b>用来表达「查找失败」非常干净，不用在外面再加一个 flag 变量。C 里你得这么写：
+    <br><br>
+    <code class="inline">int found = 0; for (...) { if (...) { found = 1; break; } } if (!found) printf("没找到");</code>
+    <br><br>
+    Python 里一个 <code class="inline">else</code> 就替代了 <code class="inline">found</code> 变量。第一次看很别扭，习惯后会爱上。
+  </div>
+
+  <h3>break 和 continue 的区别</h3>
+  <table>
+    <tr><th>关键字</th><th>作用</th><th>用在哪</th></tr>
+    <tr><td><code>break</code></td><td><b>整个循环结束</b>，跳到循环外面</td><td>找到了不用再找；菜单里选「退出」</td></tr>
+    <tr><td><code>continue</code></td><td><b>跳过本次</b>，直接进下一轮</td><td>这一条数据不合格，跳过它继续下一个</td></tr>
+  </table>
+
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [1, -2, 3, -4, 5]
+total = 0
+
+for x in nums:
+    if x &lt; 0:
+        continue          # 负数跳过，不加
+    total += x
+
+print("正数之和:", total)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">正数之和: 9</pre></div>
+  <div class="note">
+    <b>用 <code class="inline">continue</code> 可以让代码「少一层缩进」。</b>上面如果不用 continue，就得写成 <code class="inline">if x &gt;= 0: total += x</code>——数据清洗代码里经常有七八个过滤条件，用 continue 平铺下来比层层缩进好读得多。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>列表推导式：循环的另一种写法</h2>
+  <p>D003 已经见过，今天把它和循环彻底打通。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre># 写法一：普通循环
+sq = []
+for x in range(5):
+    sq.append(x * x)
+
+# 写法二：推导式（等价，但快且短）
+sq2 = [x * x for x in range(5)]
+
+print(sq)
+print(sq2)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[0, 1, 4, 9, 16]
+[0, 1, 4, 9, 16]</pre></div>
+
+  <h3>if 和 if-else 放的位置不一样</h3>
+  <div class="codebox"><button class="copy">复制</button><pre># 1) 筛选：if 在最后 → 只要满足条件的
+print([x for x in range(1, 11) if x % 2 == 0])
+
+# 2) 转换：if-else 在前面 → 每个都要，但结果不同
+print(["偶" if x % 2 == 0 else "奇" for x in range(1, 6)])</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[2, 4, 6, 8, 10]
+['奇', '偶', '奇', '偶', '奇']</pre></div>
+
+  <div class="warn">
+    <b>⚠️ 这两种 <code class="inline">if</code> 位置不同，含义也不同，很容易混：</b><br>
+    · <code class="inline">[x for x in ... <b>if 条件</b>]</code> → <b>筛掉</b>不满足的（元素变少）<br>
+    · <code class="inline">[<b>A if 条件 else B</b> for x in ...]</code> → <b>每个都保留</b>，只是结果不同（元素个数不变）<br><br>
+    差别在于：前者 <code class="inline">if</code> 不带 <code class="inline">else</code> 时是<b>过滤</b>；后者 <code class="inline">if-else</code> 成对出现时是<b>条件表达式</b>（D002 学过）。写成 <code class="inline">[x if x &gt; 2 for x in ...]</code> 会直接报 <code class="inline">SyntaxError</code>。
+  </div>
+
+  <h3>生成器表达式：把方括号换成圆括号</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>sq_list = [x * x for x in range(5)]    # 方括号 → 立刻算出整个列表
+sq_gen = (x * x for x in range(5))     # 圆括号 → 先不算，用到才算
+
+print(sq_list)
+print(sq_gen)
+print(list(sq_gen))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[0, 1, 4, 9, 16]
+&lt;generator object ...&gt;
+[0, 1, 4, 9, 16]</pre></div>
+
+  <div class="note">
+    <b>区别：</b>列表推导式会<b>立刻把所有结果算出来存进内存</b>；生成器表达式<b>一个都不算</b>，等你取值时才逐个算。<br>
+    数据量小时感觉不到差别；数据量大时（比如读 100 万行日志），生成器不会把内存撑爆。这个知识点 D012 会深入，现在知道「圆括号 = 惰性」就够了。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>把 5 个 C 风格 for 循环改写成 Python</h2>
+  <p>这就是今天的核心产出。下面每一组左边是你以前会写的，右边是 Python 的写法。<b>请在编辑器里两种都亲手敲一遍</b>，跑出一样的结果，肌肉记忆才算建立。</p>
+
+  <h3>① 求和：从「循环累加」到「直接用 sum」</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [10, 20, 30]
+
+# C 思维
+total = 0
+for i in range(len(nums)):
+    total += nums[i]
+print(total)
+
+# Python 思维
+print(sum(nums))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">60
+60</pre></div>
+
+  <h3>② 遍历：从「按下标取」到「直接拿元素」</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [10, 20, 30]
+
+# C 思维
+for i in range(len(nums)):
+    print(nums[i])
+
+# Python 思维
+for x in nums:
+    print(x)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">10
+20
+30
+10
+20
+30</pre></div>
+
+  <h3>③ 带序号：从「i+1 拼字符串」到 enumerate</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [10, 20, 30]
+
+# C 思维
+for i in range(len(nums)):
+    print(str(i + 1) + ". " + str(nums[i]))
+
+# Python 思维
+for i, x in enumerate(nums, start=1):
+    print(f"{i}. {x}")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">1. 10
+2. 20
+3. 30
+1. 10
+2. 20
+3. 30</pre></div>
+
+  <h3>④ 倒序：从「i-- 数下去」到 reversed / 负步长</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [10, 20, 30]
+
+# C 思维
+for i in range(len(nums) - 1, -1, -1):
+    print(nums[i])
+
+# Python 思维：只需要元素
+for x in reversed(nums):
+    print(x)
+
+# Python 思维：需要下标时
+for i in range(len(nums) - 1, -1, -1):
+    print(i, nums[i])</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">30
+20
+10
+30
+20
+10
+2 30
+1 20
+0 10</pre></div>
+
+  <h3>⑤ 并行遍历：从「同一个 i 取两个数组」到 zip</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>a = [1, 2, 3]
+b = [10, 20, 30]
+
+# C 思维
+for i in range(len(a)):
+    print(a[i] + b[i])
+
+# Python 思维
+for x, y in zip(a, b):
+    print(x + y)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">11
+22
+33
+11
+22
+33</pre></div>
+
+  <div class="ok">
+    <b>改写的心法只有一句：</b>先问自己「我到底要遍历<b>什么</b>」，然后直接把那个东西放 <code class="inline">in</code> 后面。<br>
+    · 要元素 → <code class="inline">for x in nums</code><br>
+    · 要序号 + 元素 → <code class="inline">for i, x in enumerate(nums)</code><br>
+    · 要两个列表配对 → <code class="inline">for x, y in zip(a, b)</code><br>
+    · 要一串数字 → <code class="inline">for i in range(n)</code><br><br>
+    <b>只有「我确实需要下标来算别的东西」时才用 range(len())</b>——这种情况比你想象中少得多。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>八道练习</h2>
+  <p>第 1 题就是今天要求的产出（九九乘法表）。命名建议 <code class="inline">p1_table.py</code>、<code class="inline">p2_leap.py</code> …</p>
+
+  <ol class="task">
+    <li><b>九九乘法表</b>：用双层 for 循环打印左下三角（对齐！见下方提示）</li>
+    <li><b>判断闰年</b>：输入年份，能被 4 整除且不能被 100 整除，或能被 400 整除 → 闰年</li>
+    <li><b>猜数字</b>：程序固定答案 42，最多让猜 3 次，猜中 break，用完次数提示失败</li>
+    <li><b>1~100 求和</b>：分别用 for 累加和 <code class="inline">sum(range())</code> 两种写法，结果要相同</li>
+    <li><b>筛选平方</b>：一行推导式，取出 1–20 里所有能被 3 整除的数的平方</li>
+    <li><b>配对打印</b>：两个列表（姓名、分数），用 zip 打印「张三 88 分」</li>
+    <li><b>带序号菜单</b>：用 enumerate 打印一个 5 项菜单，格式 <code class="inline">1) 添加</code></li>
+    <li><b>找第一个</b>：列表里找第一个能被 7 整除的数，找到就停；找不到输出「没有」。<b>用 for-else 写</b></li>
+  </ol>
+
+  <details>
+    <summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+
+    <div class="codebox"><button class="copy">复制</button><pre># p1_table.py
+for i in range(1, 10):
+    row = []
+    for j in range(1, i + 1):
+        row.append(f"{j}x{i}={i*j:&lt;3}")     # 每格固定 7 个字符宽
+    print("".join(row))
+
+
+# p2_leap.py
+year = int(input("请输入年份: "))
+if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:
+    print(f"{year} 是闰年")
+else:
+    print(f"{year} 不是闰年")
+
+
+# p3_guess.py
+answer = 42
+for i in range(1, 4):
+    n = int(input(f"第 {i} 次猜: "))
+    if n == answer:
+        print("猜对了")
+        break
+    elif n &lt; answer:
+        print("小了")
+    else:
+        print("大了")
+else:
+    print(f"机会用完，答案是 {answer}")
+
+
+# p4_sum100.py
+total = 0
+for i in range(1, 101):
+    total += i
+print(total)
+print(sum(range(1, 101)))
+
+
+# p5_filter.py
+print([x * x for x in range(1, 21) if x % 3 == 0])
+
+
+# p6_zip.py
+names = ["张三", "李四", "王五"]
+scores = [88, 95, 76]
+for n, s in zip(names, scores):
+    print(f"{n} {s} 分")
+
+
+# p7_menu.py
+menu = ["添加联系人", "删除联系人", "查找", "显示全部", "退出"]
+for i, item in enumerate(menu, start=1):
+    print(f"{i}) {item}")
+
+
+# p8_first7.py
+nums = [3, 5, 9, 14, 21]
+for x in nums:
+    if x % 7 == 0:
+        print("找到:", x)
+        break
+else:
+    print("没有")</pre></div>
+
+    <div class="codebox light"><button class="copy">复制</button><pre class="out">p1  1x1=1
+    1x2=2  2x2=4
+    1x3=3  2x3=6  3x3=9
+    ...（共 9 行，每行比上一行多一项，列对齐）
+p2  2024 是闰年
+p3  猜对时「猜对了」，3 次都没中则「机会用完，答案是 42」
+p4  5050 / 5050
+p5  [9, 36, 81, 144, 225, 324]
+p6  张三 88 分 / 李四 95 分 / 王五 76 分
+p7  1) 添加联系人 … 5) 退出
+p8  找到: 14</pre></div>
+
+    <div class="note">
+      <b>第 1 题的 <code class="inline">{i*j:&lt;3}</code> 是今天的隐藏重点。</b>如果不补宽度，会出现：
+      <div class="codebox" style="margin-top:8px"><button class="copy">复制</button><pre class="out">1x1=1
+1x2=2  2x2=4
+1x4=4  2x4=8  3x4=12 4x4=16</pre></div>
+      <code class="inline">1x4=4</code> 是 5 个字符，<code class="inline">3x4=12</code> 是 6 个字符，两列一长一短就错位了。<code class="inline">:&lt;3</code> 的意思是「结果部分左对齐、占 3 格」——1 位数补 2 个空格，2 位数补 1 个，每格总宽就都是 7 了。
+      <br><br>
+      <b>这和 D002 的中文对齐问题是同一类：</b>想让东西对齐，就得让每格的<b>宽度相同</b>，而不是让它「看起来差不多」。
+    </div>
+
+    <div class="note">
+      <b>第 3 题和第 8 题都用了 <code class="inline">for-else</code>。</b>第 3 题是「3 次都没猜中」才说答案，第 8 题是「一个都没有」才说没有——都是「循环没被 break 打断」这个语义。这个语法在写「查找类」逻辑时特别顺手。
+    </div>
+  </details>
+
+  <div class="warn">
+    <b>自测边界情况</b>（写完可以试试）：<br>
+    · 第 2 题输入 1900 年和 2000 年，结果应该不同（1900 不是，2000 是）<br>
+    · 第 5 题如果把 <code class="inline">if</code> 挪到 <code class="inline">for</code> 前面会怎样？<br>
+    · 第 8 题如果是空列表，<code class="inline">else</code> 会执行吗？（会）<br>
+    · 第 1 题把 <code class="inline">:&lt;3</code> 去掉，具体哪几行会错位？
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>今日笔记要点</h2>
+  <p>新建 <code class="inline">day04-笔记.md</code>，重点记「C 与 Python 的差别」，这些是你最容易反复踩的地方：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># D004 笔记
+
+## 流程控制
+- if / elif / else，冒号 + 缩进，没有 {} 和 ()
+- and / or / not，不是 &amp;&amp; || !
+- 缩进是语法不是排版，混用 Tab 和空格会 IndentationError
+
+## 真值判断
+- 假：0 / "" / [] / {} / set() / None / False
+- 所以 if nums: 等价于 if len(nums) &gt; 0:
+- 但 0 和 None 要区分时用 if x is not None:
+
+## 循环
+- while 和 C 一样，但没有 ++ / -- ，要写 n += 1
+- do-while 不存在，用 while True + break
+- for 遍历元素，不是数下标：for x in nums
+- range(n) 左闭右开，range(5) 是 0~4
+- enumerate 拿序号，zip 并行遍历
+- break 整个结束，continue 跳过本次
+- for-else 表示「没被 break 打断」，替代 C 里的 flag 变量
+
+## 推导式
+- [x*x for x in range(5)]
+- if 在后面 = 过滤；if-else 在前面 = 每个都转换
+- () 是生成器，惰性求值，不占内存
+
+## C 对比
+- for (i=0;i&lt;n;i++) → for i in range(n)
+- arr[i] 遍历 → for x in arr
+- 带下标 → enumerate
+- 两个数组 → zip
+- n++ 在 Python 里等于 n，不会自增！
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D004 的产出是 <b>5 个 C→Python 改写 + 九九乘法表 + 8 道练习 + 笔记</b>。</p>
+  <p>明天 D005：函数、模块与包，开始写「能被自己重复调用」的代码。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

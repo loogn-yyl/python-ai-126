@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D007 学习包 · 第 1 周复盘 + 通讯录 v1</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:20px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">DAY 007 · 第 1 周 · 收官</div>
+  <h1>周复盘 + 通讯录 v1</h1>
+  <p>今天不做新知识点。把前六天学的六件事拼成一个能跑、能存、能用的东西——然后把它推上 GitHub。</p>
+  <div class="hmeta">
+    <span>⏱ 2h 复盘 + 2h 项目</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：可运行的通讯录 + 首个 Git 仓库</span>
+    <span>🏁 里程碑 1</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配</h2>
+  <div class="timeline">
+    <div class="tl"><b>第 1 小时</b><span>复盘：知识地图 + 自测清单</span></div>
+    <div class="tl"><b>第 2 小时</b><span>项目设计 + 写核心函数</span></div>
+    <div class="tl"><b>第 3 小时</b><span>补全菜单与持久化，跑通</span></div>
+    <div class="tl"><b>第 4 小时</b><span>Git 提交 + 写 README</span></div>
+  </div>
+  <div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day07
+cd ~/python-learn/day07</pre></div>
+  <div class="note">
+    <b>今天的验收标准不是「看懂」，是「跑起来」。</b>程序能添加、能删除、能查询、关了再开数据还在——四条全过才算完成。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>第 1 周复盘：六天各解决了什么</h2>
+
+  <table>
+    <tr><th>天</th><th>学了什么</th><th>在项目里用在哪</th></tr>
+    <tr><td>D001</td><td>变量、类型、input/print、f-string</td><td>菜单显示、所有提示信息</td></tr>
+    <tr><td>D002</td><td>字符串、切片、方法、编码</td><td><code>strip()</code> 清理输入、<code>in</code> 判断关键字</td></tr>
+    <tr><td>D003</td><td>列表 / 元组 / 字典 / 集合</td><td><b>字典存联系人和菜单</b>、<code>items()</code> 遍历</td></tr>
+    <tr><td>D004</td><td>if / while / for / enumerate</td><td><b>菜单循环</b>、<code>enumerate</code> 显示序号</td></tr>
+    <tr><td>D005</td><td>函数、模块、<code>__main__</code></td><td><b>拆成 7 个函数</b>、<code>if __name__</code> 入口</td></tr>
+    <tr><td>D006</td><td>异常、with、JSON</td><td><b>JSON 持久化</b>、<code>os.path.exists</code></td></tr>
+  </table>
+
+  <div class="ok">
+    <b>看到没：这个项目没有用到任何新东西。</b>一行新语法都没有。它只是把六天的零件按正确顺序装起来。<br>
+    这就是编程的真相——<b>会用语法的人很多，能把零件装成东西的人少。</b>今天这一关比前六天加起来都重要。
+  </div>
+
+  <h3>自测：这 10 条你都能不查资料答上来吗</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>□ 1. 字符串能不能改？"hello"[0] = "H" 会怎样？
+□ 2. s[::-1] 是什么？s[1:5] 含不含下标 5？
+□ 3. b = a 之后改 b，a 会变吗？为什么？
+□ 4. sort() 和 sorted() 有什么区别？
+□ 5. 字典取值，d["x"] 和 d.get("x") 差在哪？
+□ 6. for i in len(nums) 为什么报错？
+□ 7. enumerate 和 zip 分别解决什么问题？
+□ 8. 默认参数写 def f(x=[]) 会出什么事？
+□ 9. if __name__ == "__main__" 到底在判断什么？
+□ 10. csv 读出来的数字是 int 还是 str？</pre></div>
+
+  <details>
+    <summary>答案（先自己答，再对）</summary>
+    <div class="codebox light"><button class="copy">复制</button><pre class="out">1. 不能改，抛 TypeError；所有方法都返回新字符串
+2. 反转；不含 stop，所以 s[1:5] 是下标 1~4
+3. 会变。b = a 让两个名字指向同一个列表对象（像 C 的指针赋值）
+4. sort() 原地改、返回 None；sorted() 返回新列表、原列表不变
+5. d["x"] 不存在时抛 KeyError；d.get("x") 返回 None（可给默认值）
+6. len() 返回 int，int 不能迭代；应该 for x in nums
+7. enumerate 同时拿序号和元素；zip 并行遍历多个列表
+8. 那个 [] 只创建一次，所有调用共用，数据会累积
+9. 判断「这个文件是直接被运行，还是被 import」：直接运行是 "__main__"
+10. 全是 str，要自己 int() 转</pre></div>
+    <div class="note">
+      <b>答错 3 条以内：</b>正常，翻回对应学习包看一眼就补上了。<br>
+      <b>答错 5 条以上：</b>别急着做项目，先用 1 小时把错的那些天的学习包重读一遍。基础不牢，今天这个项目会让你很痛苦。
+    </div>
+  </details>
+</section>
+
+<section>
+  <h2><span class="n">2</span>项目设计：先想清楚存什么</h2>
+
+  <p><b>需求：</b>一个命令行通讯录，能添加、删除、查找、显示全部，关掉程序再打开数据还在。</p>
+
+  <h3>关键决策：用什么存联系人</h3>
+  <table>
+    <tr><th>方案</th><th>数据结构</th><th>评价</th></tr>
+    <tr><td>方案 A</td><td><code>[("张三","138..."), ("李四","139...")]</code></td><td>查一个人要遍历整个列表，O(n)</td></tr>
+    <tr><td>方案 B</td><td><code>{"张三": "138...", "李四": "139..."}</code></td><td><b>直接按名字取，O(1)</b>；名字天然唯一，正好当 key</td></tr>
+  </table>
+
+  <div class="ok">
+    <b>选方案 B，理由就是 D003 那张复杂度表：</b>「按名字找」是通讯录最高频的操作，字典的 <code class="inline">in</code> 和取值都是 O(1)，列表是 O(n)。<br>
+    而且名字本身就不允许重复——<b>「唯一」这个特性正好对应「key 唯一」</b>，用字典等于让语言帮你做约束，不用自己写查重逻辑（只需处理「已存在」的提示）。
+  </div>
+
+  <h3>文件结构</h3>
+  <div class="tree">day07/
+├── contacts_v1.py      ← 主程序
+├── contacts.json       ← 数据文件（程序自动生成）
+├── .gitignore          ← 不上传的文件
+└── README.md           ← 项目说明</div>
+
+  <div class="note">
+    <b>为什么数据和代码分开：</b><code class="inline">contacts.json</code> 是<b>运行时产生的数据</b>，不是代码。它不该进 Git 仓库（每台电脑的数据都不一样）。<code class="inline">.gitignore</code> 就是干这个的。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>第一步：先搭骨架，别急着写功能</h2>
+  <p>很多人在这一步就栽了——想一次写完，结果越写越乱，最后卡在某个缩进上找不到北。<b>正确做法是先让菜单转起来，功能全是空的。</b></p>
+
+  <div class="codebox"><button class="copy">复制</button><pre># 骨架：只有菜单，什么都不做
+menu = ["添加联系人", "删除联系人", "查找联系人", "显示全部", "退出"]
+
+while True:
+    print("\n" + "=" * 30)
+    for i, item in enumerate(menu, start=1):
+        print(f"  {i}) {item}")
+    print("=" * 30)
+
+    choice = input("请选择: ").strip()
+
+    if choice == "1":
+        print("  [待实现] 添加")
+    elif choice == "2":
+        print("  [待实现] 删除")
+    elif choice == "3":
+        print("  [待实现] 查找")
+    elif choice == "4":
+        print("  [待实现] 显示")
+    elif choice == "5":
+        print("  再见")
+        break
+    else:
+        print("  无效选项，请输入 1-5")</pre></div>
+
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">==============================
+  1) 添加联系人
+  2) 删除联系人
+  3) 查找联系人
+  4) 显示全部
+  5) 退出
+==============================
+请选择: 5
+  再见</pre></div>
+
+  <div class="ok">
+    <b>这一步的意义：</b>骨架跑通了，你就知道「程序的基本形状是对的」。接下来每加一个功能，都能立刻测，不会因为一堆错误堆在一起而崩溃。<br>
+    <b>这个习惯以后会一直用</b>——先跑通最小版本，再逐个加功能。做 AI 应用也一样：先跑通「能对话」，再加记忆、加工具、加路由。
+  </div>
+
+  <div class="warn">
+    <b>⚠️ 三个容易出错的地方：</b><br>
+    ① <code class="inline">while True</code> 里必须有 <code class="inline">break</code>，否则退不出去（Ctrl+C 才行）<br>
+    ② <code class="inline">input().strip()</code> 一定要 strip，用户可能多打空格，<code class="inline">"1 "</code> 不等于 <code class="inline">"1"</code><br>
+    ③ 选项比较用字符串 <code class="inline">"1"</code>，不是数字 <code class="inline">1</code>——因为 <code class="inline">input()</code> 返回的就是字符串
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>第二步：把功能拆成函数</h2>
+  <p>不要在 <code class="inline">if</code> 分支里直接写一堆代码，那样主循环会变得非常长。每个功能一个函数，主循环只负责「分发」。</p>
+
+  <h3>显示全部</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>def show_all(data):
+    if not data:
+        print("  通讯录是空的")
+        return
+    print(f"  {'序号':&lt;4}{'姓名':&lt;8}{'电话'}")
+    for i, (name, phone) in enumerate(data.items(), start=1):
+        print(f"  {i:&lt;4}{name:&lt;8}{phone}")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">  序号  姓名      电话
+  1   张三      13800001111
+  2   李四      13900002222</pre></div>
+
+  <div class="note">
+    <b>注意 <code class="inline">if not data: return</code> 这个写法</b>——D004 学的「空字典是假值」。比 <code class="inline">if len(data) == 0:</code> 短，也更符合 Python 习惯。<br>
+    <b>还有个小细节：</b>表头其实没完全对齐（「姓名」占 2 个字符但显示 4 格）。这正是 D002 讲过的中文宽度问题——想完美对齐得用 <code class="inline">ljust_cn</code>。这里先接受它，知道自己为什么没对齐就够了。
+  </div>
+
+  <h3>添加（含重复检查）</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>def add_contact(data):
+    name = input("  姓名: ").strip()
+    if not name:
+        print("  姓名不能为空")
+        return
+    if name in data:                      # 字典的 in 是 O(1)
+        print(f"  {name} 已存在，电话是 {data[name]}")
+        return
+    phone = input("  电话: ").strip()
+    if not phone:
+        print("  电话不能为空")
+        return
+    data[name] = phone
+    save(data)
+    print(f"  已添加 {name}")</pre></div>
+
+  <div class="ok">
+    <b>这个函数里有四个「防御」：</b>空姓名、重名、空电话、及时保存。<br>
+    每一个都是「如果不写，用户一定会踩到」的场景。用户输入空格、重复添加同一个人、忘了填电话——这些不是极端情况，是<b>每天都会发生的情况</b>。<br><br>
+    <b>写函数时先问自己：这个函数被乱用会怎样？</b>这就是 D005 说的「边界意识」，也是专业和业余的分界线。
+  </div>
+
+  <h3>删除和查找</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>def delete_contact(data):
+    name = input("  要删除的姓名: ").strip()
+    if name not in data:
+        print(f"  没找到 {name}")
+        return
+    del data[name]
+    save(data)
+    print(f"  已删除 {name}")
+
+
+def find_contact(data):
+    keyword = input("  输入姓名关键字: ").strip()
+    hits = {k: v for k, v in data.items() if keyword in k}
+    if not hits:
+        print("  没有匹配的联系人")
+        return
+    for name, phone in hits.items():
+        print(f"  {name}: {phone}")</pre></div>
+
+  <div class="note">
+    <b><code class="inline">find_contact</code> 那行推导式是 D003 的字典推导式：</b>「遍历所有键值对，留下 key 里包含关键字的」。<br>
+    用关键字而不是全名搜索，是因为人记不全名字——输「张」就能列出所有姓张的。这个体验细节比技术本身重要。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>第三步：持久化（关了还在）</h2>
+  <p>到这一步为止，程序关了数据就没了——全在内存里。用 D006 学的 JSON 就解决了。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>import json
+import os
+
+FILE = "contacts.json"
+
+
+def load():
+    """读数据；文件不存在就返回空字典"""
+    if not os.path.exists(FILE):
+        return {}
+    with open(FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save(data):
+    """写数据"""
+    with open(FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)</pre></div>
+
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">contacts.json 的内容：
+{
+  "张三": "13800001111",
+  "李四": "13900002222"
+}</pre></div>
+
+  <div class="ok">
+    <b>读文件必须有的两样东西：</b><br>
+    <b>① <code class="inline">os.path.exists</code> 判断</b> —— 第一次运行时文件还不存在，直接 <code class="inline">open</code> 会抛 <code class="inline">FileNotFoundError</code>。返回空字典，程序就能正常启动。<br>
+    <b>② <code class="inline">encoding="utf-8"</code></b> —— 不写的话，中文名字在 Windows 上会存成乱码。<br><br>
+    <b><code class="inline">ensure_ascii=False</code></b> 是为了让文件里的人名是可读的中文，而不是 <code class="inline">"\u5f20\u4e09"</code>。
+  </div>
+
+  <div class="warn">
+    <b>⚠️ 每次增删后都调用 <code class="inline">save()</code>。</b>不要「退出时统一保存」——中途断电、Ctrl+C、程序崩了，所有操作全丢。改一次存一次，这是最简单也最可靠的做法。<b>做 AI 应用时同理，对话记录要随时落盘。</b>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>完整代码（复制这份就能跑）</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre># contacts_v1.py
+"""命令行通讯录 v1 —— 字典存储 + JSON 持久化 + 菜单循环"""
+
+import json
+import os
+
+FILE = "contacts.json"
+
+
+# ---------- 数据层 ----------
+def load():
+    if not os.path.exists(FILE):
+        return {}
+    with open(FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save(data):
+    with open(FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+# ---------- 功能层 ----------
+def show_all(data):
+    if not data:
+        print("  通讯录是空的")
+        return
+    print(f"  {'序号':&lt;4}{'姓名':&lt;8}{'电话'}")
+    for i, (name, phone) in enumerate(data.items(), start=1):
+        print(f"  {i:&lt;4}{name:&lt;8}{phone}")
+
+
+def add_contact(data):
+    name = input("  姓名: ").strip()
+    if not name:
+        print("  姓名不能为空")
+        return
+    if name in data:
+        print(f"  {name} 已存在，电话是 {data[name]}")
+        return
+    phone = input("  电话: ").strip()
+    if not phone:
+        print("  电话不能为空")
+        return
+    data[name] = phone
+    save(data)
+    print(f"  已添加 {name}")
+
+
+def delete_contact(data):
+    name = input("  要删除的姓名: ").strip()
+    if name not in data:
+        print(f"  没找到 {name}")
+        return
+    del data[name]
+    save(data)
+    print(f"  已删除 {name}")
+
+
+def find_contact(data):
+    keyword = input("  输入姓名关键字: ").strip()
+    hits = {k: v for k, v in data.items() if keyword in k}
+    if not hits:
+        print("  没有匹配的联系人")
+        return
+    for name, phone in hits.items():
+        print(f"  {name}: {phone}")
+
+
+# ---------- 界面层 ----------
+def show_menu(menu):
+    print("\n" + "=" * 30)
+    for i, item in enumerate(menu, start=1):
+        print(f"  {i}) {item}")
+    print("=" * 30)
+
+
+def main():
+    data = load()
+    menu = ["添加联系人", "删除联系人", "查找联系人", "显示全部", "退出"]
+
+    while True:
+        show_menu(menu)
+        choice = input("请选择: ").strip()
+
+        if choice == "1":
+            add_contact(data)
+        elif choice == "2":
+            delete_contact(data)
+        elif choice == "3":
+            find_contact(data)
+        elif choice == "4":
+            show_all(data)
+        elif choice == "5":
+            print("  再见")
+            break
+        else:
+            print("  无效选项，请输入 1-5")
+
+
+if __name__ == "__main__":
+    main()</pre></div>
+
+  <div class="ok">
+    <b>注意代码分成三层，用注释隔开了：</b><br>
+    <b>数据层</b>（load / save）—— 只管读写文件，不知道菜单长什么样<br>
+    <b>功能层</b>（增删查显示）—— 只管处理数据，不知道界面怎么显示<br>
+    <b>界面层</b>（show_menu / main）—— 只管交互，不知道数据怎么存<br><br>
+    <b>为什么要这么分：</b>以后 D008 要把字典换成 <code class="inline">Contact</code> 类，只改数据层；D014 要加图形界面，只改界面层。<b>这就是「分层」的全部意义——改一处不影响别处。</b>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>推上 GitHub：你的第一个仓库</h2>
+
+  <h3>先配身份（只做一次）</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>git config --global user.name "你的名字"
+git config --global user.email "你的邮箱@example.com"
+
+git config --global --list</pre></div>
+
+  <div class="note">
+    <b>这两行不配，<code class="inline">git commit</code> 会报错拒绝执行。</b>name 和 email 会写进每一次提交记录里，所以别乱填——以后面试官能看到的。
+  </div>
+
+  <h3>在项目目录里初始化</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn/day07
+git init
+git status</pre></div>
+
+  <h3>建 .gitignore</h3>
+  <p>新建 <code class="inline">.gitignore</code> 文件，写上这些：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>__pycache__/
+*.pyc
+.venv/
+.DS_Store
+contacts.json</pre></div>
+
+  <table>
+    <tr><th>条目</th><th>为什么排除</th></tr>
+    <tr><td><code>__pycache__/</code></td><td>Python 自动生成的字节码缓存，每台机器不同</td></tr>
+    <tr><td><code>*.pyc</code></td><td>同上</td></tr>
+    <tr><td><code>.venv/</code></td><td>虚拟环境，几百 MB，别人 clone 后自己建</td></tr>
+    <tr><td><code>.DS_Store</code></td><td>macOS 的文件夹图标缓存，Linux 上没用</td></tr>
+    <tr><td><code>contacts.json</code></td><td><b>你的私人数据，不该上传</b></td></tr>
+  </table>
+
+  <div class="danger">
+    <b>⚠️ 数据文件一定要排除。</b>这是新手最容易犯的错——把含手机号的 <code class="inline">contacts.json</code> 传上公开仓库。<b>以后涉及 API Key、数据库密码、用户数据，全都要放 .gitignore。</b>密钥泄露在 GitHub 上是真实会出事的，有人因此丢过工作。
+  </div>
+
+  <h3>第一次提交</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>git add .
+git status
+git commit -m "feat: 通讯录 v1 - 支持增删查改与 JSON 持久化"</pre></div>
+
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[main (root-commit) a1b2c3d] feat: 通讯录 v1 - 支持增删查改与 JSON 持久化
+ 3 files changed, 120 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+ create mode 100644 contacts_v1.py</pre></div>
+
+  <div class="note">
+    <b><code class="inline">git add</code> 和 <code class="inline">git commit</code> 的区别：</b><br>
+    <b>add</b> = 把文件放进「待提交清单」（暂存区）<br>
+    <b>commit</b> = 给这批改动拍个照，存进历史<br><br>
+    中间那个 <code class="inline">git status</code> 值得每次跑——它会用绿色列出「已经 add 的」、红色列出「改了还没 add 的」，能防止你漏文件或提交错东西。
+  </div>
+
+  <h3>推到远程仓库</h3>
+  <div class="warn">
+    <b>⚠️ 先说网络问题。</b>你的环境访问 GitHub 不稳定（装 Homebrew 时就被拦过）。两个选择：
+    <br><br>
+    <b>方案一：用 Gitee（国内，不折腾）</b> —— 到 gitee.com 注册，新建仓库，然后：
+    <div class="codebox" style="margin-top:8px"><button class="copy">复制</button><pre>git remote add origin https://gitee.com/你的用户名/contacts-v1.git
+git branch -M main
+git push -u origin main</pre></div>
+    <b>方案二：GitHub + 代理</b> —— 需要你的代理软件开着「终端代理」，或者配 SSH key。今天不展开，能用 Gitee 先把流程走通更重要。
+  </div>
+
+  <div class="codebox"><button class="copy">复制</button><pre># 查看远程仓库配了没
+git remote -v
+
+# 之后每次改完代码，三条命令就够了
+git add .
+git commit -m "描述你改了什么"
+git push</pre></div>
+
+  <h3>写 README.md</h3>
+  <p>README 是别人（和三个月后的你）打开仓库第一眼看到的东西。不用长，四块内容就够：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># 命令行通讯录 v1
+
+Python 学习第 7 天的练习项目：用字典存储联系人，JSON 持久化，纯命令行交互。
+
+## 功能
+
+- 添加联系人（自动查重）
+- 删除联系人
+- 按关键字模糊查找
+- 显示全部联系人
+- 数据存本地 contacts.json，关掉再开还在
+
+## 运行
+
+```bash
+python contacts_v1.py
+```
+
+## 学到的东西
+
+- 字典作为「按名字取」的存储结构（O(1) 查找）
+- while True + enumerate 实现菜单循环
+- JSON 读写与 ensure_ascii
+- 分层组织代码：数据层 / 功能层 / 界面层
+
+## 下一步
+
+v2 打算用 Contact 类重构，加上修改功能和输入校验。</pre></div>
+
+  <div class="ok">
+    <b>README 里「学到的东西」这一节最值钱。</b>它强迫你回头总结，而且以后面试时，面试官看你的仓库，这一节能直接说明「这个人知道自己写了什么」。<b>从第一个项目就养成写 README 的习惯。</b>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>验收清单：四条全过才算完成</h2>
+
+  <ol class="task">
+    <li><b>能添加</b>：添加张三 / 13800001111，选「显示全部」能看到他</li>
+    <li><b>能删除</b>：删掉张三，显示全部里没有了</li>
+    <li><b>能查找</b>：添加张三丰、张三，输入「张」能查出两个</li>
+    <li><b>数据不丢</b>：退出程序（选 5），重新 <code class="inline">python contacts_v1.py</code>，之前加的人还在</li>
+    <li><b>能处理错误</b>：输入 9（无效选项）不崩，提示「无效选项」；直接回车当姓名，提示「不能为空」</li>
+    <li><b>Git 有三样东西</b>：<code class="inline">git log</code> 能看到提交、远程仓库能打开、README 能正常显示</li>
+  </ol>
+
+  <div class="warn">
+    <b>常见问题速查</b><br>
+    · <b>第 4 条不过</b>（重开数据没了）→ 检查 <code class="inline">save()</code> 是不是每次增删后都调了；<code class="inline">contacts.json</code> 有没有真的出现在文件夹里<br>
+    · <b>中文变乱码</b> → <code class="inline">open()</code> 漏了 <code class="inline">encoding="utf-8"</code><br>
+    · <b><code class="inline">json.decoder.JSONDecodeError</code></b> → contacts.json 内容坏了（可能手改过），删掉它让程序重新生成<br>
+    · <b>菜单无限打印停不下来</b> → <code class="inline">while True</code> 里漏了 <code class="inline">break</code>，或者 <code class="inline">input</code> 被跳过了<br>
+    · <b>git push 卡住/超时</b> → GitHub 网络问题，换 Gitee<br>
+    · <b>git commit 报「Please tell me who you are」</b> → 没配 user.name / user.email
+  </div>
+
+  <div class="purple">
+    <b>🏁 里程碑 1 达成。</b><br><br>
+    七天前你连 Homebrew 都装不上。现在你有了：<br>
+    · 一套跑得动的 Python 环境<br>
+    · 六个知识模块（类型 / 字符串 / 容器 / 流程 / 函数 / 文件）<br>
+    · <b>一个能跑、能存数据、有 Git 历史的真实项目</b><br><br>
+    <b>下周开始写类。</b>你会看到今天这个程序怎么被拆成 <code class="inline">Contact</code> 类，怎么加上继承、魔法方法、装饰器——同一个项目一天天长大，直到变成一个真正能用的东西。
+  </div>
+</section>
+
+<footer>
+  <p>📌 D007 的产出是 <b>可运行的通讯录 + GitHub/Gitee 仓库 + README</b>。</p>
+  <p>明天 D008：类与对象，通讯录 v2 —— 用 Contact 类重构今天的所有代码。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

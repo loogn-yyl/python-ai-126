@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D001 学习包 · 变量、类型与第一个程序</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:20px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"预期输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .codebox.light .copy{background:#e2e8f0;color:#64748b}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}  .task li{counter-increment:t;padding:9px 0 9px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:9px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  .kbd{display:inline-block;background:#f1f5f9;border:1px solid #cbd5e1;
+       border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:12.5px;
+       font-family:"SF Mono",Consolas,monospace;color:#334155}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">DAY 001 · 第 1 周</div>
+  <h1>变量、数据类型与第一个程序</h1>
+  <p>四小时安排：1h 概念 → 2h 动手 → 1h 复盘。今天结束时你要有 3 个能跑的脚本。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：3 个脚本</span>
+    <span>🎯 适合有 C 基础</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>今天的时间分配</h2>
+  <div class="timeline">
+    <div class="tl"><b>第 1 小时</b><span>读第 1–4 节，边读边在终端试</span></div>
+    <div class="tl"><b>第 2–3 小时</b><span>写 3 个脚本，卡住先自己查</span></div>
+    <div class="tl"><b>第 4 小时</b><span>做 5 道练习 + 写今日笔记</span></div>
+  </div>
+  <div class="danger">
+    <b>🚨 开工前先确认：输入法是英文状态！</b>右上角显示 <b>ABC</b> 或 <b>A</b>，不是「中」「拼」。<br>
+    中文状态下 `--` 会变成 `——`、`"` 会变成 `“”`，命令看着一样但跑不了。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>建立今天的工作目录</h2>
+  <p>先确认 Python 命令能用（brew 装的 3.12 同时提供 <code class="inline">python</code> 和 <code class="inline">python3</code>）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>python --version
+python3 --version</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">Python 3.12.16
+Python 3.12.16</pre></div>
+
+  <div class="ok">
+    <b>不需要建 python 别名。</b>只要 <code class="inline">/opt/homebrew/opt/python@3.12/libexec/bin</code> 已加入 PATH，<code class="inline">python</code> 命令本来就是可用的。如果两个版本号不一致，说明 PATH 里 <code class="inline">libexec/bin</code> 没生效，回到环境配置那一步补上。
+  </div>
+
+  <p>然后建今天的工作目录：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day01
+cd ~/python-learn/day01
+pwd</pre></div>
+  <p><code class="inline">pwd</code> 会输出 <code class="inline">/Users/loogn/python-learn/day01</code>，说明你已经在里面了。今天所有文件都放这里。</p>
+</section>
+
+<section>
+  <h2><span class="n">2</span>交互式解释器：最快的试验场</h2>
+  <p>输入 <code class="inline">python</code> 回车，会出现 <code class="inline">&gt;&gt;&gt;</code> 提示符。这就是 REPL，敲一句算一句，适合验证小想法。</p>
+  <div class="codebox"><button class="copy">复制</button><pre>python</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">&gt;&gt;&gt; 1 + 1
+2
+&gt;&gt;&gt; 7 / 2
+3.5
+&gt;&gt;&gt; 7 // 2
+3
+&gt;&gt;&gt; 2 ** 10
+1024
+&gt;&gt;&gt; "hello" * 3
+'hellohellohello'</pre></div>
+  <p>退出：输入 <code class="inline">exit()</code> 回车，或按 <span class="kbd">Control</span>+<span class="kbd">D</span>。</p>
+  <div class="note">
+    <b>为什么先用 REPL：</b>不用建文件、不用保存、立即看到结果。学新语法时在这儿试 30 秒，比写文件快得多。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>变量与类型：和 C 的差别在哪</h2>
+
+  <h3>① 变量不用声明类型</h3>
+  <div class="codebox"><button class="copy">复制</button><pre># C:  int age = 18;
+age = 18
+name = "小明"
+height = 1.75
+is_student = True
+nothing = None</pre></div>
+  <p>Python 里变量就是个"标签"，贴在值上。<b>值有类型，变量没有类型</b>——同一个变量你可以先放数字再放字符串，Python 不会拦你（但别这么写）。</p>
+
+  <h3>② C 与 Python 对照表</h3>
+  <table>
+    <tr><th>概念</th><th>C 写法</th><th>Python 写法</th></tr>
+    <tr><td>整数</td><td><code class="inline">int a = 10;</code></td><td><code class="inline">a = 10</code></td></tr>
+    <tr><td>小数</td><td><code class="inline">float b = 3.14;</code></td><td><code class="inline">b = 3.14</code></td></tr>
+    <tr><td>字符</td><td><code class="inline">char c = 'A';</code></td><td><b>没有 char</b>，<code class="inline">c = 'A'</code> 是字符串</td></tr>
+    <tr><td>字符串</td><td><code class="inline">char s[] = "hi";</code></td><td><code class="inline">s = "hi"</code></td></tr>
+    <tr><td>布尔</td><td><code class="inline">int flag = 1;</code></td><td><code class="inline">flag = True</code>（<b>首字母大写</b>）</td></tr>
+    <tr><td>空值</td><td><code class="inline">NULL</code></td><td><code class="inline">None</code>（<b>首字母大写</b>）</td></tr>
+    <tr><td>输出</td><td><code class="inline">printf("%d", a);</code></td><td><code class="inline">print(a)</code></td></tr>
+    <tr><td>语句结尾</td><td>必须有 <code class="inline">;</code></td><td><b>不需要分号</b></td></tr>
+    <tr><td>代码块</td><td><code class="inline">{ }</code></td><td><b>靠缩进</b>（4 个空格）</td></tr>
+  </table>
+
+  <h3>③ 用 type() 看类型</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>a = 10
+b = 3.14
+c = "hello"
+d = True
+e = None
+
+print(type(a))
+print(type(b))
+print(type(c))
+print(type(d))
+print(type(e))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'str'&gt;
+&lt;class 'bool'&gt;
+&lt;class 'NoneType'&gt;</pre></div>
+
+  <div class="warn">
+    <b>容易搞错的两点：</b><br>
+    1. <code class="inline">True</code> / <code class="inline">False</code> / <code class="inline">None</code> <b>首字母必须大写</b>，写成 <code class="inline">true</code> 会报 <code class="inline">NameError</code>。<br>
+    2. Python 没有 <code class="inline">char</code>，单引号包起来的也是一个字符的字符串，可以 <code class="inline">'A' + 'B'</code> 得到 <code class="inline">'AB'</code>；C 里这是两个数字相加。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>运算符：那个最容易踩的除法坑</h2>
+  <table>
+    <tr><th>运算符</th><th>含义</th><th>例子</th><th>结果</th></tr>
+    <tr><td><code class="inline">+ - *</code></td><td>加减乘</td><td><code class="inline">3 * 4</code></td><td><code class="inline">12</code></td></tr>
+    <tr><td><code class="inline">/</code></td><td><b>真除法，结果永远是 float</b></td><td><code class="inline">7 / 2</code></td><td><code class="inline">3.5</code></td></tr>
+    <tr><td><code class="inline">//</code></td><td>整除，向下取整</td><td><code class="inline">7 // 2</code></td><td><code class="inline">3</code></td></tr>
+    <tr><td><code class="inline">%</code></td><td>取余</td><td><code class="inline">7 % 2</code></td><td><code class="inline">1</code></td></tr>
+    <tr><td><code class="inline">**</code></td><td>幂（C 里没有）</td><td><code class="inline">2 ** 10</code></td><td><code class="inline">1024</code></td></tr>
+  </table>
+
+  <div class="danger">
+    <b>⚠️ C 程序员第一大坑：</b>C 里 <code class="inline">7 / 2</code> 等于 <code class="inline">3</code>，Python 里等于 <code class="inline">3.5</code>。<br>
+    要整除必须写 <code class="inline">7 // 2</code>。这个差异会让你在"算分钟数""分页"这类场景里算错，务必记住。
+  </div>
+
+  <p>在 REPL 里验证一遍（输入 <code class="inline">python</code> 后逐行敲）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>print(7 / 2)
+print(7 // 2)
+print(7 % 2)
+print(2 ** 10)
+print(10 / 2)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">3.5
+3
+1
+1024
+5.0</pre></div>
+  <p>注意最后一行：<code class="inline">10 / 2</code> 结果是 <code class="inline">5.0</code> 不是 <code class="inline">5</code>——<b>只要有 <code class="inline">/</code>，结果就是 float</b>。</p>
+</section>
+
+<section>
+  <h2><span class="n">5</span>字符串与 f-string 格式化</h2>
+  <p>这是你以后用得最多的东西。单引号双引号等价，三引号可以写多行。</p>
+  <div class="codebox"><button class="copy">复制</button><pre>s = "Hello Python"
+print(s.upper())        # 全大写
+print(s.lower())        # 全小写
+print(len(s))           # 长度
+print(s[0])             # 第一个字符 H
+print(s[-1])            # 最后一个字符 n
+print(s[0:5])           # 切片，前 5 个 Hello
+print(s.split(" "))     # 按空格切分成列表
+print(s.replace("Hello", "Hi"))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">HELLO PYTHON
+hello python
+12
+H
+n
+Hello
+['Hello', 'Python']
+Hi Python</pre></div>
+
+  <h3>f-string：Python 里最好的字符串拼接</h3>
+  <p>在字符串前面加个 <code class="inline">f</code>，花括号里可以直接放变量或表达式：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>name = "小明"
+age = 18
+score = 87.5678
+
+print(f"我叫{name}，今年{age}岁")
+print(f"明年我{age + 1}岁")
+print(f"成绩保留一位小数：{score:.1f}")
+print(f"成绩保留两位小数：{score:.2f}")
+print(f"百分比：{score:.1f}%")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">我叫小明，今年18岁
+明年我19岁
+成绩保留一位小数：87.6
+成绩保留两位小数：87.57
+百分比：87.6%</pre></div>
+  <div class="note">
+    <b><code class="inline">:.2f</code> 是什么：</b>冒号后面是格式说明，<code class="inline">.2</code> 表示两位小数，<code class="inline">f</code> 表示浮点数。这相当于 C 的 <code class="inline">printf("%.2f")</code>，但不用操心类型匹配。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>input()：从键盘拿数据</h2>
+  <p><code class="inline">input()</code> 会暂停程序等你输入，按回车才继续。</p>
+  <div class="codebox"><button class="copy">复制</button><pre>name = input("请输入你的名字：")
+print(f"你好，{name}")</pre></div>
+
+  <div class="danger">
+    <b>⚠️ C 程序员第二大坑：<code class="inline">input()</code> 永远返回字符串！</b><br>
+    哪怕你输入的是 <code class="inline">18</code>，拿到的也是 <code class="inline">"18"</code>（字符串）。<br>
+    要当数字用，必须转换：<code class="inline">age = int(input("年龄："))</code> 或 <code class="inline">float(input(...))</code>。<br>
+    不转的话，<code class="inline">"18" + 1</code> 会报 <code class="inline">TypeError</code>。
+  </div>
+
+  <p>正确写法：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>age = int(input("请输入年龄："))
+height = float(input("请输入身高（米）："))
+print(f"你 {age} 岁，身高 {height} 米")</pre></div>
+
+  <p><code class="inline">print()</code> 还有两个有用参数：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>print("a", "b", "c")              # 默认用空格隔开
+print("a", "b", "c", sep="-")     # 用 - 隔开
+print("第一行", end="")            # end 改结尾符，默认是换行
+print("第二行")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">a b c
+a-b-c
+第一行第二行</pre></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>动手写 3 个脚本（今天的核心产出）</h2>
+
+  <h3>脚本 1：温度转换 <code class="inline">temp.py</code></h3>
+  <p>新建文件：<code class="inline">nano temp.py</code>，把下面代码粘进去，<span class="kbd">Control</span>+<span class="kbd">O</span> 回车保存，<span class="kbd">Control</span>+<span class="kbd">X</span> 退出。</p>
+  <div class="codebox"><button class="copy">复制</button><pre># temp.py  摄氏度转华氏度
+c = float(input("请输入摄氏度："))
+f = c * 9 / 5 + 32
+print(f"{c} 摄氏度 = {f:.1f} 华氏度")</pre></div>
+  <p>运行：<code class="inline">python temp.py</code></p>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">请输入摄氏度：37
+37.0 摄氏度 = 98.6 华氏度</pre></div>
+  <p><b>加难度（自己写）：</b>让它支持反向转换——输入华氏度也能算摄氏度，公式是 <code class="inline">(f - 32) * 5 / 9</code>。</p>
+
+  <h3>脚本 2：BMI 计算 <code class="inline">bmi.py</code></h3>
+  <p>这个脚本要引入 <code class="inline">if</code> 判断，是今天唯一的新语法：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># bmi.py  计算 BMI 并给出区间
+height = float(input("请输入身高（米，如 1.75）："))
+weight = float(input("请输入体重（公斤）："))
+
+bmi = weight / (height ** 2)
+print(f"你的 BMI 是 {bmi:.2f}")
+
+if bmi &lt; 18.5:
+    print("偏瘦")
+elif bmi &lt; 24:
+    print("正常")
+elif bmi &lt; 28:
+    print("偏胖")
+else:
+    print("肥胖")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">请输入身高（米，如 1.75）：1.75
+请输入体重（公斤）：70
+你的 BMI 是 22.86
+正常</pre></div>
+  <div class="note">
+    <b>注意语法：</b><code class="inline">if</code> 条件后面有<b>冒号</b>，下一行要<b>缩进 4 个空格</b>，没有花括号。缩进错了 Python 会直接报 <code class="inline">IndentationError</code>。
+  </div>
+
+  <h3>脚本 3：单位换算 <code class="inline">convert.py</code></h3>
+  <div class="codebox"><button class="copy">复制</button><pre># convert.py  存储单位换算
+gb = float(input("请输入 GB 数："))
+
+mb = gb * 1024
+kb = mb * 1024
+
+print(f"{gb} GB = {mb:.0f} MB")
+print(f"{gb} GB = {kb:.0f} KB")
+print(f"{gb} GB = {gb * 1024**3:.0f} 字节")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">请输入 GB 数：2
+2.0 GB = 2048 MB
+2.0 GB = 2097152 KB
+2.0 GB = 2147483648 字节</pre></div>
+
+  <div class="ok">
+    <b>三个脚本都跑通 = D001 完成。</b>把这三个文件留在 <code class="inline">~/python-learn/day01/</code> 目录里，后面几天还会用到。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>五道练习（第 4 小时做）</h2>
+  <ol class="task">
+    <li>输入两个整数，输出它们的和、差、积、商（商保留两位小数）</li>
+    <li>输入总秒数，换算成「时:分:秒」格式。例如输入 3661，输出 <code class="inline">1 时 1 分 1 秒</code>（提示：用 <code class="inline">//</code> 和 <code class="inline">%</code>）</li>
+    <li>输入圆的半径，输出面积和周长（用 <code class="inline">import math</code> 里的 <code class="inline">math.pi</code>，结果保留两位小数）</li>
+    <li>输入一句话，输出它的字符数、全大写形式、以及第一个和最后一个字符</li>
+    <li>输入三个数，输出其中的最大值（用 <code class="inline">max()</code> 函数一行搞定）</li>
+  </ol>
+
+  <details>
+    <summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+    <div class="codebox"><button class="copy">复制</button><pre># 1
+a = int(input("第一个数："))
+b = int(input("第二个数："))
+print(f"和={a+b} 差={a-b} 积={a*b} 商={a/b:.2f}")
+
+# 2
+total = int(input("总秒数："))
+h = total // 3600
+m = (total % 3600) // 60
+s = total % 60
+print(f"{h} 时 {m} 分 {s} 秒")
+
+# 3
+import math
+r = float(input("半径："))
+print(f"面积={math.pi * r ** 2:.2f} 周长={2 * math.pi * r:.2f}")
+
+# 4
+text = input("输入一句话：")
+print(f"长度={len(text)} 大写={text.upper()} 首={text[0]} 尾={text[-1]}")
+
+# 5
+nums = [float(input(f"第{i+1}个数：")) for i in range(3)]
+print(f"最大值={max(nums)}")</pre></div>
+  </details>
+</section>
+
+<section>
+  <h2><span class="n">9</span>今日笔记模板（第 4 小时最后 20 分钟）</h2>
+  <p>新建 <code class="inline">nano day01-笔记.md</code>，按这个结构写，不用长，但要自己动手写：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># D001 笔记
+
+## 今天学会的
+- 变量不需要声明类型，值有类型
+- True/False/None 首字母大写
+- / 永远返回 float，// 才是整除
+- f-string 用 {变量:.2f} 控制小数位
+- input() 返回字符串，要数字必须 int()/float()
+
+## C 与 Python 的差异（重点）
+- 7/2 在 C 是 3，在 Python 是 3.5
+- 没有 char，单字符也是 str
+- 代码块靠缩进，不用 {}
+
+## 踩过的坑
+- （写下你今天真实遇到的报错）
+
+## 明天要补的
+- （哪个知识点还没吃透）</pre></div>
+</section>
+
+<section>
+  <h2><span class="n">附</span>终端编辑器速查（没有 VS Code 也能写代码）</h2>
+  <p>现在网络问题没解决，先用终端里的 <code class="inline">nano</code>，够用：</p>
+  <table>
+    <tr><th>操作</th><th>按键</th></tr>
+    <tr><td>新建/打开文件</td><td><code class="inline">nano 文件名.py</code></td></tr>
+    <tr><td>保存</td><td><span class="kbd">Control</span>+<span class="kbd">O</span> 然后回车</td></tr>
+    <tr><td>退出</td><td><span class="kbd">Control</span>+<span class="kbd">X</span></td></tr>
+    <tr><td>撤销</td><td><span class="kbd">Option</span>+<span class="kbd">U</span></td></tr>
+    <tr><td>搜索</td><td><span class="kbd">Control</span>+<span class="kbd">W</span></td></tr>
+    <tr><td>查看目录里有哪些文件</td><td><code class="inline">ls</code></td></tr>
+    <tr><td>重新运行脚本</td><td>按 <span class="kbd">↑</span> 键调出上次命令，回车</td></tr>
+  </table>
+
+  <div class="note">
+    <b>以后有 VS Code 了怎么切换：</b>装好后在项目目录执行 <code class="inline">code .</code>，就能用图形界面编辑同样的文件，不用重新建。今天的文件都在 <code class="inline">~/python-learn/day01/</code>，不会白写。
+  </div>
+</section>
+
+<footer>
+  <p>📌 今天的目标不是"看懂"，是"跑通"。三个脚本 + 五道练习，做不完可以把练习挪到明天，但三个脚本必须跑通。</p>
+  <p>遇到报错：先读报错最后一行（那里写着错误类型和原因），再看倒数第二行（指向哪一行代码）。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

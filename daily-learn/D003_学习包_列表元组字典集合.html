@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D003 学习包 · 列表、元组、字典、集合</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:20px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">DAY 003 · 第 1 周</div>
+  <h1>列表、元组、字典、集合</h1>
+  <p>从今天起你有了「装数据」的能力。这四个容器后面会出现在你写的每一行代码里——包括所有 AI 应用的数据流。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：8 个练习 + 笔记</span>
+    <span>🔁 承接 D001 / D002</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+  <div class="timeline">
+    <div class="tl"><b>第 1 小时</b><span>读 1–2 节：列表 + 推导式</span></div>
+    <div class="tl"><b>第 2 小时</b><span>读 3–4 节：元组 + 字典</span></div>
+    <div class="tl"><b>第 3 小时</b><span>读 5–6 节：集合 + 选型</span></div>
+    <div class="tl"><b>第 4 小时</b><span>8 道练习 + 笔记</span></div>
+  </div>
+  <p>新建目录：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day03
+cd ~/python-learn/day03</pre></div>
+  <div class="note">
+    <b>今天最容易踩的坑不在语法，在「名字」。</b>第 1 节里有个「赋值不是拷贝」的实验，务必亲手敲一遍——光看会觉得自己懂了，实际写代码时 90% 的诡异 bug 都是它。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>列表：可变的有序序列</h2>
+  <p>字符串是「一串字符且不能改」，列表是「一串任意东西且能改」。就这两点差别，但用法完全不同。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [3, 1, 4, 1, 5]
+mixed = [1, "hello", 3.14, True]     # 可以混装不同类型
+empty = []
+nested = [[1, 2], [3, 4]]            # 可以嵌套
+
+print(nums[0], nums[-1])             # 索引和字符串一样
+print(nums[1:3])                     # 切片也一样
+print(len(nums))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">3 5
+[1, 4]
+5</pre></div>
+
+  <div class="note">
+    <b>和 C 数组的区别：</b>C 的数组长度固定、类型统一、名存实亡（退化成指针）。Python 列表长度随便变、类型随便混、还自带长度。你以后基本不用再关心「开多大」这件事。
+  </div>
+
+  <h3>增删改：六个必须记住的操作</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [3, 1, 4, 1, 5]
+
+nums.append(9)        # 末尾加一个
+nums.insert(0, 0)     # 在下标 0 处插入
+print(nums)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[0, 3, 1, 4, 1, 5, 9]</pre></div>
+
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [0, 3, 1, 4, 1, 5, 9]
+
+nums.remove(1)        # 删掉「第一个值等于 1」的元素（不是下标 1！）
+print(nums)
+
+last = nums.pop()     # 删掉末尾并把它返回
+print(last, nums)
+
+del nums[0]           # 按下标删
+print(nums)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[0, 3, 4, 1, 5, 9]
+9 [0, 3, 4, 1, 5]
+[3, 4, 1, 5]</pre></div>
+
+  <div class="warn">
+    <b>⚠️ <code class="inline">remove(1)</code> 删的是「值 1」，<code class="inline">del nums[1]</code> 删的是「下标 1 上的东西」。</b>这两个最容易混。列表里有重复值时 <code class="inline">remove</code> 只删最先出现的那个。
+  </div>
+
+  <table>
+    <tr><th>操作</th><th>写法</th><th>说明</th></tr>
+    <tr><td>末尾追加</td><td><code>lst.append(x)</code></td><td>最常用，一次加一个</td></tr>
+    <tr><td>末尾追加一批</td><td><code>lst.extend([a,b])</code></td><td>把列表「拆开」接上去</td></tr>
+    <tr><td>指定位置插入</td><td><code>lst.insert(i, x)</code></td><td>后面元素整体后移，代价 O(n)</td></tr>
+    <tr><td>按值删除</td><td><code>lst.remove(x)</code></td><td>找不到会 <code>ValueError</code></td></tr>
+    <tr><td>按下标弹出</td><td><code>lst.pop(i)</code></td><td>不传参数默认弹末尾</td></tr>
+    <tr><td>按下标删除</td><td><code>del lst[i]</code></td><td>不返回值</td></tr>
+    <tr><td>清空</td><td><code>lst.clear()</code></td><td>变成 <code>[]</code></td></tr>
+    <tr><td>查找下标</td><td><code>lst.index(x)</code></td><td>找不到会 <code>ValueError</code></td></tr>
+    <tr><td>统计次数</td><td><code>lst.count(x)</code></td><td>找不到返回 0</td></tr>
+    <tr><td>是否包含</td><td><code>x in lst</code></td><td>返回 <code>True</code>/<code>False</code></td></tr>
+  </table>
+
+  <h3>排序：sort 和 sorted 的区别（考点）</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>a = [3, 1, 4, 1, 5]
+
+b = a.sort()              # 原地排序，返回 None
+print("a =", a)
+print("b =", b)
+
+c = sorted(a, reverse=True)   # 生成新列表，原列表不变
+print("a =", a)
+print("c =", c)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">a = [1, 1, 3, 4, 5]
+b = None
+a = [1, 1, 3, 4, 5]
+c = [5, 4, 3, 1, 1]</pre></div>
+
+  <div class="danger">
+    <b>⚠️ 这个错误一定要现在就记住：</b><br>
+    <code class="inline">nums = nums.sort()</code> &nbsp;→&nbsp; <b>nums 会变成 None，数据全丢了。</b><br><br>
+    因为 <code class="inline">sort()</code> 是<b>原地</b>改列表、<b>返回 None</b>；<code class="inline">sorted()</code> 是<b>返回新列表</b>、原列表不动。<br>
+    规律：<b>列表自己的方法（append / sort / remove / reverse）都是原地改；内置函数（sorted / len / sum / max）都是返回新值。</b>
+  </div>
+
+  <h3 class="purple">今天最重要的一节：赋值不是拷贝</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>a = [1, 2, 3]
+b = a                 # 这不是复制！
+b.append(4)
+
+print("a =", a)
+print("b =", b)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">a = [1, 2, 3, 4]
+b = [1, 2, 3, 4]</pre></div>
+
+  <div class="danger">
+    <b>⚠️ 我只改了 b，a 也变了。</b>因为 <code class="inline">b = a</code> 只是让两个名字<b>指向同一个列表对象</b>，不是把内容拷一份。
+    <br><br>
+    <b>用 C 来理解就通了：</b><code class="inline">int a[3]; int *b = a;</code> —— b 和 a 指向同一块内存，通过 b 改，a 看到的也变。Python 的列表变量<b>本质就是个指针</b>，赋值只是复制指针。
+  </div>
+
+  <p>要真正复制一份，用切片或 <code class="inline">copy()</code>：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>a = [1, 2, 3]
+c = a[:]              # 切片 → 新列表
+c.append(5)
+
+print("a =", a)
+print("c =", c)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">a = [1, 2, 3]
+c = [1, 2, 3, 5]</pre></div>
+
+  <h3>浅拷贝的坑：嵌套列表还是要穿透</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>a = [[1, 2], [3, 4]]
+b = a[:]              # 只复制了外层
+
+b[0].append(99)       # 改的是内层列表（还是同一个对象）
+print("a =", a)
+
+b.append([5, 6])      # 改外层（这次不会影响 a）
+print("a =", a)
+print("b =", b)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">a = [[1, 2, 99], [3, 4]]
+a = [[1, 2, 99], [3, 4]]
+b = [[1, 2, 99], [3, 4], [5, 6]]</pre></div>
+
+  <div class="note">
+    <b>切片是「浅拷贝」：</b>外层换了个新列表，但里面装的还是原来那些子对象的<b>指针</b>。所以改子列表会穿透。
+    真要完全独立，用 <code class="inline">import copy; copy.deepcopy(a)</code>。
+    <br><br>
+    <b>什么时候需要在意：</b>处理二维表格（Excel 数据、矩阵、API 返回的嵌套 JSON）时，浅拷贝的穿透会让你改了一行结果全表都变了。现在知道有这回事，遇到时能想起来就行。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>列表推导式：一行生成列表</h2>
+  <p>昨天第 8 题你用过一次 <code class="inline">[int(x) for x in s.split(",")]</code>。这个写法叫列表推导式，是 Python 最标志性的语法，必须写熟。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre># 普通写法
+sq = []
+for x in range(1, 6):
+    sq.append(x * x)
+
+# 推导式写法（完全等价）
+sq = [x * x for x in range(1, 6)]
+
+print(sq)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[1, 4, 9, 16, 25]</pre></div>
+
+  <h3>加条件：把 if 写在后面</h3>
+  <div class="codebox"><button class="copy">复制</button><pre># 1~10 里的偶数
+ev = [x for x in range(1, 11) if x % 2 == 0]
+print(ev)
+
+# 把一组单词转大写
+words = ["hello", "world"]
+print([w.upper() for w in words])</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[2, 4, 6, 8, 10]
+['HELLO', 'WORLD']</pre></div>
+
+  <div class="note">
+    <b>记忆口诀：</b>先说「要什么」（<code class="inline">x * x</code>），再说「从哪来」（<code class="inline">for x in ...</code>），最后说「筛掉谁」（<code class="inline">if ...</code>）。写的时候顺序就是读的顺序。
+  </div>
+
+  <p>顺便把其他三个容器也各来一句（后面会用，先混个脸熟）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>d = {k: v for k, v in [("a", 1), ("b", 2)]}    # 字典推导式
+s = {x % 3 for x in range(10)}                 # 集合推导式
+
+print(d)
+print(s)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">{'a': 1, 'b': 2}
+{0, 1, 2}</pre></div>
+
+  <div class="warn">
+    <b>⚠️ 别为了「一行」把推导式写复杂。</b>超过一个 <code class="inline">for</code> 加一个 <code class="inline">if</code> 就该换回普通循环——推导式是给「简单转换」用的，嵌套两层以上可读性会崩，尤其以后别人要读你的代码。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>元组：不可变的列表</h2>
+  <p>元组的语法几乎和列表一样，区别只有两个：用圆括号、创建后不能改。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>t = ("张三", 18, "北京")
+
+print(len(t), t[0], t[-1])
+print(t[1:])               # 切片同样支持
+print(t[::-1])             # 反转</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">3 张三 北京
+(18, '北京')
+('北京', 18, '张三')</pre></div>
+
+  <div class="codebox"><button class="copy">复制</button><pre>t = ("张三", 18)
+t[0] = "李四"</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">TypeError: 'tuple' object does not support item assignment</pre></div>
+
+  <h3>元组最有用的功能：解包</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>t = ("张三", 18, "北京")
+
+name, age, city = t        # 一次拆成三个变量
+print(name, age, city)
+
+# 用 * 接住剩下的
+first, *rest = (1, 2, 3, 4)
+print(first, rest)
+
+# 交换两个变量（C 里要靠临时变量）
+a, b = 1, 2
+a, b = b, a
+print(a, b)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">张三 18 北京
+1 [2, 3, 4]
+2 1</pre></div>
+
+  <div class="ok">
+    <b>解包是后面天天要用的东西。</b>遍历字典、读函数返回值、处理 API 返回的 (key, value) 对，全靠它。<code class="inline">a, b = b, a</code> 这个交换写法也请直接记住——Python 里不需要临时变量。
+  </div>
+
+  <h3>单元素元组的坑</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>print(type((5,)))    # 加了逗号 → 元组
+print(type((5)))     # 没加逗号 → 只是加了个括号的 int</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">&lt;class 'tuple'&gt;
+&lt;class 'int'&gt;</pre></div>
+  <div class="warn">
+    <b>⚠️ 只有一个元素的元组，逗号不能省：<code class="inline">(5,)</code>。</b>括号在 Python 里只是分组符号，<b>逗号才决定它是元组</b>。<code class="inline">(5)</code> 就是整数 5。
+  </div>
+
+  <h3>既然不能改，为什么还要用它</h3>
+  <table>
+    <tr><th>场景</th><th>为什么用元组</th></tr>
+    <tr><td>函数返回多个值</td><td><code>return x, y</code> 本质就是返回元组</td></tr>
+    <tr><td>字典的 key</td><td>字典 key 必须不可变，元组可以，列表不行</td></tr>
+    <tr><td>固定配置 / 常量组</td><td>如 <code>RGB = (255, 0, 0)</code>，语义上就是「不该改」</td></tr>
+    <tr><td>性能与内存</td><td>比列表省内存、创建更快</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">4</span>字典：靠名字找东西</h2>
+  <p>列表靠下标找（第几个），字典靠 key 找（叫什么）。这是两种完全不同的取数思路。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>d = {"apple": 3, "banana": 5}
+
+print(d["apple"])
+
+d["orange"] = 2       # 不存在 → 新增
+d["apple"] = 10       # 已存在 → 覆盖
+
+print(d)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">3
+{'apple': 10, 'banana': 5, 'orange': 2}</pre></div>
+
+  <div class="note">
+    <b>字典的增和改是同一个写法：</b><code class="inline">d[key] = value</code>。key 不存在就是新增，存在就是覆盖——不需要先判断。
+  </div>
+
+  <h3>取值的两种方式：[] 和 get()</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>d = {"apple": 10}
+
+print(d.get("pear"))          # 不存在 → 返回 None，不报错
+print(d.get("pear", 0))       # 不存在 → 返回你给的默认值
+print(d["pear"])              # 不存在 → 直接报错</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">None
+0
+Traceback ... KeyError: 'pear'
+（前两行正常输出；第三行在程序遇到时才会中断）</pre></div>
+  <div class="danger">
+    <b>⚠️ 读字典优先用 <code class="inline">get()</code>。</b>数据来源不可控时（用户输入、API 返回、CSV 列名），key 不一定存在，用 <code class="inline">[]</code> 会让整个程序崩在 KeyError。这条和第 1 节「能用切片就别用索引」是同一个思路——<b>选不会崩的写法</b>。
+  </div>
+
+  <h3>遍历的三个姿势</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>d = {"apple": 10, "banana": 5, "orange": 2}
+
+print(list(d.keys()))       # 所有 key
+print(list(d.values()))     # 所有 value
+print(list(d.items()))      # 所有 (key, value) 对
+
+for k, v in d.items():      # 最常用：同时拿 key 和 value
+    print(k, v)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">['apple', 'banana', 'orange']
+[10, 5, 2]
+[('apple', 10), ('banana', 5), ('orange', 2)]
+apple 10
+banana 5
+orange 2</pre></div>
+  <div class="note">
+    <b>给 <code class="inline">keys()</code> / <code class="inline">values()</code> / <code class="inline">items()</code> 外面套 <code class="inline">list()</code> 只是为了看清楚内容。</b>实际遍历时不用套：<code class="inline">for k in d:</code> 直接就是遍历 key。
+  </div>
+
+  <h3>计数：字典最经典的用法</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>sentence = "to be or not to be"
+freq = {}
+
+for w in sentence.split():
+    freq[w] = freq.get(w, 0) + 1
+
+print(freq)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">{'to': 2, 'be': 2, 'or': 1, 'not': 1}</pre></div>
+  <div class="ok">
+    <b><code class="inline">freq.get(w, 0) + 1</code> 这一行是核心。</b>意思是：字典里有 w 就拿它的值，没有就当 0，然后加 1 写回去。如果是第一次遇到这个词，<code class="inline">get</code> 返回 0，加 1 后存进去 1——不用写 <code class="inline">if w in freq</code> 判断。
+    <br><br>
+    这个模式（词频统计）就是后面做文本分析、推荐系统、数据聚合的雏形。
+  </div>
+
+  <h3>字典的 key 有什么要求</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>d = {}
+d[(1, 2)] = "元组当 key，可以"
+print(d)
+
+d[[1, 2]] = "列表当 key"</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">{(1, 2): '元组当 key，可以'}
+Traceback ... TypeError: unhashable type: 'list'
+（只有第一行能输出，第二行写完立刻报错）</pre></div>
+  <div class="warn">
+    <b>⚠️ key 必须「不可变」（准确说是可哈希）。</b>数字、字符串、元组可以；列表、字典、集合不行。<br>
+    直觉理解：字典靠 key 算出一个位置来存值，如果 key 能被改，改完之后就找不回来了。所以可变的东西不能当 key。
+  </div>
+
+  <h3>嵌套：这才是真实数据的样子</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>student = {
+    "name": "张三",
+    "age": 18,
+    "scores": {"语文": 88, "数学": 95}
+}
+
+print(student["name"])
+print(student["scores"]["数学"])       # 一层层取下去
+
+student["scores"]["英语"] = 76         # 直接往里加
+print(student["scores"])</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">张三
+95
+{'语文': 88, '数学': 95, '英语': 76}</pre></div>
+  <div class="note">
+    <b>记住这个结构。</b>你以后从任何 API 拿到的 JSON、读进来的每一行配置，都是这种「字典套字典 / 字典套列表」的形状。<b>会用 <code class="inline">[]</code> 一层层剥进去，就等于会处理真实数据了。</b>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>集合：去重和二选一之外的能力</h2>
+  <p>集合就两件事：<b>去重</b> 和 <b>集合运算</b>。看着简单，但用得极多。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>s = {1, 2, 2, 3, 3, 3}
+print(s, len(s))          # 自动去重
+
+lst = [1, 2, 2, 3, 1]
+print(list(set(lst)))     # 列表去重的经典写法</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">{1, 2, 3} 3
+[1, 2, 3]</pre></div>
+
+  <div class="warn">
+    <b>⚠️ 两个坑：</b><br>
+    <b>① 空集合要写 <code class="inline">set()</code>，不能写 <code class="inline">{}</code></b> —— <code class="inline">{}</code> 是空字典。<br>
+    <b>② <code class="inline">set()</code> 去重会打乱顺序</b>，上例输出 <code class="inline">[1, 2, 3]</code> 只是碰巧。
+  </div>
+
+  <div class="danger">
+    <b>为什么说「碰巧」：</b>集合内部靠哈希值决定元素放在哪个位置，而<b>打印时是按位置顺序输出的</b>。<br><br>
+    · <b>小整数的哈希值就是它自己</b>（hash(1)=1, hash(2)=2），所以整数集合看起来总是「从小到大」，像个错觉。<br>
+    · <b>字符串的哈希值每次运行都不同</b>（Python 启动时会加随机种子），所以中文/英文集合每次打印顺序都可能变。<br><br>
+    动手验证一下，连跑三次看结果是否一样：
+    <div class="codebox" style="margin-top:8px"><button class="copy">复制</button><pre>print(set(["张三", "李四", "王五", "赵六"]))</pre></div>
+    <b>结论：别依赖集合的打印顺序。</b>要稳定输出就套 <code class="inline">sorted()</code>；要「去重且保持原来的顺序」，用第 7 节第 2 题的循环写法。
+  </div>
+
+  <h3>集合运算：交集、并集、差集</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>a = {1, 2, 3, 4}
+b = {3, 4, 5}
+
+print(a &amp; b)      # 交集：两个都有
+print(a | b)      # 并集：合起来去重
+print(a - b)      # 差集：在 a 不在 b
+print(a ^ b)      # 对称差：只在一个里的</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">{3, 4}
+{1, 2, 3, 4, 5}
+{1, 2}
+{1, 2, 5}</pre></div>
+
+  <div class="note">
+    <b>符号记忆：</b><code class="inline">&amp;</code> 像「与」→ 都要有；<code class="inline">|</code> 像「或」→ 有一个就行；<code class="inline">-</code> 就是减法。<br>
+    这三个符号对应 <code class="inline">intersection()</code> / <code class="inline">union()</code> / <code class="inline">difference()</code>，效果一样，符号更短。
+  </div>
+
+  <div class="purple">
+    <b>实际用在哪：</b>两个用户群的共同好友（交集）、推荐系统里「排除已看过」（差集）、统计今天有多少独立访客（去重）。做数据处理时，「去重」这一步几乎每个项目都要做。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>四者对比：什么时候用哪个</h2>
+
+  <table>
+    <tr><th></th><th>列表 list</th><th>元组 tuple</th><th>字典 dict</th><th>集合 set</th></tr>
+    <tr><td>写法</td><td><code>[1,2]</code></td><td><code>(1,2)</code></td><td><code>{"a":1}</code></td><td><code>{1,2}</code></td></tr>
+    <tr><td>有序</td><td>✅</td><td>✅</td><td>✅（3.7+ 保插入序）</td><td>❌</td></tr>
+    <tr><td>可变</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td></tr>
+    <tr><td>重复元素</td><td>允许</td><td>允许</td><td>key 唯一</td><td>不允许</td></tr>
+    <tr><td>怎么取</td><td>下标 <code>[0]</code></td><td>下标 <code>[0]</code></td><td>key <code>["a"]</code></td><td>不能取</td></tr>
+    <tr><td>典型用途</td><td>一组同类数据</td><td>一条不可改的记录</td><td>带名字的字段集合</td><td>去重、交并差</td></tr>
+  </table>
+
+  <h3>判断「在不在里面」的速度差异</h3>
+  <p>这条对以后处理大数据很关键，现在先建立一个直觉：</p>
+  <table>
+    <tr><th>操作</th><th>列表</th><th>字典</th><th>集合</th></tr>
+    <tr><td>放一个元素到末尾</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+    <tr><td>按下标 / key 取</td><td>O(1)</td><td>O(1)</td><td>—</td></tr>
+    <tr><td><b><code>x in ...</code> 查找</b></td><td><b>O(n)</b></td><td><b>O(1)</b></td><td><b>O(1)</b></td></tr>
+    <tr><td>头部插入 <code>insert(0,x)</code></td><td>O(n)</td><td>—</td><td>—</td></tr>
+    <tr><td>按值删除 <code>remove(x)</code></td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+  </table>
+
+  <div class="danger">
+    <b>⚠️ 最实用的一条：判断「某个值在不在」时，别用列表，用集合。</b><br><br>
+    列表要一个一个比，1 万条数据就要比 1 万次；集合是算出一个位置直接跳过去，不管多少条都差不多快。<br><br>
+    后面处理用户 ID 黑名单、敏感词表、已读集合这类「只需要判断存在」的场景，写成 <code class="inline">if x in some_set</code> 会比 <code class="inline">if x in some_list</code> 快几个数量级。
+  </div>
+
+  <h3>选型口诀</h3>
+  <div class="ok">
+    <b>① 一串顺序重要的数据</b> → 列表<br>
+    <b>② 一条不该被改的记录（坐标、RGB、函数返回多值）</b> → 元组<br>
+    <b>③ 每个东西有名字，要按名字取</b> → 字典<br>
+    <b>④ 只关心「有没有」「去重」「交并差」</b> → 集合<br><br>
+    <b>拿不准的时候：先用列表。</b>99% 的场景列表都够，等发现「我要按名字取值」再换字典，发现「要判重」再换集合。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习（每题一个文件）</h2>
+  <p>建议命名：<code class="inline">p1_stats.py</code>、<code class="inline">p2_dedup.py</code> … 方便回看。</p>
+
+  <ol class="task">
+    <li><b>数字统计</b>：输入 <code class="inline">3,1,4,1,5</code>，输出最大值、最小值、平均值（拆分 → 转数字 → 用 <code class="inline">max</code>/<code class="inline">min</code>/<code class="inline">sum</code>）</li>
+    <li><b>去重保序</b>：输入一串数字，去掉重复但<b>保持原来顺序</b>（不能直接用 <code class="inline">set</code>，会乱序）</li>
+    <li><b>词频统计</b>：输入一句英文，输出每个单词出现几次（用 <code class="inline">dict.get</code>）</li>
+    <li><b>列表推导式</b>：一行生成 1–100 内所有偶数的平方</li>
+    <li><b>成绩管理</b>：用字典存三门成绩，输出平均分和<b>最高分的科目名</b>（提示：<code class="inline">max(d, key=d.get)</code>）</li>
+    <li><b>共同好友</b>：两个集合，分别输出共同好友、全部好友（用集合运算）</li>
+    <li><b>信息拆包</b>：用列表存若干 <code class="inline">(姓名, 年龄)</code> 元组，遍历打印「张三 今年 18 岁」</li>
+    <li><b>成绩排名</b>：把上面的 <code class="inline">(姓名, 分数)</code> 列表<b>按分数从高到低</b>排（用 <code class="inline">sorted</code> + <code class="inline">key</code>）</li>
+  </ol>
+
+  <details>
+    <summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+
+    <div class="codebox"><button class="copy">复制</button><pre># p1_stats.py
+s = input("请输入用逗号分隔的数字: ")
+nums = [int(x) for x in s.split(",")]
+print(f"最大 {max(nums)}，最小 {min(nums)}，平均 {sum(nums)/len(nums):.1f}")
+
+
+# p2_dedup.py
+s = input("请输入用逗号分隔的数字: ")
+items = s.split(",")
+
+seen = []
+for x in items:
+    if x not in seen:      # 没见过才加
+        seen.append(x)
+
+print(seen)
+
+
+# p3_wordfreq.py
+sentence = input("请输入一句英文: ")
+freq = {}
+
+for w in sentence.split():
+    freq[w] = freq.get(w, 0) + 1
+
+for w, c in freq.items():
+    print(f"{w}: {c}")
+
+
+# p4_squares.py
+print([x * x for x in range(1, 101) if x % 2 == 0])
+
+
+# p5_scores.py
+scores = {"语文": 88, "数学": 95, "英语": 76}
+
+print(f"平均分：{sum(scores.values()) / len(scores):.1f}")
+
+best = max(scores, key=scores.get)      # 按 value 比大小，取出 key
+print(f"最高分：{best} {scores[best]}")
+
+
+# p6_friends.py
+a = {"张三", "李四", "王五"}
+b = {"李四", "王五", "赵六"}
+
+print("共同好友：", sorted(a &amp; b))     # 套 sorted 让输出稳定可复现
+print("全部好友：", sorted(a | b))
+
+
+# p7_unpack.py
+students = [("张三", 18), ("李四", 20)]
+
+for name, age in students:
+    print(f"{name} 今年 {age} 岁")
+
+
+# p8_rank.py
+people = [("张三", 88), ("李四", 95), ("王五", 76)]
+
+for name, score in sorted(people, key=lambda x: x[1], reverse=True):
+    print(f"{name} {score}")</pre></div>
+
+    <div class="codebox light"><button class="copy">复制</button><pre class="out">p1  最大 5，最小 1，平均 2.8
+p2  ['3', '1', '4', '5']
+p3  to: 2 / be: 2 / or: 1 / not: 1
+p4  [4, 16, 36, 64, 100, ... , 9604, 10000]
+p5  平均分：86.3 / 最高分：数学 95
+p6  共同好友： ['李四', '王五'] / 全部好友： ['张三', '李四', '王五', '赵六']
+p7  张三 今年 18 岁 / 李四 今年 20 岁
+p8  李四 95 / 张三 88 / 王五 76</pre></div>
+
+    <div class="note">
+      <b>三个重点：</b><br>
+      <b>第 2 题</b> —— <code class="inline">if x not in seen</code> 是「去重保序」的标准解法。别图省事用 <code class="inline">set</code>，顺序会丢。<br>
+      <b>第 5 题</b> —— <code class="inline">max(scores, key=scores.get)</code> 这个写法值得背下来：<code class="inline">max</code> 默认比 key，加了 <code class="inline">key=</code> 参数就改成「按 value 比，但返回 key」。<br>
+      <b>第 8 题</b> —— <code class="inline">lambda x: x[1]</code> 的意思是「拿每个元组的第 2 个元素（分数）来比较」。这是排序题的标准套路，后面会反复出现。
+    </div>
+
+    <div class="danger">
+      <b>⚠️ 第 6 题为什么外面要套 <code class="inline">sorted()</code>：</b>集合是无序的，<b>直接 print 一个集合，每次运行打印出来的顺序都可能不一样</b>——因为 Python 每次启动都会给字符串换一套随机哈希值。<br><br>
+      你可以自己试试：把 <code class="inline">sorted()</code> 去掉，连跑三次 <code class="inline">python p6_friends.py</code>，看输出顺序变不变。<br><br>
+      <b>实际意义：</b>凡是「要给人看」或「要写进文件做对比」的输出，内容来自集合就套一个 <code class="inline">sorted()</code>。否则今天跑出来是这样，明天跑出来是那样，出了问题根本没法复现。
+    </div>
+  </details>
+
+  <div class="warn">
+    <b>自测边界情况</b>（写完可以试试）：<br>
+    · 第 1 题输入空字符串会怎样？<br>
+    · 第 3 题输入空句子会怎样？<br>
+    · 第 5 题字典是空的，<code class="inline">sum()/len()</code> 会怎样？<br>
+    · 第 8 题两个人分数一样，顺序稳定吗？<br>
+    崩了不要紧，能说出「为什么崩」就算学到了。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+  <p>新建 <code class="inline">day03-笔记.md</code>，至少覆盖这几条：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># D003 笔记
+
+## 核心概念
+- 列表 = 可变有序；元组 = 不可变；字典 = key→value；集合 = 去重无序
+- b = a 是引用不是拷贝！要复制用 a[:] 或 copy()
+- 切片是浅拷贝，嵌套列表会穿透，彻底独立要 deepcopy
+- sort() 原地改返回 None；sorted() 返回新列表
+
+## 方法速查
+- append / extend / insert / remove / pop / del / clear
+- remove(x) 按值删，del lst[i] 按下标删
+- dict.get(k, 默认值) 不会崩，d[k] 会抛 KeyError
+- 遍历字典用 d.items() 同时拿 key 和 value
+
+## 语法
+- [x*x for x in range(1,6)]           列表推导式
+- [x for x in nums if x % 2 == 0]     带条件
+- name, age = ("张三", 18)            元组解包
+- a, b = b, a                         交换不用临时变量
+- (5,) 才是单元素元组，(5) 是 int
+
+## 集合
+- 空集合是 set()，{} 是空字典
+- & 交集 | 并集 - 差集 ^ 对称差
+- 去重会乱序，要保序自己写循环
+
+## 性能
+- x in list 是 O(n)，x in set/dict 是 O(1)
+
+## 踩过的坑
+- （写你真实遇到的）
+
+## C 对比
+- 列表变量类似指针，赋值复制的是指针
+- Python 数组自动扩容，不用管长度
+- 不需要临时变量的 swap</pre></div>
+</section>
+
+<footer>
+  <p>📌 D003 的产出是 <b>8 个 .py 文件 + 1 份笔记</b>。今天开始你写的代码「有结构」了。</p>
+  <p>明天 D004：条件判断与循环，把 if / for / while 补成完整体系。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

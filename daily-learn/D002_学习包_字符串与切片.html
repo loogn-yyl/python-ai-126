@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D002 学习包 · 字符串与切片</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:20px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">DAY 002 · 第 1 周</div>
+  <h1>字符串与切片</h1>
+  <p>今天的内容以后用得最多——所有文本处理、数据清洗、API 返回值解析，根基都在这里。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：8 个练习 + 笔记</span>
+    <span>🔁 承接 D001</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+  <div class="timeline">
+    <div class="tl"><b>第 1 小时</b><span>读 1–4 节，边读边在 REPL 里试</span></div>
+    <div class="tl"><b>第 2–3 小时</b><span>写 8 道练习（每题一个 .py）</span></div>
+    <div class="tl"><b>第 4 小时</b><span>编码实验 + 笔记</span></div>
+  </div>
+  <p>新建目录：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day02
+cd ~/python-learn/day02</pre></div>
+  <div class="note">
+    <b>建议：</b>练习直接在 VS Code 里写（`code .` 打开目录），REPL 留给"临时验证某个方法怎么用"。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>字符串是什么：不可变序列</h2>
+
+  <p>Python 的字符串是一个<b>字符序列</b>，同时支持两件事：像 C 的数组一样按下标访问，像对象一样调用方法。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>s = "Hello Python"
+
+print(len(s))        # 长度
+print(s[0])          # 第一个
+print(s[-1])         # 最后一个
+print(s[6])          # 第 7 个（下标从 0 开始）</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">12
+H
+n
+P</pre></div>
+
+  <h3>关键特性：不可变</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>s = "hello"
+s[0] = "H"        # 想改第一个字符</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">TypeError: 'str' object does not support item assignment</pre></div>
+  <div class="danger">
+    <b>⚠️ 和 C 最大的区别：</b>C 里 <code class="inline">char s[] = "hello"; s[0] = 'H';</code> 完全合法，Python 里直接报错。<br>
+    Python 的字符串一旦创建就<b>不能修改任何字符</b>，所有"修改"操作（`replace`、`upper`、`strip`）都是<b>返回一个新字符串</b>，原字符串不变。这是新手最容易误解的地方。
+  </div>
+  <div class="codebox"><button class="copy">复制</button><pre>s = "hello"
+t = s.upper()
+
+print(s)    # 原字符串没变
+print(t)    # 新字符串</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">hello
+HELLO</pre></div>
+
+  <h3>和 C 字符串的完整对比</h3>
+  <table>
+    <tr><th>对比项</th><th>C</th><th>Python</th></tr>
+    <tr><td>底层</td><td><code>char</code> 数组，以 <code>\0</code> 结尾</td><td>对象，内部记录长度与编码</td></tr>
+    <tr><td>求长度</td><td><code>strlen()</code> 遍历到 <code>\0</code>，O(n)</td><td><code>len(s)</code> 直接读长度，O(1)</td></tr>
+    <tr><td>可否修改</td><td>可以，<code>s[0]='H'</code></td><td><b>不可以</b>，所有方法返回新串</td></tr>
+    <tr><td>拼接</td><td><code>strcat()</code></td><td><code>+</code> 或 <code>join()</code></td></tr>
+    <tr><td>单引号内容</td><td><code>'A'</code> 是 char（1 字节）</td><td><code>'A'</code> 是 str（长度 1）</td></tr>
+    <tr><td>中文</td><td>需要 <code>wchar_t</code> 或 UTF-8 字节数组</td><td>原生支持，<code>len("中文")</code> = 2</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">2</span>切片：Python 最强的基础能力</h2>
+  <p>语法是 <code class="inline">s[start:stop:step]</code>，三个参数都可省略。<b>取到 stop 之前为止，不包含 stop</b>。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>s = "Hello Python"
+
+print(s[0:5])     # 下标 0~4
+print(s[:5])      # 省略 start，从头开始
+print(s[6:])      # 省略 stop，取到末尾
+print(s[-6:])     # 负数从末尾数
+print(s[:])       # 完整复制</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">Hello
+Hello
+Python
+Python
+Hello Python</pre></div>
+
+  <h3>带步长</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>s = "0123456789"
+
+print(s[::2])     # 每隔 2 个取一个（偶数位）
+print(s[1::2])    # 从 1 开始，每隔 2 个
+print(s[::-1])    # 步长为 -1 → 反转
+print(s[8:2:-2])  # 从 8 倒着走到 2 之后，每次跨 2</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">02468
+13579
+9876543210
+864</pre></div>
+
+  <div class="ok">
+    <b>记住这一个：<code class="inline">s[::-1]</code> 是反转字符串。</b>面试高频题"判断回文"就靠它：<code class="inline">s == s[::-1]</code>。
+  </div>
+
+  <h3>切片不会报错（这点和索引不同）</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>s = "abc"
+print(s[10])      # 索引越界 → 报错
+print(s[10:20])   # 切片越界 → 返回空字符串</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">Traceback ... IndexError: string index out of range
+（第二行正常输出空行）</pre></div>
+  <div class="note">
+    <b>实用意义：</b>切片是"安全"的，哪怕范围离谱也不崩；索引是"危险"的，越界直接抛异常。所以处理用户输入时，<b>能用切片就别用索引</b>。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>常用方法速查表</h2>
+  <p>下面这些覆盖了 90% 的日常场景。全部<b>不改变原字符串</b>，都返回新值。</p>
+
+  <h3>大小写</h3>
+  <table>
+    <tr><th>方法</th><th>作用</th><th>示例</th><th>结果</th></tr>
+    <tr><td><code>.upper()</code></td><td>全大写</td><td><code>"abC".upper()</code></td><td><code>"ABC"</code></td></tr>
+    <tr><td><code>.lower()</code></td><td>全小写</td><td><code>"abC".lower()</code></td><td><code>"abc"</code></td></tr>
+    <tr><td><code>.title()</code></td><td>每个单词首字母大写</td><td><code>"hello world".title()</code></td><td><code>"Hello World"</code></td></tr>
+    <tr><td><code>.capitalize()</code></td><td>整句首字母大写</td><td><code>"hello world".capitalize()</code></td><td><code>"Hello world"</code></td></tr>
+    <tr><td><code>.swapcase()</code></td><td>大小写互换</td><td><code>"aB".swapcase()</code></td><td><code>"Ab"</code></td></tr>
+  </table>
+
+  <h3>清理与替换</h3>
+  <table>
+    <tr><th>方法</th><th>作用</th><th>示例</th><th>结果</th></tr>
+    <tr><td><code>.strip()</code></td><td>去掉两端空白</td><td><code>"  hi  ".strip()</code></td><td><code>"hi"</code></td></tr>
+    <tr><td><code>.lstrip()</code> / <code>.rstrip()</code></td><td>只去左 / 只去右</td><td><code>"  hi  ".rstrip()</code></td><td><code>"  hi"</code></td></tr>
+    <tr><td><code>.replace(a, b)</code></td><td>替换全部</td><td><code>"aXbXc".replace("X","-")</code></td><td><code>"a-b-c"</code></td></tr>
+    <tr><td><code>.replace(a,b,1)</code></td><td>只替换 1 次</td><td><code>"aXbXc".replace("X","-",1)</code></td><td><code>"a-bXc"</code></td></tr>
+  </table>
+  <div class="note">
+    <code class="inline">strip()</code> 用得比你想的多——用户输入几乎都会带上多余空格或换行，<code class="inline">input().strip()</code> 应该成为肌肉记忆。
+  </div>
+
+  <h3>切分与拼接</h3>
+  <table>
+    <tr><th>方法</th><th>作用</th><th>示例</th><th>结果</th></tr>
+    <tr><td><code>.split(sep)</code></td><td>按分隔符切成列表</td><td><code>"a,b,c".split(",")</code></td><td><code>['a','b','c']</code></td></tr>
+    <tr><td><code>.split()</code></td><td>按任意空白切分</td><td><code>"a  b   c".split()</code></td><td><code>['a','b','c']</code></td></tr>
+    <tr><td><code>sep.join(列表)</code></td><td>用 sep 把列表连成串</td><td><code>"-".join(['a','b'])</code></td><td><code>"a-b"</code></td></tr>
+  </table>
+  <div class="warn">
+    <b>⚠️ <code class="inline">join()</code> 的写法反直觉：</b>分隔符在前，列表在后 —— <code class="inline">"-".join(列表)</code>，不是 <code class="inline">列表.join("-")</code>。
+  </div>
+
+  <h3>查找与判断</h3>
+  <table>
+    <tr><th>方法</th><th>作用</th><th>示例</th><th>结果</th></tr>
+    <tr><td><code>.find(x)</code></td><td>找下标，找不到返回 <b>-1</b></td><td><code>"hello".find("l")</code></td><td><code>2</code></td></tr>
+    <tr><td><code>.index(x)</code></td><td>找下标，找不到<b>抛异常</b></td><td><code>"hello".index("z")</code></td><td><code>ValueError</code></td></tr>
+    <tr><td><code>.count(x)</code></td><td>统计出现次数</td><td><code>"hello".count("l")</code></td><td><code>2</code></td></tr>
+    <tr><td><code>x in s</code></td><td>是否包含</td><td><code>"ell" in "hello"</code></td><td><code>True</code></td></tr>
+    <tr><td><code>.startswith(x)</code></td><td>是否以 x 开头</td><td><code>"hello".startswith("he")</code></td><td><code>True</code></td></tr>
+    <tr><td><code>.endswith(x)</code></td><td>是否以 x 结尾</td><td><code>"a.py".endswith(".py")</code></td><td><code>True</code></td></tr>
+    <tr><td><code>.isdigit()</code></td><td>是否全为数字</td><td><code>"123".isdigit()</code></td><td><code>True</code></td></tr>
+    <tr><td><code>.isalpha()</code></td><td>是否全为字母</td><td><code>"ab1".isalpha()</code></td><td><code>False</code></td></tr>
+  </table>
+  <div class="ok">
+    <b>用 find 还是 index？</b>日常用 <code class="inline">find</code>——找不到返回 -1，不会让程序崩。需要"必须存在"时才用 <code class="inline">index</code>。
+  </div>
+
+  <h3>填充与对齐</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>print("42".zfill(5))          # 左补 0 到 5 位
+print("hi".center(10, "*"))    # 居中，两侧补 *
+print("hi".ljust(6, "-"))      # 左对齐
+print("hi".rjust(6, "-"))      # 右对齐</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">00042
+****hi****
+hi----
+----hi</pre></div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>f-string 进阶：格式控制</h2>
+  <p>D001 学过的 <code class="inline">:.2f</code> 只是开始。f-string 的完整格式是 <code class="inline">{值:填充对齐 宽度 .精度 类型}</code>。</p>
+
+  <h3>常用格式符</h3>
+  <table>
+    <tr><th>写法</th><th>含义</th><th>示例</th><th>结果</th></tr>
+    <tr><td><code>:.2f</code></td><td>两位小数</td><td><code>f"{3.14159:.2f}"</code></td><td><code>3.14</code></td></tr>
+    <tr><td><code>:g</code></td><td>智能格式（去掉多余的 .0）</td><td><code>f"{37.0:g}"</code></td><td><code>37</code></td></tr>
+    <tr><td><code>:d</code></td><td>整数</td><td><code>f"{42:d}"</code></td><td><code>42</code></td></tr>
+    <tr><td><code>:08.2f</code></td><td>宽度 8、补 0、两位小数</td><td><code>f"{3.14:08.2f}"</code></td><td><code>00003.14</code></td></tr>
+    <tr><td><code>:03d</code></td><td>宽度 3、补 0</td><td><code>f"{7:03d}"</code></td><td><code>007</code></td></tr>
+    <tr><td><code>:,</code></td><td>千分位分隔</td><td><code>f"{1234567:,}"</code></td><td><code>1,234,567</code></td></tr>
+    <tr><td><code>:.1%</code></td><td>百分比</td><td><code>f"{0.256:.1%}"</code></td><td><code>25.6%</code></td></tr>
+    <tr><td><code>:&gt;10</code></td><td>右对齐，宽 10</td><td><code>f"{'hi':&gt;10}"</code></td><td><code>        hi</code></td></tr>
+    <tr><td><code>:&lt;10</code></td><td>左对齐</td><td><code>f"{'hi':&lt;10}"</code></td><td><code>hi        </code></td></tr>
+    <tr><td><code>:^10</code></td><td>居中</td><td><code>f"{'hi':^10}"</code></td><td><code>    hi    </code></td></tr>
+  </table>
+
+  <h3>对齐的实际用途：打印表格</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>rows = [("苹果", 3, 12.5), ("香蕉", 10, 4.0), ("西瓜", 1, 30.0)]
+
+print(f"{'商品':&lt;6}{'数量':&gt;4}{'单价':&gt;8}")
+print("-" * 18)
+for name, qty, price in rows:
+    print(f"{name:&lt;6}{qty:&gt;4}{price:&gt;8.1f}")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">商品    数量    单价
+------------------
+苹果     3   12.5
+香蕉    10    4.0
+西瓜     1   30.0</pre></div>
+
+  <div class="danger">
+    <b>⚠️ 发现了吗：数字没有和"数量""单价"对齐。</b>这不是你写错了，是<b>中文比英文宽</b>造成的。<br><br>
+    宽度参数 <code class="inline">{:&lt;6}</code> 里的 <code class="inline">6</code> 数的是<b>字符个数</b>，屏幕上占多少格子它不管。一个汉字算 <b>1 个字符</b>，但显示时占 <b>2 格</b>（等于两个英文字母宽）。<br><br>
+    <b>算一下就明白了：</b><br>
+    · 表头 <code class="inline">{'数量':&gt;4}</code> → 2 个汉字已占满 4 个字符位，不再补空格 → 屏幕实际宽度 <b>2 + 4 = 6 格</b><br>
+    · 数据 <code class="inline">{3:&gt;4}</code> → 补 3 个空格 + 1 个数字 → 屏幕宽度 <b>4 格</b><br>
+    两者差 2 格，所以后面的列整体左移了。
+  </div>
+
+  <h3>解法一：含中文的表格，宽度按"显示宽度"算</h3>
+  <p>写两个小工具函数（中文算 2 格，英文算 1 格），以后所有中文表格都能用：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>import unicodedata
+
+def dw(s):
+    """显示宽度：中文/全角算 2，英文算 1"""
+    return sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in s)
+
+def ljust_cn(s, width):
+    return s + " " * max(0, width - dw(s))
+
+def rjust_cn(s, width):
+    return " " * max(0, width - dw(s)) + s
+
+
+rows = [("苹果", 3, 12.5), ("香蕉", 10, 4.0), ("西瓜", 1, 30.0)]
+
+print(ljust_cn("商品", 8) + rjust_cn("数量", 6) + rjust_cn("单价", 8))
+print("-" * 22)
+for name, qty, price in rows:
+    print(ljust_cn(name, 8) + rjust_cn(str(qty), 6) + rjust_cn(f"{price:.1f}", 8))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">商品      数量    单价
+----------------------
+苹果         3    12.5
+香蕉        10     4.0
+西瓜         1    30.0</pre></div>
+
+  <h3>解法二：偷懒但够用</h3>
+  <p>中文表头不参与宽度控制，手动补空格；或者干脆用英文表头：</p>
+  <div class="codebox"><button class="copy">复制</button><pre>print(f"{'name':&lt;8}{'qty':&gt;5}{'price':&gt;8}")
+for name, qty, price in rows:
+    print(f"{name:&lt;8}{qty:&gt;5}{price:&gt;8.1f}")</pre></div>
+
+  <div class="ok">
+    <b>什么时候需要在意：</b>自己调试时随便对齐就行；但后面做数据报表、CLI 工具输出，或者给业务方看的终端表格，中文对齐就必须处理——面试里"怎么打印对齐的中文表格"也是常见问题。
+  </div>
+  <div class="note">
+    <b>注意这一行：<code class="inline">"-" * 18</code></b> —— 字符串可以直接乘数字，得到重复内容。C 里得写循环，Python 一行搞定。同理 <code class="inline">"ab" * 3</code> 得到 <code class="inline">"ababab"</code>。
+  </div>
+
+  <h3>f-string 里可以放任何表达式</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>x = 7
+name = "小明"
+
+print(f"{x * 2 + 1}")               # 算术
+print(f"{name.upper()}")            # 方法调用
+print(f"{'成年' if x &gt;= 18 else '未成年'}")   # 条件表达式
+print(f"{len(name)} 个字")           # 函数调用</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">15
+小明
+未成年
+2 个字</pre></div>
+  <div class="danger">
+    <b>⚠️ 一个 <code class="inline">{}</code> 里只能放表达式，不能再套 <code class="inline">{}</code>。</b>昨天<br>
+    <code class="inline">f"{max{max(a,b), c}}"</code> 报 <code class="inline">SyntaxError</code> 就是这个原因。正确写法是 <code class="inline">f"{max(a, b, c)}"</code>——函数用圆括号。
+  </div>
+
+  <h3>什么时候该加 f，什么时候不用</h3>
+  <p>判断标准只有一条：<b>这段字符串里有没有变量要"嵌进去"</b>。有就用 f，没有就不用。</p>
+
+  <table>
+    <tr><th>场景</th><th>写法</th><th>要不要 f</th></tr>
+    <tr><td>输出固定文字</td><td><code>print("程序开始")</code></td><td>❌ 不要</td></tr>
+    <tr><td>打印变量本身</td><td><code>print(name)</code></td><td>❌ 不要（直接传变量）</td></tr>
+    <tr><td>打印表达式结果</td><td><code>print(a + b)</code></td><td>❌ 不要</td></tr>
+    <tr><td>文字里夹变量</td><td><code>print(f"你好，{name}")</code></td><td>✅ 要</td></tr>
+    <tr><td>要控制格式（小数位/对齐/补零）</td><td><code>print(f"{score:.1f}")</code></td><td>✅ 必须用</td></tr>
+    <tr><td>调试看数据结构</td><td><code>print(data)</code></td><td>❌ 不要（f 反而看不清类型）</td></tr>
+  </table>
+
+  <div class="codebox"><button class="copy">复制</button><pre>name = "小明"
+score = 87.5678
+
+print("程序开始")                  # 固定文字，不用 f
+print()                            # 空行，不用 f
+print(name)                        # 打变量本身，不用 f
+print(f"你好，{name}")              # 文字夹变量，用 f
+print(f"得分：{score:.1f}")          # 要格式，必须用 f</pre></div>
+
+  <div class="warn">
+    <b>两种典型的错法：</b><br>
+    <b>① 该加没加</b> —— <code class="inline">print("你好，{name}")</code> 输出的是字面量 <code class="inline">你好，{name}</code>，花括号原样打印，不报错但结果错。<br>
+    <b>② 不该加却加了</b> —— <code class="inline">print(f"程序开始")</code> 不会出错，只是多余，读代码的人会以为这里本该有变量。
+  </div>
+
+  <h3>另一种写法：print 的多个参数</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>name = "小明"
+age = 18
+
+print("姓名：", name, "年龄：", age)     # 逗号分隔，自动插空格
+print(f"姓名：{name} 年龄：{age}")        # f-string，完全可控</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">姓名： 小明 年龄： 18
+姓名：小明 年龄：18</pre></div>
+  <div class="note">
+    <b>区别：</b>逗号分隔会自动插入空格（所以"姓名："后面多了个空格），格式不受控；f-string 想在哪放什么就在哪放。<b>正式输出一律用 f-string，临时调试可以用逗号。</b>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>编码：中文为什么占 3 个字节</h2>
+  <p>这个知识点今天看着抽象，但后面处理 CSV、读文件、调 API 时，80% 的乱码问题都源于它。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>s = "中文abc"
+
+print(len(s))                       # 字符数
+print(len(s.encode("utf-8")))       # UTF-8 下的字节数
+print(s.encode("utf-8"))            # 实际的字节</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">5
+9
+b'\xe4\xb8\xad\xe6\x96\x87abc'</pre></div>
+
+  <p><b>怎么算的：</b>一个中文字符在 UTF-8 下占 3 个字节，两个中文 = 6 字节，三个英文字母 = 3 字节，合计 9。</p>
+
+  <table>
+    <tr><th>编码</th><th>英文</th><th>中文</th><th>说明</th></tr>
+    <tr><td>ASCII</td><td>1 字节</td><td>不支持</td><td>最早的编码，只有 128 个字符</td></tr>
+    <tr><td>GBK</td><td>1 字节</td><td>2 字节</td><td>中文 Windows 的默认编码</td></tr>
+    <tr><td>UTF-8</td><td>1 字节</td><td>3 字节</td><td><b>现在的事实标准</b>，Mac/Linux 默认</td></tr>
+  </table>
+
+  <div class="codebox"><button class="copy">复制</button><pre># 编码：字符串 → 字节
+b = "你好".encode("utf-8")
+
+# 解码：字节 → 字符串
+s = b.decode("utf-8")
+
+print(b)
+print(s)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">b'\xe4\xbd\xa0\xe5\xa5\xbd'
+你好</pre></div>
+
+  <div class="warn">
+    <b>⚠️ 常见报错预演：用错的编码解码</b>
+    <div class="codebox" style="margin-top:8px"><button class="copy">复制</button><pre>"你好".encode("gbk").decode("utf-8")</pre></div>
+    会抛 <code class="inline">UnicodeDecodeError</code>。这就是"乱码"的本质——<b>用 A 编码存的，用 B 编码读</b>。
+  </div>
+
+  <div class="ok">
+    <b>记住三条就够用了：</b><br>
+    1. 读文件、写文件、连数据库，<b>统一用 UTF-8</b><br>
+    2. <code class="inline">len()</code> 数的是<b>字符</b>，不是字节<br>
+    3. 遇到乱码，先查"存的时候用的什么编码"，而不是急着改代码
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>八道练习（每题一个文件）</h2>
+  <p>建议命名：`p1_reverse.py`、`p2_count.py` … 方便回看。</p>
+
+  <ol class="task">
+    <li><b>反转字符串</b>：输入一句话，输出反转结果（用切片，一行搞定）</li>
+    <li><b>统计字符</b>：输入一句话和一个字符，输出该字符出现几次（用 <code class="inline">count</code>）</li>
+    <li><b>姓名脱敏</b>：输入姓名「张三丰」，输出「张*丰」——保留首尾，中间用 * 代替</li>
+    <li><b>提取用户名</b>：输入邮箱 `abc@qq.com`，输出 `abc`（用 <code class="inline">split</code>）</li>
+    <li><b>单词首字母大写</b>：输入「hello world from python」，输出「Hello World From Python」</li>
+    <li><b>手机号打码</b>：输入 `13812345678`，输出 `138****5678`（用切片拼接）</li>
+    <li><b>判断回文</b>：输入一个字符串，判断正着读和反着读是否一样，输出「是回文」或「不是回文」</li>
+    <li><b>逗号分隔求和</b>：输入 `1,2,3,4`，输出总和 10（用 <code class="inline">split</code> + 列表推导式）</li>
+  </ol>
+
+  <details>
+    <summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+
+    <div class="codebox"><button class="copy">复制</button><pre># p1_reverse.py
+s = input("请输入一句话: ")
+print(s[::-1])
+
+
+# p2_count.py
+s = input("请输入一句话: ")
+ch = input("要统计的字符: ")
+print(f"'{ch}' 出现了 {s.count(ch)} 次")
+
+
+# p3_mask_name.py
+name = input("请输入姓名: ")
+print(name[0] + "*" * (len(name) - 2) + name[-1])
+
+
+# p4_email.py
+email = input("请输入邮箱: ")
+print(email.split("@")[0])
+
+
+# p5_title.py
+s = input("请输入一句英文: ")
+print(s.title())
+
+
+# p6_phone.py
+phone = input("请输入手机号: ")
+print(phone[:3] + "****" + phone[7:])
+
+
+# p7_palindrome.py
+s = input("请输入字符串: ")
+if s == s[::-1]:
+    print("是回文")
+else:
+    print("不是回文")
+
+
+# p8_sum.py
+s = input("请输入用逗号分隔的数字: ")
+nums = [int(x) for x in s.split(",")]
+print(f"总和: {sum(nums)}")</pre></div>
+
+    <div class="note">
+      <b>第 3 题和第 6 题是重点</b>——它们把「切片 + 字符串乘法 + 拼接」三件事合起来了。第 3 题的 <code class="inline">"*" * (len(name) - 2)</code> 是关键：如果名字是两个字，这里乘 0 得到空字符串，不会出错。
+    </div>
+  </details>
+
+  <div class="warn">
+    <b>自测边界情况</b>（写完可以试试）：<br>
+    · 第 3 题输入两个字的名字「张三」会怎样？<br>
+    · 第 7 题输入空字符串会怎样？<br>
+    · 第 8 题输入 `1,2,abc` 会怎样？<br>
+    崩了不要紧，能说出"为什么崩"就算学到了。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>今日笔记要点</h2>
+  <p>新建 `day02-笔记.md`，至少覆盖这几条：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># D002 笔记
+
+## 核心概念
+- 字符串不可变，所有方法都返回新字符串
+- 切片 s[start:stop:step]，不含 stop
+- s[::-1] 反转；切片越界不报错，索引越界报错
+
+## 方法速查
+- strip() 去两端空白 → input().strip() 是习惯
+- split() 切分，sep.join(list) 拼接（分隔符在前）
+- find() 找不到返回 -1，index() 找不到抛异常
+
+## f-string 格式
+- {值:&lt;6} 左对齐宽6，{:&gt;4} 右对齐，{:^10} 居中
+- {:03d} 补零，{:,} 千分位，{:.1%} 百分比
+
+## 编码
+- len() 数字符，len(s.encode("utf-8")) 数字节
+- 中文 UTF-8 占 3 字节，GBK 占 2 字节
+- 乱码 = 用 A 编码存、B 编码读
+
+## 踩过的坑
+- （写你真实遇到的）
+
+## C 对比
+- C 的 char[] 可修改，Python 的 str 不可变
+- strlen() 是 O(n)，len() 是 O(1)</pre></div>
+</section>
+
+<footer>
+  <p>📌 D002 的产出是 <b>8 个 .py 文件 + 1 份笔记</b>。练习比脚本重要——它们是面试题的原型。</p>
+  <p>明天 D003 是列表、元组、字典、集合，数据结构开始上强度。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

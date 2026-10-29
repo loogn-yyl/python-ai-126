@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D005 学习包 · 函数、模块与包</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:20px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="day">DAY 005 · 第 1 周</div>
+  <h1>函数、模块与包</h1>
+  <p>今天开始，你写的代码不再是一条线走到底，而是能被反复调用的零件。顺便会踩到一个 Python 最著名的坑。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：自建 utils.py + 调用脚本</span>
+    <span>🔁 承接 D004</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+  <div class="timeline">
+    <div class="tl"><b>第 1 小时</b><span>读 1–2 节：def / return / 默认参数</span></div>
+    <div class="tl"><b>第 2 小时</b><span>读 3–5 节：*args / 作用域 / lambda</span></div>
+    <div class="tl"><b>第 3 小时</b><span>读 6 节：模块与 import（今天重点）</span></div>
+    <div class="tl"><b>第 4 小时</b><span>写 utils.py + 8 道练习 + 笔记</span></div>
+  </div>
+  <div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day05
+cd ~/python-learn/day05</pre></div>
+  <div class="note">
+    <b>今天的产出和前几天不一样：</b>不是一个练习一个文件，而是要建一套「工具模块 + 调用方」的结构。这是你第一次写「多文件程序」，也是后面所有项目的骨架。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>def 与 return：语法变了，概念没变</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>def area(r):
+    return 3.14159 * r * r
+
+print(area(2))
+print(f"{area(2):.2f}")</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">12.56636
+12.57</pre></div>
+
+  <table>
+    <tr><th></th><th>C</th><th>Python</th></tr>
+    <tr><td>定义</td><td><code>double area(double r) { }</code></td><td><code>def area(r):</code></td></tr>
+    <tr><td>参数类型</td><td>必须声明</td><td><b>不声明</b>（想标可以用注解）</td></tr>
+    <tr><td>返回类型</td><td>必须声明</td><td><b>不声明</b>，直接 <code>return</code></td></tr>
+    <tr><td>函数体</td><td><code>{ }</code></td><td>缩进</td></tr>
+    <tr><td>调用</td><td>必须先声明或原型</td><td>必须先定义（写在调用之前）</td></tr>
+  </table>
+
+  <h3>没有 return 会怎样</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>def say_hi(name):
+    print(f"你好，{name}")
+
+result = say_hi("张三")
+print("返回值是:", result)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">你好，张三
+返回值是: None</pre></div>
+
+  <div class="warn">
+    <b>⚠️ 没有 <code class="inline">return</code> 的函数返回 <code class="inline">None</code>，不是「什么都不返回」。</b>C 里 <code class="inline">void</code> 函数真的没有返回值，Python 里所有函数都有返回值，没写就是 <code class="inline">None</code>。<br><br>
+    这解释了 D001 那个经典困惑：<code class="inline">lst.sort()</code> 得到 <code class="inline">None</code>，因为 <code class="inline">sort()</code> 是「原地改、不返回值」的函数，它末尾没有 <code class="inline">return</code>。
+  </div>
+
+  <h3>print 和 return 是两件事</h3>
+  <table>
+    <tr><th></th><th><code>print()</code></th><th><code>return</code></th></tr>
+    <tr><td>作用</td><td>给人看，输出到屏幕</td><td>给程序用，把值交回调用处</td></tr>
+    <tr><td>能继续运算吗</td><td>不能</td><td>能</td></tr>
+    <tr><td>用在哪</td><td>脚本的最终输出</td><td>函数内部</td></tr>
+  </table>
+  <div class="codebox"><button class="copy">复制</button><pre>def bad_area(r):
+    print(3.14159 * r * r)      # 只是打印
+
+def good_area(r):
+    return 3.14159 * r * r      # 交回结果
+
+bad_area(2) * 2                 # 报错！None 不能乘</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">12.56636
+TypeError: unsupported operand type(s) for *: 'NoneType' and 'int'</pre></div>
+  <div class="ok">
+    <b>判断标准：</b>这个函数的结果<b>后面还要不要用</b>？要用就 <code class="inline">return</code>，只是给人看一眼才 <code class="inline">print</code>。<br>
+    <b>函数内部尽量只 return 不 print</b>——输出交给调用方决定，函数才能被复用。这是写模块的基本纪律。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>默认参数，以及那个著名的坑</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>def greet(name, greeting="你好"):
+    return f"{greeting}，{name}"
+
+print(greet("张三"))
+print(greet("张三", "早上好"))
+print(greet(greeting="晚上好", name="李四"))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">你好，张三
+早上好，张三
+晚上好，李四</pre></div>
+
+  <div class="note">
+    <b>最后一行是「关键字参数」：</b>按名字传，顺序随便。C 没有这个能力。<br>
+    规则：<b>带默认值的参数必须放在不带默认值的后面</b>。<code class="inline">def f(a=1, b)</code> 会直接 <code class="inline">SyntaxError</code>。
+  </div>
+
+  <h3 class="purple">坑来了：默认参数里写可变对象</h3>
+  <p>下面这段代码看起来很合理，但结果会让所有人愣一下。请务必亲手跑一遍。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>def bad(item, box=[]):
+    box.append(item)
+    return box
+
+print(bad(1))
+print(bad(2))
+print(bad(3))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[1]
+[1, 2]
+[1, 2, 3]</pre></div>
+
+  <div class="danger">
+    <b>⚠️ 你要的应该是 <code class="inline">[1]</code>、<code class="inline">[2]</code>、<code class="inline">[3]</code>，为什么列表一直在累积？</b><br><br>
+    因为 <b>默认值只在函数「定义」时创建一次</b>，不是每次调用都新建。<code class="inline">box=[]</code> 里的那个列表是函数对象的一部分，所有调用<b>共用同一个</b>。<br><br>
+    用 D003 的知识理解：<code class="inline">box</code> 这个名字始终指向同一个列表对象（就是「赋值是指针」那个道理），<code class="inline">append</code> 一直在改它。
+  </div>
+
+  <h3>正确写法：默认值用 None，函数内部再建</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>def good(item, box=None):
+    if box is None:
+        box = []          # 每次调用都新建一个
+    box.append(item)
+    return box
+
+print(good(1))
+print(good(2))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[1]
+[2]</pre></div>
+
+  <div class="ok">
+    <b>记成一条铁律：</b>默认参数<b>永远不要</b>写 <code class="inline">[]</code>、<code class="inline">{}</code>、<code class="inline">set()</code> 这些可变对象，一律写 <code class="inline">None</code> 然后在函数里判断。<br>
+    字符串、数字、元组、<code class="inline">True/False</code> 这些不可变的可以放心当默认值。<br><br>
+    <b>这是 Python 面试最高频的坑之一</b>，也是实际项目里最难查的 bug 之一——因为它不报错，只是「数据莫名其妙多了」。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>*args 和 **kwargs：参数数量不定</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>def total(*args):
+    return sum(args)
+
+print(total(1, 2, 3))
+print(total(1, 2, 3, 4, 5))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">6
+15</pre></div>
+
+  <div class="codebox"><button class="copy">复制</button><pre>def profile(**kwargs):
+    for k, v in kwargs.items():
+        print(f"{k}: {v}")
+
+profile(name="张三", age=18)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">name: 张三
+age: 18</pre></div>
+
+  <table>
+    <tr><th>写法</th><th>收到什么</th><th>怎么用</th></tr>
+    <tr><td><code>*args</code></td><td>一个<b>元组</b>，装所有多余的位置参数</td><td><code>sum(args)</code>、<code>for x in args</code></td></tr>
+    <tr><td><code>**kwargs</code></td><td>一个<b>字典</b>，装所有多余的关键字参数</td><td><code>kwargs["name"]</code>、<code>kwargs.items()</code></td></tr>
+  </table>
+
+  <div class="warn">
+    <b>⚠️ 名字不重要，星号才重要。</b><code class="inline">*args</code> 和 <code class="inline">*nums</code> 完全等价，<code class="inline">args</code> / <code class="inline">kwargs</code> 只是约定俗称的名字。<b>但星号数量决定了收的是元组还是字典</b>：
+    <br>· 一个星号 → 多余的位置参数，装成元组
+    <br>· 两个星号 → 多余的关键字参数，装成字典
+  </div>
+
+  <h3>反过来用：把列表拆成参数</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [3, 1, 4, 1, 5]
+
+print(max(nums))       # 传一个列表进去
+print(max(*nums))      # 拆成 5 个参数，效果一样但意义不同</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">5
+5</pre></div>
+  <div class="note">
+    <b>什么时候需要 <code class="inline">*nums</code>：</b>当函数不接受列表、只接受一个个参数的时候。比如 <code class="inline">print(*nums)</code> 会输出 <code class="inline">3 1 4 1 5</code>（空格分隔），而 <code class="inline">print(nums)</code> 输出的是 <code class="inline">[3, 1, 4, 1, 5]</code>。这个技巧以后打印结果时很常用。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>多返回值：靠元组</h2>
+  <p>Python 函数只能 <code class="inline">return</code> 一个值，但「一个值」可以是元组——所以看起来像返回了多个。</p>
+
+  <div class="codebox"><button class="copy">复制</button><pre>def minmax(nums):
+    return min(nums), max(nums)      # 实际返回一个元组
+
+lo, hi = minmax([3, 1, 4, 1, 5])
+print(lo, hi)
+
+print(minmax([3, 1, 4]))            # 直接打印能看到是个元组</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">1 5
+(1, 4)</pre></div>
+
+  <div class="ok">
+    <b>这就是 D003 元组解包最实用的场景。</b><code class="inline">lo, hi = minmax(...)</code> 一次拆两个。C 里要返回多个值得传指针进去改，Python 直接返回元组就行。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>作用域：LEGB 四层查找</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>x = "全局"
+
+def outer():
+    x = "外层"
+    def inner():
+        x = "内层"
+        print(x)      # 先找自己这层
+    inner()
+    print(x)          # 再找 outer 这层
+
+outer()
+print(x)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">内层
+外层
+全局</pre></div>
+
+  <div class="timeline">
+    <div class="tl"><b>L · Local</b><span>函数内部</span></div>
+    <div class="tl"><b>E · Enclosing</b><span>外层函数</span></div>
+    <div class="tl"><b>G · Global</b><span>模块全局</span></div>
+    <div class="tl"><b>B · Built-in</b><span>内置（print、len 等）</span></div>
+  </div>
+
+  <div class="note">
+    <b>规则：Python 找一个变量名时，按 L → E → G → B 的顺序就近找，找到就停。</b><br>
+    所以三个 <code class="inline">x</code> 各在各的层，互不干扰，输出三个不同的值。
+  </div>
+
+  <h3>函数里改全局变量：要声明 global</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>count = 0
+
+def add():
+    global count      # 声明「我要改的是外面那个」
+    count += 1
+
+add()
+add()
+print(count)</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">2</pre></div>
+
+  <div class="danger">
+    <b>⚠️ 不加 <code class="inline">global</code> 会报 <code class="inline">UnboundLocalError</code>，而不是「改不了但也不报错」。</b><br>
+    因为只要函数体里出现了 <code class="inline">count = ...</code>（包括 <code class="inline">+=</code>），Python 就认定 <code class="inline">count</code> 是这个函数的<b>局部变量</b>，那么 <code class="inline">count += 1</code> 就等于「读一个还没赋值的局部变量」→ 报错。
+  </div>
+
+  <div class="warn">
+    <b>但更好的做法是：别用 global。</b><br>
+    全局变量让函数变得「有状态」，两个函数互相影响，调试起来很痛苦。正确做法是把状态<b>当参数传进去、返回值带出来</b>：
+    <div class="codebox" style="margin-top:8px"><button class="copy">复制</button><pre>def add(count):
+    return count + 1
+
+count = 0
+count = add(count)
+count = add(count)
+print(count)</pre></div>
+    效果一样，但函数是「纯」的——给同样的输入永远得同样的输出。<b>这是后面写所有项目、所有 AI 应用的基本要求</b>（D007 的通讯录项目就是这么设计的：数据当参数传，不靠 global）。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>lambda：一行写完的小函数</h2>
+
+  <div class="codebox"><button class="copy">复制</button><pre>double = lambda x: x * 2
+print(double(5))
+
+# 完全等价于
+def double2(x):
+    return x * 2
+print(double2(5))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">10
+10</pre></div>
+
+  <div class="warn">
+    <b>⚠️ lambda 只适合「一行能写完的表达式」。</b>不能写 <code class="inline">if</code> 语句块、不能写 <code class="inline">for</code> 循环、不能有多条语句。需要这些就用 <code class="inline">def</code>。<br>
+    <b>不要给 lambda 起名字</b>——<code class="inline">double = lambda x: x*2</code> 这种写法其实不如直接 <code class="inline">def double(x): return x*2</code>，可读性更好。lambda 的真正用武之地是<b>当参数传</b>。
+  </div>
+
+  <h3>真正的用途：给 sorted 传排序规则</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [3, 1, 4, 1, 5]
+print(sorted(nums, key=lambda x: -x))       # 按相反数排 = 降序
+
+students = [("张三", 88), ("李四", 95), ("王五", 76)]
+print(sorted(students, key=lambda s: s[1]))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[5, 4, 3, 1, 1]
+[('王五', 76), ('张三', 88), ('李四', 95)]</pre></div>
+
+  <div class="note">
+    <b><code class="inline">key=lambda s: s[1]</code> 怎么读：</b>「对每个元素 s，取它的第 2 项（分数）来比较」。<br>
+    也可以用 <code class="inline">reverse=True</code> 代替 <code class="inline">-x</code> 的取负技巧，两种都行，看场景。
+  </div>
+
+  <h3>map 和 filter：lambda 的另一半搭档</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>nums = [3, 1, 4, 1, 5]
+
+print(list(map(lambda x: x * 2, nums)))     # 每个都乘 2
+print(list(filter(lambda x: x &gt; 2, nums)))   # 只要大于 2 的</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">[6, 2, 8, 2, 10]
+[3, 4, 5]</pre></div>
+
+  <div class="warn">
+    <b>但这两个用推导式写更清楚：</b>
+    <div class="codebox" style="margin-top:8px"><button class="copy">复制</button><pre>nums = [3, 1, 4, 1, 5]
+print([x * 2 for x in nums])
+print([x for x in nums if x &gt; 2])</pre></div>
+    <b>map/filter 配 lambda 是「函数式」写法，推导式是「Pythonic」写法。</b>都认识，但日常优先用推导式——一眼能看出「在干嘛」，而且不用套 <code class="inline">list()</code>。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>模块与包：把代码拆成多个文件</h2>
+  <p>今天的重点。函数解决了「代码重复」，模块解决「文件太长」。</p>
+
+  <h3>先理解 import 在干什么</h3>
+  <div class="codebox"><button class="copy">复制</button><pre>import math                 # 整个模块拿进来，用 math.xxx 访问
+print(math.sqrt(16))
+print(math.pi)
+
+from math import sqrt, pi   # 只拿需要的名字，直接用
+print(sqrt(16))
+print(pi)
+
+import math as m            # 起个别名（常用：import numpy as np）
+print(m.sqrt(16))</pre></div>
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">4.0
+3.141592653589793
+4.0
+3.141592653589793
+4.0</pre></div>
+
+  <table>
+    <tr><th>写法</th><th>之后怎么用</th><th>什么时候用</th></tr>
+    <tr><td><code>import math</code></td><td><code>math.sqrt()</code></td><td><b>推荐默认</b>，来源清晰</td></tr>
+    <tr><td><code>from math import sqrt</code></td><td><code>sqrt()</code></td><td>用得很多、名字不冲突时</td></tr>
+    <tr><td><code>import math as m</code></td><td><code>m.sqrt()</code></td><td>名字太长，如 <code>import numpy as np</code></td></tr>
+    <tr><td><code>from math import *</code></td><td>直接全用</td><td><b>不要用</b>，不知道名字从哪来</td></tr>
+  </table>
+
+  <div class="danger">
+    <b>⚠️ C 的 <code class="inline">#include</code> 是把文件内容直接贴进来，Python 的 <code class="inline">import</code> 完全不是。</b><br>
+    <code class="inline">import</code> 是<b>执行那个文件一次</b>，然后拿到它里面的变量和函数。所以：<br>
+    · <code class="inline">import</code> 同一个模块两次，文件只执行一次（有缓存）<br>
+    · 被 import 的文件里如果有 <code class="inline">print()</code>，<b>import 的时候就会打印</b><br>
+    第二点就是下面 <code class="inline">if __name__ == "__main__"</code> 存在的理由。
+  </div>
+
+  <h3>自己写一个模块</h3>
+  <p>在 <code class="inline">~/python-learn/day05/</code> 里建两个文件：</p>
+  <div class="tree">day05/
+├── utils.py       ← 工具模块（被调用）
+└── main.py        ← 调用方（运行这个）</div>
+
+  <p><b>utils.py</b>（模块文件，只定义函数，不执行）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># utils.py
+"""常用小工具函数"""
+
+def area_circle(r):
+    """圆面积"""
+    return 3.14159 * r * r
+
+def celsius_to_fahrenheit(c):
+    """摄氏转华氏"""
+    return c * 9 / 5 + 32
+
+def is_leap(year):
+    """判断闰年"""
+    return (year % 4 == 0 and year % 100 != 0) or year % 400 == 0
+
+def minmax(nums):
+    """同时返回最小值和最大值"""
+    return min(nums), max(nums)
+
+
+# 只有直接运行 utils.py 时才执行，被 import 时不执行
+if __name__ == "__main__":
+    print("这是 utils.py 的自测")
+    print(area_circle(2))
+    print(is_leap(2024))</pre></div>
+
+  <p><b>main.py</b>（调用方）：</p>
+  <div class="codebox"><button class="copy">复制</button><pre># main.py
+import utils
+
+print(utils.area_circle(2))
+print(utils.celsius_to_fahrenheit(100))
+print(utils.is_leap(2024))
+print(utils.minmax([3, 1, 4, 1, 5]))</pre></div>
+
+  <div class="codebox light"><button class="copy">复制</button><pre class="out">运行 python main.py：
+12.56636
+212.0
+True
+(1, 5)
+
+（注意：「这是 utils.py 的自测」没有打印出来）</pre></div>
+
+  <h3>if __name__ == "__main__" 到底是什么</h3>
+  <p>这是 Python 新手最懵的一行。拆开看就三件事：</p>
+  <table>
+    <tr><th>问题</th><th>答案</th></tr>
+    <tr><td><code>__name__</code> 是什么</td><td>每个文件都有个内置变量 <code>__name__</code></td></tr>
+    <tr><td>它的值是多少</td><td><b>直接运行这个文件</b> → <code>"__main__"</code><br><b>被别的文件 import</b> → 文件名（如 <code>"utils"</code>）</td></tr>
+    <tr><td>所以这行在干嘛</td><td>「只有在直接运行我时才执行下面这块」——相当于 C 的 <code>main()</code></td></tr>
+  </table>
+
+  <div class="codebox"><button class="copy">复制</button><pre># 验证一下：把这段存成 whoami.py，然后分别用两种方式跑
+print("__name__ 的值是:", __name__)
+
+# 方式一：python whoami.py          → __main__
+# 方式二：在别的文件里 import whoami → whoami</pre></div>
+
+  <div class="ok">
+    <b>为什么必须要写这一行：</b><br>
+    不加的话，<code class="inline">main.py</code> 一 import utils，utils 里的测试代码就全跑了，屏幕上冒出一堆不该有的输出。<br>
+    加上的话：<b>自己跑 = 带自测；被别人 import = 只提供函数，安静不出声。</b><br><br>
+    以后你写的每个模块都该这么收尾，这是 Python 的通用惯例。
+  </div>
+
+  <h3>包：文件夹里的一堆模块</h3>
+  <div class="tree">myproject/
+├── main.py
+└── tools/                ← 文件夹 = 包
+    ├── __init__.py       ← 有这个文件才算「包」（3.3+ 可省，但建议保留）
+    ├── text.py
+    └── number.py</div>
+  <div class="codebox"><button class="copy">复制</button><pre># 假设上面的目录已经建好，在 main.py 里可以这样导入
+from tools.text import clean
+from tools import number
+
+clean("  hi  ")
+number.add(1, 2)</pre></div>
+  <div class="warn">
+    <b>⚠️ 这段跑不了</b>——它假设你已经真的建好了 <code class="inline">tools/</code> 文件夹和里面两个 .py 文件。今天先把结构看懂，第 7 题只做到「两个文件」这一层就够，包的结构以后用到了再建。
+  </div>
+  <div class="note">
+    <b>点号就是路径：</b><code class="inline">tools.text</code> = <code class="inline">tools/</code> 文件夹下的 <code class="inline">text.py</code>。<br>
+    这个结构以后会一直用——D008 开始写类的时候会拆成 <code class="inline">models/</code>、<code class="inline">services/</code>，做 AI 应用时会有 <code class="inline">chains/</code>、<code class="inline">tools/</code>、<code class="inline">prompts/</code>。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>八道练习</h2>
+  <p><b>第 7、8 题是今天的核心产出</b>（utils.py + 调用方），前 6 题是热身。</p>
+
+  <ol class="task">
+    <li><b>圆面积函数</b>：<code class="inline">area(r)</code>，返回面积（用 <code class="inline">math.pi</code>）</li>
+    <li><b>默认参数</b>：<code class="inline">greet(name, greeting="你好")</code>，返回问候语字符串</li>
+    <li><b>可变参数</b>：<code class="inline">average(*nums)</code>，返回平均值；不传参数时返回 0（注意除零）</li>
+    <li><b>关键字参数</b>：<code class="inline">describe(**info)</code>，把传入的所有配置打印成 <code class="inline">键: 值</code></li>
+    <li><b>多返回值</b>：<code class="inline">stats(nums)</code>，返回 <code class="inline">(最小值, 最大值, 平均值)</code></li>
+    <li><b>lambda 排序</b>：学生列表 <code class="inline">[("张三",88), ...]</code>，按分数从高到低排</li>
+    <li><b>建 utils.py</b>：把前 5 题的函数都搬进去，加上 docstring 和 <code class="inline">if __name__ == "__main__"</code> 自测块</li>
+    <li><b>建 main.py</b>：<code class="inline">import utils</code>，把 5 个函数各调用一次，输出结果</li>
+  </ol>
+
+  <details>
+    <summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+
+    <div class="codebox"><button class="copy">复制</button><pre># utils.py
+"""D005 练习：我自己的工具模块"""
+
+import math
+
+
+def area(r):
+    """圆面积"""
+    return math.pi * r * r
+
+
+def greet(name, greeting="你好"):
+    """生成问候语"""
+    return f"{greeting}，{name}"
+
+
+def average(*nums):
+    """求平均值，没有参数时返回 0"""
+    if not nums:
+        return 0
+    return sum(nums) / len(nums)
+
+
+def describe(**info):
+    """打印所有配置项"""
+    for k, v in info.items():
+        print(f"{k}: {v}")
+
+
+def stats(nums):
+    """返回 (最小值, 最大值, 平均值)"""
+    return min(nums), max(nums), sum(nums) / len(nums)
+
+
+if __name__ == "__main__":
+    print("--- utils 自测 ---")
+    print(f"{area(2):.2f}")
+    print(greet("张三"))
+    print(average(1, 2, 3))
+    describe(name="李四", age=20)
+    print(stats([3, 1, 4, 1, 5]))</pre></div>
+
+    <div class="codebox"><button class="copy">复制</button><pre># main.py
+import utils
+
+
+print(f"圆面积: {utils.area(2):.2f}")
+print(utils.greet("张三"))
+print(f"平均值: {utils.average(1, 2, 3)}")
+print(f"空参数: {utils.average()}")
+utils.describe(name="李四", age=20)
+print(utils.stats([3, 1, 4, 1, 5]))
+
+# 第 6 题
+students = [("张三", 88), ("李四", 95), ("王五", 76)]
+for name, score in sorted(students, key=lambda s: s[1], reverse=True):
+    print(f"{name} {score}")</pre></div>
+
+    <div class="codebox light"><button class="copy">复制</button><pre class="out">python main.py 的输出：
+圆面积: 12.57
+你好，张三
+平均值: 2.0
+空参数: 0
+name: 李四
+age: 20
+(1, 5, 2.8)
+李四 95
+张三 88
+王五 76</pre></div>
+
+    <div class="note">
+      <b>第 3 题的 <code class="inline">if not nums: return 0</code> 是想让你养成习惯。</b><code class="inline">average()</code> 不传参数时 <code class="inline">len(nums)</code> 是 0，除法会 <code class="inline">ZeroDivisionError</code>。<b>写函数时先想「极端输入会怎样」</b>——空列表、空字符串、0、负数。这条从 D002 一路提到现在，是写代码的基本素养。
+      <br><br>
+      <b>第 7、8 题的意义：</b>你第一次有了「可复用代码」和「调用方」的分离。以后 D007 的通讯录、D008 的类、直到 AI 应用，都是这个结构的放大版——<b>逻辑放模块里，入口放 main 里。</b>
+    </div>
+  </details>
+
+  <div class="warn">
+    <b>自测边界情况</b>（写完可以试试）：<br>
+    · 第 3 题 <code class="inline">average()</code> 不传参数会不会崩？<br>
+    · 第 5 题传空列表 <code class="inline">stats([])</code> 会怎样？<br>
+    · 第 7 题把 <code class="inline">if __name__ == "__main__"</code> 注释掉，再跑 main.py，看看屏幕多了什么<br>
+    · 第 8 题把 <code class="inline">import utils</code> 改成 <code class="inline">from utils import area</code>，代码要怎么改？
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>今日笔记要点</h2>
+  <div class="codebox"><button class="copy">复制</button><pre># D005 笔记
+
+## 函数基础
+- def name(param): 缩进，没有 {} 和类型声明
+- 没有 return 的函数返回 None（不是「不返回」）
+- print 是给人看，return 是给程序用
+- 函数内部尽量只 return 不 print，输出交给调用方
+
+## 参数
+- 默认参数必须放在后面
+- **默认参数不能写 [] {} set()** —— 只会创建一次，所有调用共用
+  正确写法：默认 None，函数里 if x is None: x = []
+- *args 收成元组，**kwargs 收成字典
+- 反向用：max(*nums) 把列表拆成参数
+
+## 作用域 LEGB
+- Local → Enclosing → Global → Built-in，就近找
+- 改全局变量要 global，但更好的做法是当参数传、用返回值带出
+
+## lambda
+- 一行表达式，不能有多语句
+- 主要用途：sorted(key=...)、map、filter 的参数
+- 但 map/filter 用推导式更清楚
+
+## 模块
+- import math / from math import sqrt / import numpy as np
+- 不要写 from xxx import *
+- import 会执行那个文件一次（所以要有 __main__ 保护）
+- __name__：直接运行 = "__main__"，被 import = 文件名
+- 包 = 带 __init__.py 的文件夹，点号就是路径
+
+## C 对比
+- #include 贴内容，import 执行模块并拿名字
+- void 函数 vs 返回 None
+- 返回多个值：C 要传指针，Python 返回元组
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D005 的产出是 <b>utils.py + main.py + 8 道练习 + 笔记</b>。这是你第一个多文件程序。</p>
+  <p>明天 D006：异常处理与文件读写，让程序「崩得优雅」，学会读写 CSV / JSON。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>
