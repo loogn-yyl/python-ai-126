@@ -3,4 +3,4 @@
 students = [("张三", 18), ("李四", 28)]
 
 for name, age in students:
-    print(f"{name}今年{age}岁")
+    print(f"{name} 今年 {age} 岁")

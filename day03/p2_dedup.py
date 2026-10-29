@@ -2,11 +2,12 @@
 
 s = input("请输入一串数字, 用逗号隔开: ")
 
-nums = [int(x) for x in s.split(",")]
-res = []
-
-for x in nums:
-    if x not in res:
-        res.append(x)
-
-print(res)
+if s == "":
+    print("无输入")
+else:
+    nums = [int(x) for x in s.split(",")]
+    res = []
+    for x in nums:
+        if x not in res:
+            res.append(x)
+    print(res)
