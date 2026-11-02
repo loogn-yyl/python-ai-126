@@ -2,7 +2,7 @@
 
 answer = 42
 for i in range(3):
-    x = int(input(f"第{i}次猜数字: "))
+    x = int(input(f"第{i + 1}次猜数字: "))
     if x == answer:
         print("猜中了")
         break
