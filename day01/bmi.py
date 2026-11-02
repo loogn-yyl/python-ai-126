@@ -1,5 +1,5 @@
 # bmi.py 计算 BMI 并给出区间
-height = float(input("请输入身高（米，如 1.75）: "))
+height = float(input("请输入身高（米，如 1.75): "))
 weight = float(input("请输入体重（公斤）: "))
 
 
