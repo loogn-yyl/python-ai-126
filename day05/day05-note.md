@@ -36,4 +36,4 @@
 
 ## 踩过的坑
 - 降序可以写成 sorted(nums, key=lambda x: -x)
-  也可以写成 sorted(students, key=lambda s: s[1], reverse=True）
+  也可以写成 sorted(students, key=lambda s: s[1], reverse=True)
