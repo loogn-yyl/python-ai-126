@@ -22,7 +22,7 @@ students = []
 subject_acc = {s: [] for s in subjects}   # 必须在循环外，只建一次
 skipped = 0
 
-with open("scores_csv.csv", "r", newline="", encoding="utf-8") as f:
+with open("scores.csv", "r", newline="", encoding="utf-8") as f:
     for row in csv.DictReader(f):
         name = row["姓名"]
 

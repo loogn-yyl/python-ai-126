@@ -2,7 +2,7 @@
 
 import csv
 
-with open("scores_csv.csv", "w", newline="", encoding="utf-8") as f:
+with open("scores.csv", "w", newline="", encoding="utf-8") as f:
     w = csv.writer(f)
     w.writerow(["姓名", "语文", "数学", "英语"])
     w.writerow(["张三", 88, 95, 76])
