@@ -12,11 +12,11 @@ print("csv 写入完成")
 # no.2
 import csv
 
-with open("demo.csv", "r", encoding="utf-8") as f:
+with open("demo.csv", "r", newline="", encoding="utf-8") as f:
     r = csv.reader(f)
     for row in r:
         print(row)
 
-with open("demo.csv", "r", encoding="utf-8") as f:
+with open("demo.csv", "r", newline="", encoding="utf-8") as f:
     for row in csv.DictReader(f):
         print(row)
