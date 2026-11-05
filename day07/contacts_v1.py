@@ -12,7 +12,7 @@ def load():
     if not os.path.exists(FILE):
         return {}
     with open(FILE, "r", encoding="utf-8") as f:
-        return json.loads(f)
+        return json.load(f)
 
 def save(data):
     """写数据"""
@@ -58,6 +58,9 @@ def delete_contact(data):
 
 def find_contact(data):
     keyword = input("  要查找的姓名: ").strip()
+    if not keyword:
+        print("  姓名不能为空")
+        return
     hits = {k: v for k, v in data.items() if keyword in k}
     if not hits:
         print("  没有匹配的联系人")
