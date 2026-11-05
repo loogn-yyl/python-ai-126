@@ -3,16 +3,29 @@
 
 import json
 import os
+import unicodedata
 
 FILE = "contacts.json"
+
+def dw(s):
+    """字符串占几个显示格: 中文/全角算 2, 其余算 1"""
+    return sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in s)
+
+def pad(s, width):
+    """右侧补空格, 补到占满 width 个显示格"""
+    return s + " " * (width - dw(s))
 
 # ---------- 数据层 ----------
 def load():
     """读数据: 文件不存在就返回空字典"""
     if not os.path.exists(FILE):
         return {}
-    with open(FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        print(f"  {FILE} 内容损坏, 已按空通讯录启动")
+        return {}
 
 def save(data):
     """写数据"""
@@ -24,9 +37,9 @@ def show_all(data):
     if not data:
         print("  通讯录是空的")
         return
-    print(f"  {'序号':<4}{'姓名':<8}{'电话'}")
+    print("  " + pad("序号", 5) + pad("姓名", 12) + "电话")
     for i, (name, phone) in enumerate(data.items(), start=1):
-        print(f"  {i:<4}{name:<8}{phone}")
+        print("  " + pad(str(i), 5) + pad(name, 12) + phone)
 
 def add_contact(data):
     name = input("  要添加的姓名: ").strip()
