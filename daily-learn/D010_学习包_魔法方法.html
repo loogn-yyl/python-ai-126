@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D010 学习包 · 魔法方法</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 010 · 第 2 周</div>
+  <h1>魔法方法</h1>
+  <p>今天让你的对象变得「像个原生类型」——能直接打印、能比较、能排序、能遍历，调用方一行都不用改。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：Book（可比较可排序可去重）</span>
+    <span>🔁 承接 D009</span>
+    <span>🎯 8 个魔法方法</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1–2 节：__str__ / __repr__ / __eq__</span></div><div class="tl"><b>第 2 小时</b><span>读 3–4 节：排序、容器协议</span></div><div class="tl"><b>第 3 小时</b><span>读 5–6 节：__call__、@property</span></div><div class="tl"><b>第 4 小时</b><span>八道练习 + 笔记</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day10
+cd ~/python-learn/day10</pre></div>
+<div class="note"><b>今天的主题一句话：让你的对象用起来像 Python 自带的东西。</b>自己写的 <code class="inline">Book</code> 也能 <code class="inline">print(book)</code>、能 <code class="inline">sorted(books)</code>、能 <code class="inline">len(shelf)</code>、能 <code class="inline">book in shelf</code>——这些都不需要别人记住你的方法名，因为它们复用<b>全 Python 统一的写法</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>__str__ 与 __repr__：让对象能直接打印</h2>
+<p>D008 你见过 <code class="inline">print(Contact("张三"))</code> 输出的是一串地址。两个魔法方法就是为了改掉它：</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price
+
+    def __str__(self):
+        return f"《{self.title}》{self.price} 元"
+
+    def __repr__(self):
+        return f"Book({self.title!r}, {self.price!r})"
+
+
+b = Book("流畅的 Python", 128.0)
+print(b)
+print(str(b))
+print(repr(b))
+print([b])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">《流畅的 Python》128.0 元
+《流畅的 Python》128.0 元
+Book('流畅的 Python', 128.0)
+[Book('流畅的 Python', 128.0)]</pre></div>
+<table><tr><th>方法</th><th>什么时候被调用</th><th>写给谁看</th></tr><tr><td><code>__str__</code></td><td><code>print(obj)</code>、<code>str(obj)</code>、<code>f"{obj}"</code></td><td><b>人</b>——尽量好看</td></tr><tr><td><code>__repr__</code></td><td><code>repr(obj)</code>、<b>放进容器里打印</b>、调试器</td><td><b>开发者</b>——最好是能重建对象的代码</td></tr></table>
+<div class="warn"><b>最容易被忽略的一行：<code>print([b])</code> 走的是 <code>__repr__</code>，不是 <code>__str__</code>。</b>因为列表的 <code class="inline">__str__</code> 是「把每个元素的 <code class="inline">repr</code> 拼起来」。所以 <b>两个都要写</b>——只写 <code class="inline">__str__</code> 的话，打印列表、写日志、看报错时看到的还是一堆地址。</div>
+<div class="note"><b>写 <code class="inline">__repr__</code> 的一个实用技巧：用 <code class="inline">!r</code>。</b><code class="inline">f"Book({self.title!r}, {self.price!r})"</code> 会自动给字符串加引号、给数字原样输出，得到 <code class="inline">Book('流畅的 Python', 128.0)</code>——这行东西粘回 Python 里能直接重建一个对象，这就是 <code>repr</code> 的理想状态。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>__eq__ 与 __hash__：能不能比较、能不能去重</h2>
+<p>D008 见过：<code class="inline">Contact("张三") == Contact("张三")</code> 是 <code class="inline">False</code>。因为默认的 <code class="inline">==</code> 问的是「是不是同一个对象」，和 <code class="inline">is</code> 一样。</p>
+<div class="codebox"><button class="copy">复制</button><pre>class A:
+    def __init__(self, v):
+        self.v = v
+
+
+class B:
+    def __init__(self, v):
+        self.v = v
+
+    def __eq__(self, other):
+        if not isinstance(other, B):
+            return NotImplemented
+        return self.v == other.v
+
+
+print("没写 __eq__:", A(1) == A(1))
+print("写了 __eq__:", B(1) == B(1))
+print("值不同:", B(1) == B(2))
+print("跟别的类型比:", B(1) == 1)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">没写 __eq__: False
+写了 __eq__: True
+值不同: False
+跟别的类型比: False</pre></div>
+<p>三个细节值得说清楚：</p>
+<table><tr><th>细节</th><th>说明</th></tr><tr><td><code>return NotImplemented</code></td><td>不是 <code>False</code>。它的意思是「我不会跟他比」，Python 会再去问对方能不能比，两边都不行才返回 <code>False</code></td></tr><tr><td>为什么要 <code>isinstance</code> 检查</td><td>不检查的话 <code>B(1) == 1</code> 会去访问 <code>1.v</code>，直接抛 <code>AttributeError</code></td></tr><tr><td><code>!=</code> 自动有了</td><td><code>a != c</code> 输出 <code>True</code>——定义 <code>__eq__</code> 之后 Python 自动给你配一个反向的 <code>!=</code></td></tr></table>
+<h3>然后踩一个必踩的坑：定义了 __eq__ 就不能进 set 了</h3>
+<div class="codebox"><button class="copy">复制</button><pre>class A:
+    def __init__(self, v):
+        self.v = v
+
+    def __eq__(self, other):
+        return isinstance(other, A) and self.v == other.v
+
+
+print("能比较:", A(1) == A(1))
+try:
+    print(set([A(1)]))
+except TypeError as e:
+    print("TypeError:", e)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">能比较: True
+TypeError: unhashable type: 'A'</pre></div>
+<p>能 <code class="inline">==</code> 但不能进 <code class="inline">set</code>，看着很怪，其实是 Python 的规矩：<b>定义了 <code class="inline">__eq__</code> 却不定义 <code class="inline">__hash__</code>，Python 会把 <code class="inline">__hash__</code> 设成 <code class="inline">None</code>，这个类就不可哈希</b>，也就不能当字典的 key、不能放进 set。</p>
+<div class="note"><b>为什么这么设计：</b>哈希表要求「相等的两个东西哈希值必须相同」。你改了「相等」的定义，Python 不知道新的「相等」该怎么算哈希，与其给你一个错的哈希（会导致 <code class="inline">in</code> 查不到、去重失效），不如直接拒绝。<br><br><b>补法就三行：</b>相等按什么比，哈希就按同一个东西算。</div>
+<div class="codebox"><button class="copy">复制</button><pre>def __eq__(self, other):
+    return isinstance(other, Book) and self.title == other.title
+
+def __hash__(self):
+    return hash(self.title)          # 和 __eq__ 用同一个字段</pre></div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>__lt__：让对象能排序</h2>
+<p><code class="inline">sorted(books)</code> 对自定义对象默认会报 <code class="inline">TypeError: '<' not supported between instances</code>，它不知道谁大谁小。给它一个 <code class="inline">__lt__</code>（less than）就行：</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price
+
+    def __str__(self):
+        return f"{self.title}({self.price})"
+
+    def __lt__(self, other):
+        return self.price &lt; other.price
+
+
+books = [Book("C 程序设计", 59.0), Book("流畅的 Python", 128.0), Book("算法导论", 99.0)]
+print("默认按 price 升序:")
+for b in sorted(books):
+    print(" ", b)
+
+print("按书名排（key 优先于 __lt__）:")
+for b in sorted(books, key=lambda x: x.title):
+    print(" ", b)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">默认按 price 升序:
+  C 程序设计(59.0)
+  算法导论(99.0)
+  流畅的 Python(128.0)
+按书名排（key 优先于 __lt__）:
+  C 程序设计(59.0)
+  流畅的 Python(128.0)
+  算法导论(99.0)</pre></div>
+<table><tr><th>写法</th><th>按什么排</th><th>什么时候用</th></tr><tr><td>定义 <code>__lt__</code> + <code>sorted(books)</code></td><td>对象<b>默认</b>的那个顺序</td><td>这个类只有一种自然的排序方式（价格、日期、优先级）</td></tr><tr><td><code>sorted(books, key=lambda b: b.title)</code></td><td>临时指定的字段</td><td><b>临时换一种排法，不动类</b>——更常用</td></tr><tr><td><code>sorted(books, reverse=True)</code></td><td>反过来</td><td>任何排序都能加</td></tr></table>
+<div class="warn"><b><code>key=</code> 永远优先于 <code>__lt__</code>。</b>上面第二段输出按书名排了，说明给了 <code class="inline">key</code> 就不会调 <code class="inline">__lt__</code>。<br>所以真实项目里，<b>大部分排序用 <code class="inline">key=</code> 就够了，不必去写 <code class="inline">__lt__</code></b>。什么时候该写？当这个对象<b>有一个不可否认的自然顺序</b>时——比如按日期排的事件、按分数排的成绩。</div>
+<div class="note"><b>还有一个小陷阱：<code>__eq__</code> 和 <code>__lt__</code> 的口径要一致。</b>如果 <code class="inline">__eq__</code> 只看标题、而 <code class="inline">__lt__</code> 只看价格，就会出现「两本书相等，但一本比另一本贵」这种自相矛盾的状态，排序结果会不稳定。<br><b>经验：要么都按同一个字段，要么 </b><code class="inline">__eq__</code><b> 按全部字段、<code class="inline">__lt__</code> 按第一个字段排。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>让对象像容器：__len__ / __getitem__ / __iter__</h2>
+<p>三个方法一写，你的对象就能用 <code class="inline">len()</code>、<code class="inline">obj[0]</code>、<code class="inline">for x in obj</code>、<code class="inline">in</code>、<code class="inline">切片</code>——全部是 Python 原生语法，不需要记你的方法名。</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Shelf:
+    def __init__(self, books):
+        self.books = list(books)
+
+    def __len__(self):
+        return len(self.books)
+
+    def __getitem__(self, i):
+        return self.books[i]
+
+    def __iter__(self):
+        return iter(self.books)
+
+
+s = Shelf(["C 程序设计", "流畅的 Python", "算法导论"])
+print(len(s))
+print(s[0])
+print(s[-1])
+for name in s:
+    print("  读完了:", name)
+print([n for n in s if "Python" in n])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">3
+C 程序设计
+算法导论
+  读完了: C 程序设计
+  读完了: 流畅的 Python
+  读完了: 算法导论
+['流畅的 Python']</pre></div>
+<table><tr><th>方法</th><th>解锁的写法</th><th>说明</th></tr><tr><td><code>__len__</code></td><td><code>len(s)</code></td><td>返回一个整数</td></tr><tr><td><code>__getitem__</code></td><td><code>s[0]</code>、<code>s[-1]</code>、<code>s[0:2]</code></td><td>切片时收到的是一个 <code>slice</code> 对象，直接转给内部列表就行</td></tr><tr><td><code>__iter__</code></td><td><code>for x in s</code>、<code>list(s)</code>、<code>in</code>、推导式</td><td>返回一个迭代器；D012 会专门讲它</td></tr></table>
+<div class="note"><b>只要写了 <code>__getitem__</code>，<code>for</code> 循环其实也能跑</b>——Python 会从下标 0 开始一个个取，直到抛 <code>IndexError</code>。这是老式写法，能跑但慢（每次都从头找），<b>所以 <code class="inline">__iter__</code> 还是要写</b>。D012 会讲清楚两者差别。</div>
+<div class="ok"><b>这就是「鸭子类型」的实用价值：</b>调用方不需要知道你是 <code>list</code> 还是 <code class="inline">Shelf</code>，只要你能被 <code class="inline">for</code> 遍历、能 <code class="inline">len()</code>，就能塞进任何接受「可迭代对象」的地方——<code class="inline">sum()</code>、<code class="inline">max()</code>、<code class="inline">sorted()</code>、<code class="inline">enumerate()</code>，一个都不用改。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>__call__：让对象像函数</h2>
+<div class="codebox"><button class="copy">复制</button><pre>class Multiplier:
+    def __init__(self, n):
+        self.n = n
+
+    def __call__(self, x):
+        return x * self.n
+
+
+double = Multiplier(2)
+triple = Multiplier(3)
+print(double(5), triple(5))
+print(callable(double), callable(5))
+
+books = ["C 程序设计", "流畅的 Python", "算法导论"]
+print(list(map(double, [1, 2, 3])))
+print(sorted(books, key=Multiplier(1)) == sorted(books))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">10 15
+True False
+[2, 4, 6]
+True</pre></div>
+<p>写了 <code class="inline">__call__</code>，对象就能像函数一样加括号调用。<code class="inline">callable(double)</code> 从 <code class="inline">False</code> 变成 <code class="inline">True</code>。</p>
+<p><b>那为什么不直接写个函数？</b>因为函数记不住状态，而对象可以：</p>
+<table><tr><th>写法</th><th>能不能带状态</th><th>例子</th></tr><tr><td><code>def double(x): return x * 2</code></td><td>不能，除非用默认参数或全局变量</td><td>固定倍率</td></tr><tr><td><code>class Multiplier:</code> + <code>__call__</code></td><td><b>能</b>，倍率存在 <code>self.n</code> 里</td><td><code>Multiplier(2)</code> / <code>Multiplier(0.8)</code> 各自独立</td></tr></table>
+<div class="note">真实项目里这个模式用得很多，而且理由都很实际：需要一个「带配置的函数」时，写成类能让配置和逻辑待在一起，还能顺手加校验、加日志。<b>D013 的装饰器本质就是「能记住配置的可调用对象」</b>，今天这个是它的前置知识。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>@property：看起来是属性，其实是方法</h2>
+<p>想让「给价格赋值」这件事自动做校验，又不想让调用方写 <code class="inline">b.set_price(99)</code>。用 <code class="inline">@property</code>：</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price              # 注意：这里会走下面的 setter
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, v):
+        if v &lt; 0:
+            raise ValueError("价格不能为负")
+        self._price = v
+
+
+b = Book("流畅的 Python", 128.0)
+print(b.price)
+b.price = 99.9
+print(b.price)
+try:
+    b.price = -1
+except ValueError as e:
+    print("ValueError:", e)
+print("价格还是:", b.price)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">128.0
+99.9
+ValueError: 价格不能为负
+价格还是: 99.9</pre></div>
+<p>四点必须记住：</p>
+<table><tr><th>点</th><th>说明</th></tr><tr><td>调用方看不出区别</td><td><code>b.price</code> 长得像读属性，<code>b.price = 99.9</code> 长得像写属性，实际走的是两个方法</td></tr><tr><td>内部存到 <code>self._price</code></td><td>下划线开头表示「内部字段，别直接碰」。<b>不能也叫 <code>self.price</code></b>，那会无限递归</td></tr><tr><td><code>__init__</code> 里也会走 setter</td><td>所以 <code>Book("书名", -1)</code> 一样会被拦下来，校验只需要写一处</td></tr><tr><td><code>@property</code> 单独用是只读</td><td>只写 getter 不写 setter，赋值就报错</td></tr></table>
+<h3>只读的计算属性</h3>
+<div class="codebox"><button class="copy">复制</button><pre>class Order:
+    def __init__(self, price, count):
+        self.price = price
+        self.count = count
+
+    @property
+    def total(self):                # 只读的计算属性
+        return self.price * self.count
+
+
+o = Order(59.0, 3)
+print(o.total)
+try:
+    o.total = 100
+except AttributeError as e:
+    print("AttributeError:", e)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">177.0
+AttributeError: property 'total' of 'Order' object has no setter</pre></div>
+<div class="note"><b><code>total</code> 不存下来，每次现算。</b>好处是永远不会出现「单价改了但总价忘了更新」这种不一致——这是 D008 那句「文件格式和内存表示是两件事」的同一个思路：<b>能算出来的东西，就不要存第二份</b>。</div>
+<h3>三种装饰器放在一起看</h3>
+<div class="codebox"><button class="copy">复制</button><pre>class Demo:
+    count = 0
+
+    def __init__(self, v):
+        self.v = v
+        Demo.count += 1
+
+    def normal(self):
+        return f"normal: {self.v}"
+
+    @classmethod
+    def cls_info(cls):
+        return f"cls: {cls.__name__}, count={cls.count}"
+
+    @staticmethod
+    def helper(x):
+        return f"static: {x}"
+
+    @property
+    def double(self):
+        return self.v * 2
+
+
+d = Demo(21)
+print(d.normal())
+print(Demo.cls_info())
+print(Demo.helper("不用对象"))
+print(d.double, d.double)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">normal: 21
+cls: Demo, count=1
+static: 不用对象
+42 42</pre></div>
+<table><tr><th>写法</th><th>调用时</th><th>名字访问</th><th>典型用途</th></tr><tr><td><code>def m(self)</code></td><td><code>d.m()</code></td><td>方法</td><td>读写对象数据</td></tr><tr><td><code>@classmethod</code></td><td><code>Demo.m()</code> 或 <code>d.m()</code></td><td>方法</td><td>第二个构造函数（<code>from_text</code>）</td></tr><tr><td><code>@staticmethod</code></td><td><code>Demo.m()</code></td><td>方法</td><td>和类相关但不碰数据的工具</td></tr><tr><td><code>@property</code></td><td><code>d.m</code> <b>不加括号</b></td><td><b>属性</b></td><td>带校验的字段、计算值</td></tr></table>
+<div class="warn"><b><code>d.double</code> 不加括号是对的，加了就报 <code>TypeError: 'int' object is not callable</code>。</b>这是新写 @property 最容易犯的错——它现在<b>是属性不是方法</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 8 题是今天的产出</b>（可打印、可比较、可排序、可去重的 Book）。</p>
+<ol class="task"><li><b>能打印</b>：给 <code class="inline">Book</code> 写 <code class="inline">__str__</code> 和 <code class="inline">__repr__</code>，验证 <code class="inline">print(b)</code> 和 <code class="inline">print([b, b])</code> 输出不同</li><li><b>能比较</b>：<code class="inline">__eq__</code> 按标题比，测四组：同书同名、同书异价、异书、跟字符串比</li><li><b>能排序</b>：<code class="inline">__lt__</code> 按价格，验证 <code class="inline">sorted(books)</code> 和 <code class="inline">reverse=True</code> 都正常</li><li><b>能去重</b>：补 <code class="inline">__hash__</code>，用 <code class="inline">set</code> 去掉重复的书，并验证 <code class="inline">in</code> 能查到</li><li><b>像容器</b>：<code class="inline">Shelf</code> 写 <code class="inline">__len__</code> / <code class="inline">__getitem__</code> / <code class="inline">__iter__</code>，验证 <code class="inline">len()</code>、下标、负下标、切片、for、推导式</li><li><b>像函数</b>：<code class="inline">Discount(0.8)</code> 用 <code class="inline">__call__</code> 打八折，验证 <code class="inline">callable()</code> 和列表推导式里能用</li><li><b>带校验的属性</b>：<code class="inline">price</code> 用 <code class="inline">@property</code> + setter 拦住负数，<code class="inline">total</code> 做成只读计算属性</li><li><b>图书清单</b>（综合）：四个方法齐上，<code class="inline">sorted()</code> 按价格、按书名各排一次，<code class="inline">set()</code> 去重，最后算总价</li></ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<!--run-skip: 八份文件拼在一起展示-->
+<div class="codebox"><button class="copy">复制</button><pre>class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price
+
+    def __str__(self):
+        return f"《{self.title}》{self.price} 元"
+
+    def __repr__(self):
+        return f"Book({self.title!r}, {self.price!r})"
+
+b = Book("算法导论", 99.0)
+print(b)
+print(repr(b))
+print([b, b])
+
+
+
+class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price
+
+    def __eq__(self, other):
+        if not isinstance(other, Book):
+            return NotImplemented
+        return self.title == other.title
+
+a = Book("算法导论", 99.0)
+b = Book("算法导论", 120.0)
+c = Book("流畅的 Python", 128.0)
+print(a == b, a == c, a != c, a == "算法导论")
+
+
+
+class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price
+
+    def __str__(self):
+        return f"{self.title}({self.price})"
+
+    def __lt__(self, other):
+        return self.price &lt; other.price
+
+books = [Book("流畅的 Python", 128.0), Book("C 程序设计", 59.0), Book("算法导论", 99.0)]
+print([str(b) for b in sorted(books)])
+print([str(b) for b in sorted(books, reverse=True)])
+
+
+
+class Book:
+    def __init__(self, title):
+        self.title = title
+
+    def __eq__(self, other):
+        return isinstance(other, Book) and self.title == other.title
+
+    def __hash__(self):
+        return hash(self.title)
+
+books = {Book("算法导论"), Book("算法导论"), Book("流畅的 Python")}
+print(len(books))
+print(sorted(b.title for b in books))
+print(Book("算法导论") in books)
+
+
+
+class Shelf:
+    def __init__(self):
+        self.books = []
+
+    def add(self, title):
+        self.books.append(title)
+
+    def __len__(self):
+        return len(self.books)
+
+    def __getitem__(self, i):
+        return self.books[i]
+
+    def __iter__(self):
+        return iter(self.books)
+
+s = Shelf()
+s.add("算法导论")
+s.add("流畅的 Python")
+print(len(s))
+print(s[0], s[1])
+print(s[0:2])
+for i, name in enumerate(s, start=1):
+    print(i, name)
+
+
+
+class Discount:
+    def __init__(self, rate):
+        self.rate = rate
+
+    def __call__(self, price):
+        return round(price * self.rate, 1)
+
+vip = Discount(0.8)
+print(vip(100), vip(59.0))
+print(callable(vip), callable(0.8))
+print([vip(p) for p in [100, 200, 50]])
+
+
+
+class Book:
+    def __init__(self, title, price, count=1):
+        self.title = title
+        self.price = price
+        self.count = count
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, v):
+        if v &lt; 0:
+            raise ValueError("价格不能为负")
+        self._price = v
+
+    @property
+    def total(self):
+        return round(self._price * self.count, 2)
+
+b = Book("算法导论", 99.0, 3)
+print(b.price, b.total)
+b.price = 100.0
+print(b.total)
+try:
+    b.price = -5
+except ValueError as e:
+    print("ValueError:", e)
+print(b.total)
+
+
+
+class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price
+
+    def __str__(self):
+        return f"《{self.title}》{self.price:.1f} 元"
+
+    def __repr__(self):
+        return f"Book({self.title!r}, {self.price!r})"
+
+    def __eq__(self, other):
+        return isinstance(other, Book) and self.title == other.title
+
+    def __hash__(self):
+        return hash(self.title)
+
+    def __lt__(self, other):
+        return self.price &lt; other.price
+
+
+books = [
+    Book("流畅的 Python", 128.0),
+    Book("算法导论", 99.0),
+    Book("C 程序设计", 59.0),
+    Book("算法导论", 99.0),          # 重复的一本
+]
+
+print("按价格从低到高：")
+for b in sorted(books):
+    print(" ", b)
+
+print("按书名（中文按拼音序无关，这里是码点序）：")
+for b in sorted(books, key=lambda x: x.title):
+    print(" ", b)
+
+unique = sorted(set(books))
+print("去掉重复后：", len(unique), "本")
+print("总价：", sum(b.price for b in unique))
+print(unique[0] &lt; unique[-1], unique[0] == Book("C 程序设计", 0))</pre></div>
+<p>依次运行 p1–p8 的输出：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">《算法导论》99.0 元
+Book('算法导论', 99.0)
+[Book('算法导论', 99.0), Book('算法导论', 99.0)]
+True False True False
+['C 程序设计(59.0)', '算法导论(99.0)', '流畅的 Python(128.0)']
+['流畅的 Python(128.0)', '算法导论(99.0)', 'C 程序设计(59.0)']
+2
+['流畅的 Python', '算法导论']
+True
+2
+算法导论 流畅的 Python
+['算法导论', '流畅的 Python']
+1 算法导论
+2 流畅的 Python
+80.0 47.2
+True False
+[80.0, 160.0, 40.0]
+99.0 297.0
+300.0
+ValueError: 价格不能为负
+300.0
+按价格从低到高：
+  《C 程序设计》59.0 元
+  《算法导论》99.0 元
+  《算法导论》99.0 元
+  《流畅的 Python》128.0 元
+按书名（中文按拼音序无关，这里是码点序）：
+  《C 程序设计》59.0 元
+  《流畅的 Python》128.0 元
+  《算法导论》99.0 元
+  《算法导论》99.0 元
+去掉重复后： 3 本
+总价： 286.0
+True True</pre></div>
+</details>
+<div class="note"><b>最后一行 <code>True True</code> 里藏着今天最值得想的一件事。</b><code class="inline">unique[0] < unique[-1]</code> 是 <code class="inline">True</code>（59 比 128 小），<code class="inline">unique[0] == Book("C 程序设计", 0)</code> 也是 <code class="inline">True</code>（标题相同就算相等）。同一个对象，<b>相等看标题、大小看价格</b>——这就是上面 warn 里说的「口径不一致」。本例没问题因为书不重名，但真实项目里这种设计会让你在排序去重时得到莫名其妙的结果。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D010 笔记
+
+## 打印
+- __str__  → print(obj) / str(obj) / f"{obj}"     给人看
+- __repr__ → repr(obj) / 打印列表 / 调试器          给开发者看，最好能重建对象
+- print([obj]) 走的是 __repr__，不是 __str__ → 两个都要写
+- repr 里用 !r：f"Book({title!r})" → Book('书名')
+
+## 比较
+- 默认 == 和 is 一个意思，比的是「是不是同一个对象」
+- __eq__ 里先 isinstance 检查，比不了就 return NotImplemented（不是 False）
+- 定义了 __eq__ 不定义 __hash__ → 类变成不可哈希，不能进 set、不能当 dict key
+- __hash__ 要和 __eq__ 用同一个字段算
+
+## 排序
+- sorted(books) 需要 __lt__，否则 TypeError
+- sorted(books, key=lambda b: b.x) 更常用，key 优先于 __lt__
+- __eq__ 和 __lt__ 口径要一致，否则排序结果不稳定
+
+## 让它像容器
+- __len__      → len(obj)
+- __getitem__  → obj[0] / obj[-1] / obj[0:2]（切片收到 slice 对象）
+- __iter__     → for x in obj / in / 推导式 / list()
+- 只写 __getitem__ 也能 for，但慢；能写 __iter__ 就写
+
+## 让它像函数
+- __call__ → obj(x)
+- 比函数强的地方：能带状态（self.n 就是配置）
+
+## @property
+- @property + @x.setter → 长得像属性，实际走方法
+- 内部字段用 self._x，不能同名（会无限递归）
+- __init__ 里赋值也会走 setter → 校验只写一处
+- 只写 getter 就是只读，赋值报 AttributeError
+- 调用时不加括号！d.total 不是 d.total()
+
+## 三种装饰器
+- @classmethod  cls    第二个构造函数
+- @staticmethod 无参数  工具函数
+- @property    不加括号 当属性用
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D010 的产出是 <b>可打印、可比较、可排序、可去重的 Book 类 + 8 道练习 + 笔记</b>。</p>
+  <p>明天 D011：<code>dataclass</code>、<code>Enum</code> 枚举、类型注解 —— 今天手写的 <code>__init__</code> / <code>__repr__</code> / <code>__eq__</code>，明天一行 <code>@dataclass</code> 全部自动生成。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

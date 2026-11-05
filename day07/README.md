@@ -13,7 +13,7 @@ Python 学习第 7 天的练习项目：用字典存储联系人，JSON 持久�
 ## 运行
 
 ```bash
-python contacts_v1.py
+python3 contacts_v1.py
 ```
 
 ## 学到的东西

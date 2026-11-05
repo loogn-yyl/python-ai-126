@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D013 学习包 · 闭包与装饰器</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 013 · 第 2 周</div>
+  <h1>闭包与装饰器</h1>
+  <p>今天学的是「不改函数内部，就能给它加上新能力」——计时、重试、日志，全部套在外面。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：timer / retry / log</span>
+    <span>🔁 承接 D005 的 LEGB</span>
+    <span>🎁 @ 语法糖</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1–2 节：闭包、装饰器的本质</span></div><div class="tl"><b>第 2 小时</b><span>读 3–4 节：functools.wraps、带参数的装饰器</span></div><div class="tl"><b>第 3 小时</b><span>读 5–6 节：类装饰器、三个实战装饰器</span></div><div class="tl"><b>第 4 小时</b><span>八道练习 + 笔记</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day13
+cd ~/python-learn/day13</pre></div>
+<div class="note"><b>今天的两个概念经常被讲得很玄，其实都很朴素。</b>闭包 = 一个函数记住了外面变量的值；装饰器 = 一个函数接收另一个函数，包一层再返回。合在一起就是「不改函数内部，就能给它加上计时、重试、日志」。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>闭包：函数能记住外面的变量</h2>
+<div class="codebox"><button class="copy">复制</button><pre>def make_counter():
+    count = 0
+
+    def inner():
+        nonlocal count
+        count += 1
+        return count
+
+    return inner
+
+
+c1 = make_counter()
+print(c1(), c1(), c1())
+c2 = make_counter()
+print(c2())
+print(c1())</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">1 2 3
+1
+4</pre></div>
+<p>看最后两行：<code class="inline">c2()</code> 是 1，说明 <b>两次 <code class="inline">make_counter()</code> 各自有一份独立的 <code class="inline">count</code></b>；紧接着 <code class="inline">c1()</code> 是 4，说明 <code class="inline">c1</code> 那份一直被记着，没丢。</p>
+<table><tr><th>要素</th><th>在这里是</th><th>说明</th></tr><tr><td>外层函数</td><td><code>make_counter</code></td><td>创建并返回内层函数</td></tr><tr><td>内层函数</td><td><code>inner</code></td><td>用到外层的 <code>count</code></td></tr><tr><td><b>闭包</b></td><td><code>inner</code> + 它捕获的 <code>count</code></td><td><b>函数 + 它记住的变量</b>，一起被返回出去</td></tr><tr><td><code>nonlocal</code></td><td><code>nonlocal count</code></td><td>声明「我要改外层的那个 count」，不是新建一个</td></tr></table>
+<div class="warn"><b><code>make_counter()()</code> 立刻报错：</b><code class="inline">UnboundLocalError: cannot access local variable 'count'</code><br>这就是 D005 讲过的 LEGB 规则：函数里只要出现 <code>count = ...</code> 这种赋值，Python 就认定 <code>count</code> 是<b>局部变量</b>，于是 <code>count + 1</code> 里的 <code class="inline">count</code> 还没赋值就被读了。<b>加一行 <code class="inline">nonlocal count</code> 只是告诉 Python「别新建，用外层的那个」</b>，和 <code>global</code> 是同一个道理，只是目标层级不同（global 找最外层，nonlocal 找外层函数）。</div>
+<div class="note"><b>C 里没有闭包，但你有类似的直觉。</b><code class="inline">static int count = 0;</code> 在函数里也能跨调用保存值，区别是它只有<b>一份</b>，全局共享；闭包是<b>每次调用外层函数就新建一份</b>——这就是为什么 <code class="inline">c1</code> 和 <code class="inline">c2</code> 互不影响。想要「每个实例一份」的状态，C 里得靠传结构体指针，Python 用闭包就够了。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>装饰器：函数收函数，返回函数</h2>
+<p>先不带 @ 语法，看清它到底在干什么：</p>
+<div class="codebox"><button class="copy">复制</button><pre>def my_decorator(func):
+    def wrapper():
+        print("  调用前")
+        func()
+        print("  调用后")
+
+    return wrapper
+
+
+def hello():
+    print("你好")
+
+
+hello2 = my_decorator(hello)
+hello2()
+print("---")
+my_decorator(hello)()
+
+
+@my_decorator
+def hi():
+    print("hi")
+
+
+print("---")
+hi()
+help(hi)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">  调用前
+你好
+  调用后
+---
+  调用前
+你好
+  调用后
+---
+  调用前
+hi
+  调用后
+Help on function wrapper in module __main__:
+
+wrapper()</pre></div>
+<table><tr><th>代码</th><th>等价于</th></tr><tr><td><code>hello2 = my_decorator(hello)</code></td><td>把 hello 这个函数<b>当参数传进去</b></td></tr><tr><td><code>hello2()</code></td><td>调用返回来的 wrapper，wrapper 里再调原来的 hello</td></tr><tr><td><code>@my_decorator<br>def hi(): ...</code></td><td><b>完全等价于</b> <code>hi = my_decorator(hi)</code></td></tr></table>
+<div class="ok"><b>记住这一条就够了：<code>@deco</code> 只是 <code>f = deco(f)</code> 的语法糖。</b>没有任何魔法。<code>@</code> 之后，名字 <code>hi</code> 指向的<b>已经不是原来那个函数</b>，而是 wrapper。<br>所以 <code>help(hi)</code> 显示的是 <code>wrapper</code>——这正好引出下一节。</div>
+<div class="note"><b>为什么装饰器这么有用：</b>计时、日志、重试、缓存、权限检查，这些逻辑和业务无关、但每个函数都要加。写进函数里会污染业务代码，复制粘贴又维护不了。装饰器让它们<b>套在函数外面</b>，被装饰的函数一个字都不用改。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>两个必踩的坑：参数丢失、名字丢失</h2>
+<h3>坑一：wrapper 不接收参数</h3>
+<!--run-skip: 报错示例-->
+<div class="codebox"><button class="copy">复制</button><pre>def deco(func):
+    def wrapper():
+        return func()
+
+    return wrapper
+
+
+@deco
+def add(a, b):
+    return a + b
+
+
+print(add(1, 2))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">TypeError: deco.&lt;locals&gt;.wrapper() takes 0 positional arguments but 2 were given</pre></div>
+<p>你调的是 <code class="inline">add(1, 2)</code>，但 <code class="inline">add</code> 现在指向 <code class="inline">wrapper</code>，而 <code class="inline">wrapper</code> 的定义是 <code class="inline">def wrapper():</code>——<b>一个参数都不收</b>。报错信息里的 <code class="inline">deco.<locals>.wrapper</code> 就是在提醒你「这是装饰器里那个 wrapper」。</p>
+<div class="codebox"><button class="copy">复制</button><pre>def wrapper(*args, **kwargs):
+    return func(*args, **kwargs)</pre></div>
+<p><b>标准答案就是这两个星号。</b><code class="inline">*args</code> 接所有位置参数，<code class="inline">**kwargs</code> 接所有关键字参数，原样转给 <code class="inline">func</code>。写装饰器时这两行<b>默认就要写上</b>，除非你明确只想装饰无参函数。</p>
+<h3>坑二：函数的名字和文档丢了</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import functools
+
+
+def deco_plain(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def deco_wraps(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@deco_plain
+def a(x):
+    """a 的文档字符串"""
+    return x
+
+
+@deco_wraps
+def b(x):
+    """b 的文档字符串"""
+    return x
+
+
+print("没有 wraps:", a.__name__, repr(a.__doc__))
+print("有 wraps  :", b.__name__, repr(b.__doc__))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">没有 wraps: wrapper None
+有 wraps  : b 'b 的文档字符串'</pre></div>
+<table><tr><th></th><th>没有 <code>wraps</code></th><th>有 <code>wraps</code></th></tr><tr><td><code>__name__</code></td><td><code>wrapper</code></td><td><code>b</code></td></tr><tr><td><code>__doc__</code></td><td><code>None</code></td><td><code>'b 的文档字符串'</code></td></tr><tr><td>报错信息里显示的名字</td><td>全是 <code>wrapper</code>，看不出是哪个函数</td><td>真实函数名</td></tr><tr><td><code>help()</code> / IDE 提示</td><td>没有说明</td><td>正常显示</td></tr></table>
+<div class="danger"><b>这不是「讲究」，是排错时的实际成本。</b>线上报错栈里出现十个 <code>wrapper</code>，你根本不知道是哪个函数出的问题。<br><b>规则：写装饰器一定加 <code class="inline">@functools.wraps(func)</code>，一行的事。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>带参数的装饰器：多套一层</h2>
+<p>想要 <code class="inline">@repeat(3)</code> 这种「装饰器自己也能带参数」的写法，就得再套一层函数：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import functools
+
+
+def repeat(n):
+    def deco(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            result = None
+            for _ in range(n):
+                result = func(*args, **kwargs)
+            return result
+
+        return wrapper
+
+    return deco
+
+
+@repeat(3)
+def hello(name):
+    print("hi", name)
+
+
+hello("张三")
+print(hello.__name__)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">hi 张三
+hi 张三
+hi 张三
+hello</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>def repeat(n):              # 第 1 层：收装饰器的参数
+    def deco(func):         # 第 2 层：收被装饰的函数
+        @functools.wraps(func)
+        def wrapper(*a, **kw):   # 第 3 层：收函数调用时的参数
+            ...
+        return wrapper
+    return deco</pre></div>
+<table><tr><th>层</th><th>收什么</th><th>什么时候执行</th></tr><tr><td><code>repeat(n)</code></td><td>装饰器参数 <code>3</code></td><td><b>定义函数时</b>（<code>@repeat(3)</code> 那一刻）</td></tr><tr><td><code>deco(func)</code></td><td>被装饰的函数</td><td>紧接着，同上</td></tr><tr><td><code>wrapper(*a)</code></td><td>调用时的实际参数</td><td><b>每次调用</b></td></tr></table>
+<div class="note"><b>判断要不要三层的方法：看 <code>@</code> 后面有没有括号。</b><br><code class="inline">@timer</code> → 两层（<code>timer(func)</code>）<br><code class="inline">@retry(3)</code> → 三层（<code>retry(3)</code> 先执行，返回 <code>deco</code>，再由 <code>deco(func)</code> 收函数）<br>写错了会得到一个很典型的报错：<code>TypeError: 'function' object is not callable</code>——因为你少写了一层，Python 把函数当成了装饰器参数。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>类装饰器：用类来当装饰器</h2>
+<p>装饰器只要求「能被调用」，所以除了函数，<b>一个实现了 <code class="inline">__call__</code> 的对象也能当装饰器</b>（D010 学过）。这样做的好处是：状态存得住。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import functools
+
+
+class CountCalls:
+    def __init__(self, func):
+        self.func = func
+        self.count = 0
+        functools.update_wrapper(self, func)
+
+    def __call__(self, *args, **kwargs):
+        self.count += 1
+        print(f"  第 {self.count} 次调用 {self.func.__name__}")
+        return self.func(*args, **kwargs)
+
+
+@CountCalls
+def greet(name):
+    return f"你好 {name}"
+
+
+print(greet("张三"))
+print(greet("李四"))
+print("调用次数:", greet.count)
+print(greet.__name__)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">  第 1 次调用 greet
+你好 张三
+  第 2 次调用 greet
+你好 李四
+调用次数: 2
+greet</pre></div>
+<table><tr><th></th><th>函数装饰器</th><th>类装饰器</th></tr><tr><td>怎么写</td><td>三层函数嵌套</td><td><code>__init__</code> 存 func + <code>__call__</code> 调用</td></tr><tr><td>状态存哪</td><td>要靠 <code>nonlocal</code> 或可变默认参数</td><td><b><code>self.count</code>，天然就有</b></td></tr><tr><td>名字要保留吗</td><td><code>@functools.wraps</code></td><td><code>functools.update_wrapper(self, func)</code></td></tr></table>
+<div class="note"><b>什么时候用类装饰器：装饰器自己需要记状态、或者需要好几个配置项时。</b>上面这个「统计调用次数」用函数也能写，但要用 <code class="inline">nonlocal</code> 绕一圈；用类就直白得多。真实项目里两种都能见到，<b>读得懂就行，写的时候优先选简单的</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>三个能直接用的装饰器</h2>
+<p>这三个是日常最常用的，抄进自己的工具文件就能一直用。<b>注意每个都以 <code class="inline">@functools.wraps(func)</code> 开头</b>。</p>
+<h3>① timer —— 测耗时</h3>
+<!--run-skip: 耗时数字每次不同-->
+<div class="codebox"><button class="copy">复制</button><pre>import functools
+import time
+
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        used = (time.perf_counter() - start) * 1000
+        print(f"  [{func.__name__}] 用时 {used:.2f} ms")
+        return result
+
+    return wrapper
+
+
+@timer
+def slow_sum(n):
+    return sum(i * i for i in range(n))
+
+
+print("结果:", slow_sum(1000000))
+print("函数名还是:", slow_sum.__name__)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">  [slow_sum] 用时 133.22 ms
+结果: 333332833333500000
+函数名还是: slow_sum</pre></div>
+<div class="note">用 <code class="inline">time.perf_counter()</code> 而不是 <code class="inline">time.time()</code>：前者是<b>单调时钟</b>，专门用来测时长——系统时间被校准、被时区改动都不影响它。<code class="inline">time.time()</code> 会跳，测出来的数可能是负的。</div>
+<h3>② retry —— 失败重试</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import functools
+
+
+def retry(times=3):
+    def deco(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            for i in range(1, times + 1):
+                try:
+                    return func(*args, **kwargs)
+                except ValueError as e:
+                    print(f"  第 {i} 次失败: {e}")
+            print("  全部失败，放弃")
+            return None
+
+        return wrapper
+
+    return deco
+
+
+@retry(3)
+def parse(text):
+    return int(text)
+
+
+print(parse("42"))
+print(parse("abc"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">42
+  第 1 次失败: invalid literal for int() with base 10: 'abc'
+  第 2 次失败: invalid literal for int() with base 10: 'abc'
+  第 3 次失败: invalid literal for int() with base 10: 'abc'
+  全部失败，放弃
+None</pre></div>
+<div class="warn"><b>重试只对「可能会自己好的错」有意义。</b>网络超时、接口限流、数据库锁等待 —— 这些重试有用。<code class="inline">int("abc")</code> 这种<b>数据本身错了</b>的，重试一百次也一样，纯属浪费。<br>还有一条纪律：<b>必须设上限</b>。没有上限的重试 = 死循环。</div>
+<div class="note">真实项目里还要加「间隔」——第一次失败立刻重试往往还是失败。标准做法是每次等待时间翻倍（退避）：0.1s → 0.2s → 0.4s。今天先把结构学会，加个 <code class="inline">time.sleep(0.1 * i)</code> 就是带间隔版。</div>
+<h3>③ log —— 不污染业务代码的日志</h3>
+<p>D013 的产出就靠它：通讯录的每个操作都自动记一行，而增删函数里<b>一句日志代码都没有</b>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>def log(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        with open("actions.log", "a", encoding="utf-8") as f:
+            f.write(f"{func.__name__}({args[0]}) -&gt; {result}\n")
+        return result
+    return wrapper</pre></div>
+<div class="note"><b>这就是装饰器最标准的用途：把「和业务无关」的事从业务函数里赶出去。</b>看 <code class="inline">add()</code> 的函数体，只有「加一个人、返回结果」两件事，没有任何 <code class="inline">open</code>、<code class="inline">write</code>——它根本不知道有日志这回事。想改成写数据库、发消息、上报监控，只改装饰器，业务函数一动不动。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 8 题是今天的产出</b>（给通讯录加日志装饰器）。</p>
+<ol class="task"><li><b>闭包计数器</b>：<code class="inline">make_counter()</code> 返回一个函数，每次调用 +1；造两个计数器验证互不影响</li><li><b>闭包工厂</b>：<code class="inline">make_multiplier(n)</code> 返回「乘以 n」的函数，造 2 倍和 3 倍各一个</li><li><b>最简单的装饰器</b>：调用前后各打印一行，<b>先用 <code class="inline">f = deco(f)</code> 的手写形式，再用 @ 语法</b></li><li><b>保留参数</b>：装饰一个带默认参数的函数，验证 <code class="inline">*args/**kwargs</code> 能把位置参数和关键字参数都转过去</li><li><b>wraps 对比</b>：同一个装饰器写两版，打印 <code class="inline">__name__</code> 和 <code class="inline">__doc__</code> 看差别</li><li><b>带参数的装饰器</b>：<code class="inline">@repeat(2)</code> 让函数执行两次，返回最后一次的结果</li><li><b>计时器</b>：给「列表推导」和「生成器求和」两个函数各加 <code class="inline">@timer</code>，比一比</li><li><b>日志装饰器</b>（综合）：给通讯录的 <code class="inline">add</code> / <code class="inline">delete</code> 套上 <code class="inline">@log</code>，每次操作自动追加一行到 <code class="inline">actions.log</code>，再读出来打印</li></ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<!--run-skip: 八份文件拼在一起展示-->
+<div class="codebox"><button class="copy">复制</button><pre>def make_counter():
+    count = 0
+
+    def inner():
+        nonlocal count
+        count += 1
+        return count
+
+    return inner
+
+
+c1 = make_counter()
+c2 = make_counter()
+print(c1(), c1(), c1())
+print(c2(), c2())
+print(c1())
+
+
+
+def make_multiplier(n):
+    def multiply(x):
+        return x * n
+
+    return multiply
+
+
+double = make_multiplier(2)
+triple = make_multiplier(3)
+print(double(10), triple(10))
+print([double(i) for i in range(1, 4)])
+print(double.__name__)
+
+
+
+def trace(func):
+    def wrapper():
+        print("开始", func.__name__)
+        func()
+        print("结束", func.__name__)
+
+    return wrapper
+
+
+@trace
+def work():
+    print("  正在干活")
+
+
+work()
+
+
+
+import functools
+
+
+def deco(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        print("调用", func.__name__, args, kwargs)
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@deco
+def add(a, b=0):
+    return a + b
+
+
+print(add(1, 2))
+print(add(1, b=5))
+print(add.__name__)
+
+
+
+import functools
+
+
+def plain(func):
+    def wrapper(*a, **kw):
+        return func(*a, **kw)
+
+    return wrapper
+
+
+def kept(func):
+    @functools.wraps(func)
+    def wrapper(*a, **kw):
+        return func(*a, **kw)
+
+    return wrapper
+
+
+@plain
+def f1():
+    """f1 的说明"""
+
+
+@kept
+def f2():
+    """f2 的说明"""
+
+
+print(f1.__name__, repr(f1.__doc__))
+print(f2.__name__, repr(f2.__doc__))
+
+
+
+import functools
+
+
+def repeat(n):
+    def deco(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            result = None
+            for _ in range(n):
+                result = func(*args, **kwargs)
+            return result
+
+        return wrapper
+
+    return deco
+
+
+@repeat(2)
+def shout(text):
+    print("  " + text * 2)
+    return text
+
+
+print(shout("嘿"))
+
+
+
+import functools
+import time
+
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        used = (time.perf_counter() - start) * 1000
+        print(f"  {func.__name__} 用时 {used:.2f} ms")
+        return result
+
+    return wrapper
+
+
+@timer
+def build_list(n):
+    return [i * i for i in range(n)]
+
+
+@timer
+def build_gen(n):
+    return sum(i * i for i in range(n))
+
+
+print(build_list(200000)[-1])
+print(build_gen(200000))
+
+
+
+import functools
+import os
+
+LOG = "actions.log"
+
+
+def log(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        with open(LOG, "a", encoding="utf-8") as f:
+            f.write(f"{func.__name__}({args[0]}) -&gt; {result}\n")
+        return result
+
+    return wrapper
+
+
+contacts = {}
+
+
+@log
+def add(name):
+    contacts[name] = "13800001111"
+    return "已添加"
+
+
+@log
+def delete(name):
+    if name in contacts:
+        del contacts[name]
+        return "已删除"
+    return "没找到"
+
+
+if os.path.exists(LOG):
+    os.remove(LOG)
+
+print(add("张三"))
+print(add("李四"))
+print(delete("王五"))
+print("剩余:", sorted(contacts))
+print("--- 日志 ---")
+print(open(LOG, encoding="utf-8").read().strip())
+os.remove(LOG)</pre></div>
+<p>依次运行 p1–p8 的输出（p7 的耗时每次不同，这里写实际跑出来的一次）：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">1 2 3
+1 2
+4
+20 30
+[2, 4, 6]
+multiply
+开始 work
+  正在干活
+结束 work
+调用 add (1, 2) {}
+3
+调用 add (1,) {'b': 5}
+6
+add
+wrapper None
+f2 'f2 的说明'
+  嘿嘿
+  嘿嘿
+嘿
+  build_list 用时 21.50 ms
+39999600001
+  build_gen 用时 31.13 ms
+2666646666700000
+已添加
+已添加
+没找到
+剩余: ['张三', '李四']
+--- 日志 ---
+add(张三) -&gt; 已添加
+add(李四) -&gt; 已添加
+delete(王五) -&gt; 没找到</pre></div>
+</details>
+<div class="note"><b>第 7 题有个反直觉的结果：生成器那一版更慢（31.13 ms vs 21.50 ms）。</b><br>这不矛盾。D012 说生成器<b>省内存</b>，没说它更快——每个元素都要走一遍 <code class="inline">yield</code> 的机制，单看速度常常比直接建列表还慢一点。它的优势在<b>内存</b>和<b>能不能处理无限/超大序列</b>。<br><b>所以选型看瓶颈在哪：</b>内存吃紧用生成器，纯粹求快就建列表。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D013 笔记
+
+## 闭包
+- 内层函数用到外层函数的变量，外层函数把这个内层函数返回出去
+- 返回的是「函数 + 它记住的变量」
+- 每次调用外层函数 → 一份新的状态，互不影响
+- 改外层变量要写 nonlocal；不写会 UnboundLocalError（LEGB 规则）
+
+## 装饰器本质
+- @deco 等价于 f = deco(f)，没有任何魔法
+- deco 收一个函数，返回一个新的函数（wrapper）
+- @ 之后，名字指向的已经是 wrapper，不是原函数
+
+## 两个必踩的坑
+- wrapper 忘了 *args, **kwargs → TypeError: takes 0 positional arguments
+- 忘了 @functools.wraps(func) → __name__ 变 wrapper、__doc__ 变 None、报错栈里认不出是谁
+
+## 带参数的装饰器
+- 三层：外层收装饰器参数，中层收 func，内层 wrapper 收调用参数
+- 判断方法：@ 后面有括号就是三层
+
+## 类装饰器
+- 实现 __call__ 的类也能当装饰器
+- 好处：状态存在 self 里，不用 nonlocal
+- 名字保留用 functools.update_wrapper(self, func)
+
+## 三个常用
+- timer：time.perf_counter()（单调时钟，测时长用它，别用 time.time()）
+- retry：只对「可能会自己好」的错重试；必须设上限；真实场景要加退避间隔
+- log：把日志从业务函数里赶出去，业务函数完全不知道有日志
+
+## 反直觉
+- 生成器省内存，但不一定更快（有 yield 的开销）
+- 选型看瓶颈：内存吃紧用生成器，求快就建列表
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D013 的产出是 <b>timer / retry / log 三个装饰器 + 8 道练习 + 笔记</b>。这三个文件以后会一直用。</p>
+  <p>明天 D014：第 2 周复盘 + 通讯录 v3 —— 把 OOP 和装饰器合起来，加上 <b>pytest 单元测试</b>。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D012 学习包 · 迭代器与生成器</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 012 · 第 2 周</div>
+  <h1>迭代器与生成器</h1>
+  <p>今天解决一个具体问题：数据大到装不进内存怎么办。答案只有两个字母——yield。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：日志统计脚本（不用 readlines）</span>
+    <span>🔁 承接 D005 的 for</span>
+    <span>⚡ 惰性求值</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1–2 节：for 背后、手写迭代器</span></div><div class="tl"><b>第 2 小时</b><span>读第 3 节：yield 生成器</span></div><div class="tl"><b>第 3 小时</b><span>读 4–5 节：惰性求值、itertools</span></div><div class="tl"><b>第 4 小时</b><span>八道练习 + 笔记</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day12
+cd ~/python-learn/day12</pre></div>
+<div class="note"><b>今天解决的问题很具体：数据大到装不进内存怎么办。</b>D006 你学过 <code class="inline">f.readlines()</code>，文件小的时候没问题；一个 2GB 的日志文件，这一行就能把内存吃光。生成器是标准答案，而且是 Python 里最优雅的机制之一。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>for 循环背后发生了什么</h2>
+<p>你写了无数遍 <code class="inline">for x in nums:</code>，但它到底做了什么？</p>
+<div class="codebox"><button class="copy">复制</button><pre>nums = [10, 20, 30]
+it = iter(nums)
+print(type(it).__name__)
+print(next(it))
+print(next(it))
+print(next(it))
+try:
+    next(it)
+except StopIteration:
+    print("StopIteration：没有了")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">list_iterator
+10
+20
+30
+StopIteration：没有了</pre></div>
+<p><code class="inline">for</code> 循环展开来就是四步：</p>
+<div class="codebox"><button class="copy">复制</button><pre>it = iter(nums)          # ① 拿到迭代器
+while True:
+    try:
+        x = next(it)     # ② 一个个取
+    except StopIteration:  # ③ 取完了
+        break
+    print(x)             # ④ 你的循环体</pre></div>
+<div class="note"><b>关键是 ③：迭代器用「抛异常」来表示结束。</b>这不是设计失误，是有意的——返回值里没有「空」这个概念的容器（比如数字序列），用异常告诉调用方「没有了」最干净。C 里你大概会返回 NULL 或 -1 当哨兵值，那就要额外约定「-1 不算数据」，万一真有一项是 -1 就出事了。</div>
+<h3>可迭代 ≠ 迭代器</h3>
+<div class="codebox"><button class="copy">复制</button><pre>nums = [1, 2, 3]
+print("列表有 __iter__ 吗:", hasattr(nums, "__iter__"))
+print("列表有 __next__ 吗:", hasattr(nums, "__next__"))
+
+it = iter(nums)
+print("迭代器有 __next__ 吗:", hasattr(it, "__next__"))
+print("iter(迭代器) 还是自己吗:", iter(it) is it)
+
+for x in it:
+    print("消耗:", x)
+print("再遍历一次：", list(it))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">列表有 __iter__ 吗: True
+列表有 __next__ 吗: False
+迭代器有 __next__ 吗: True
+iter(迭代器) 还是自己吗: True
+消耗: 1
+消耗: 2
+消耗: 3
+再遍历一次： []</pre></div>
+<table><tr><th></th><th><b>可迭代对象</b>（iterable）</th><th><b>迭代器</b>（iterator）</th></tr><tr><td>有什么方法</td><td>只有 <code>__iter__</code></td><td><code>__iter__</code> + <code>__next__</code></td></tr><tr><td>例子</td><td>list、str、dict、range、生成器函数</td><td><code>iter(list)</code>、生成器对象、文件对象</td></tr><tr><td>能重复遍历吗</td><td><b>能</b>，每次 <code>iter()</code> 给你新的迭代器</td><td><b>不能</b>，走完就空了</td></tr><tr><td><code>for</code> 拿它怎么办</td><td>先调 <code>iter()</code> 造一个迭代器</td><td>直接用</td></tr></table>
+<div class="warn"><b>「再遍历一次：[]」是今天最容易踩的坑。</b>迭代器是<b>一次性</b>的，走完就空了，再 <code class="inline">list(it)</code> 得到空列表。<br>所以下面这种写法是 bug：<br><code class="inline">total = sum(gen)</code> 之后又 <code class="inline">max(gen)</code> —— 第二次永远是空的，还不报错，只是结果不对。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>手写一个迭代器</h2>
+<p>自己写一遍，比看十遍概念有用。目标：从 3 数到 1。</p>
+<div class="codebox"><button class="copy">复制</button><pre>class CountDown:
+    def __init__(self, start):
+        self.n = start
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.n &lt;= 0:
+            raise StopIteration
+        self.n -= 1
+        return self.n + 1
+
+
+for i in CountDown(3):
+    print(i)
+
+cd = CountDown(2)
+print(list(cd))
+print("第二次 list 同一个对象:", list(cd))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">3
+2
+1
+[2, 1]
+第二次 list 同一个对象: []</pre></div>
+<p>两个方法各管一件事：</p>
+<table><tr><th>方法</th><th>作用</th></tr><tr><td><code>__iter__(self)</code></td><td>返回<b>迭代器本身</b>。<code>for</code> 进来第一件事就是调它</td></tr><tr><td><code>__next__(self)</code></td><td>返回下一个值；<b>没有下一个了就 <code>raise StopIteration</code></b></td></tr><tr><td><code>return self</code></td><td>因为这个对象自己就是迭代器。写成 <code>return iter(self.items)</code> 就是另一种模式</td></tr></table>
+<div class="warn"><b>手写版有个同样的一次性坑：</b>同一个 <code class="inline">CountDown(2)</code> 对象第二次 <code class="inline">list()</code> 得到 <code class="inline">[]</code>，因为 <code class="inline">self.n</code> 已经被减到 0 了。<br>这就是为什么大多数人<b>不手写迭代器</b>——见下一节。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>yield：三行写完一个迭代器</h2>
+<p>同样的功能，用 <code class="inline">yield</code> 重写：</p>
+<div class="codebox"><button class="copy">复制</button><pre>def countdown(start):
+    n = start
+    while n &gt; 0:
+        yield n
+        n -= 1
+
+
+for i in countdown(3):
+    print(i)
+
+cd = countdown(2)
+print(list(cd))
+print("第二次同一对象:", list(cd))
+print("新建一个:", list(countdown(2)))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">3
+2
+1
+[2, 1]
+第二次同一对象: []
+新建一个: [2, 1]</pre></div>
+<p>10 行变 5 行，而且不用自己管 <code class="inline">StopIteration</code>、不用管 <code class="inline">return self</code>。<b>函数里出现 <code class="inline">yield</code>，这个函数就变成了「生成器函数」</b>：调用它不执行函数体，而是返回一个生成器对象；每次 <code class="inline">next()</code> 才继续往下跑。</p>
+<table><tr><th>普通函数</th><th>生成器函数</th></tr><tr><td><code>return</code> 返回一个值，然后结束</td><td><code>yield</code> 交出一个值，<b>然后暂停</b>，下次从暂停处继续</td></tr><tr><td>调用就执行到底</td><td>调用只创建对象，执行时机由 <code>next()</code>/<code>for</code> 决定</td></tr><tr><td><code>def f(): return [1, 2, 3]</code></td><td><code>def f(): yield 1; yield 2; yield 3</code></td></tr></table>
+<h3>「暂停」到底是什么意思</h3>
+<div class="codebox"><button class="copy">复制</button><pre>def numbers(n):
+    for i in range(n):
+        print("  算出一个", i)
+        yield i
+
+
+print("开始循环")
+for x in numbers(3):
+    print("拿到", x)
+print("结束")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">开始循环
+  算出一个 0
+拿到 0
+  算出一个 1
+拿到 1
+  算出一个 2
+拿到 2
+结束</pre></div>
+<p><b>看输出的交替顺序。</b>如果生成器是一次性算完再交给你，应该是三个「算出一个」先全打印完。实际是一算一交、交替出现——证明它是<b>真的懒</b>：你要一个，它算一个。</p>
+<div class="note"><b>这个特性带来三个好处：</b><br>① <b>省内存</b>：一百万个结果不需要一百万个位置，只需要一个<br>② <b>能表示无限序列</b>：斐波那契可以一直 yield 下去（D009 的练习里那个无限生成器就是）<br>③ <b>能边算边用</b>：读一行处理一行，不用等文件读完</div>
+<div class="warn"><b>反过来也有一条限制：生成器只能往前走，不能回头、不能取下标、不能 <code>len()</code>。</b>需要反复遍历的数据，还是老老实实用 list。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>真实场景：读一个装不进内存的文件</h2>
+<p>先造一个 5.4MB 的文件，两种读法比内存占用（<code class="inline">tracemalloc</code> 是标准库，专业测内存用的）：</p>
+<!--run-skip: 内存数字随机器浮动，见下-->
+<div class="codebox"><button class="copy">复制</button><pre>import os
+import tracemalloc
+
+with open("big.txt", "w", encoding="utf-8") as f:
+    for i in range(200000):
+        f.write(f"第 {i} 行 一些内容\n")
+
+print("文件大小:", round(os.path.getsize("big.txt") / 1024 / 1024, 1), "MB")
+
+tracemalloc.start()
+total = 0
+for line in open("big.txt", encoding="utf-8"):
+    total += int(line.split()[1])
+cur, peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+print("逐行读  累加 =", total, " 峰值内存 =", round(peak / 1024 / 1024, 1), "MB")
+
+tracemalloc.start()
+lines = open("big.txt", encoding="utf-8").readlines()
+total2 = sum(int(l.split()[1]) for l in lines)
+cur2, peak2 = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+print("readlines 累加 =", total2, " 峰值内存 =", round(peak2 / 1024 / 1024, 1), "MB")
+print("结果一样吗:", total == total2)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">文件大小: 5.4 MB
+逐行读  累加 = 19999900000  峰值内存 = 0.0 MB
+readlines 累加 = 19999900000  峰值内存 = 18.5 MB
+结果一样吗: True</pre></div>
+<p><b>结果完全一样，内存差 18 倍。</b>注意 <code class="inline">readlines()</code> 用的 18.5MB 比文件本身还大——因为每行都是一个 Python 字符串对象，对象头 + 字符存储，比文件里的 UTF-8 字节要占得多。</p>
+<table><tr><th>写法</th><th>内存</th><th>适合</th></tr><tr><td><code>f.readlines()</code></td><td>整个文件</td><td>小文件，需要反复访问、需要下标</td></tr><tr><td><code>for line in f:</code></td><td><b>一行</b></td><td><b>任何大文件</b>——养成这个习惯就对了</td></tr><tr><td><code>f.read()</code></td><td>整个文件成一个字符串</td><td>要整体替换、正则跨行匹配时</td></tr></table>
+<div class="ok"><b>记住这一行：<code>for line in f</code> 背后就是迭代器协议。</b>文件对象天生就是迭代器，所以 D006 学的「逐行读」和今天学的「生成器」是同一套机制。这不是巧合——Python 把「一次给一个」做大成了统一的语言特性，列表、字典、文件、生成器、数据库游标全都遵守它，所以 <code class="inline">for</code> 能遍历它们所有。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>生成器表达式：把 [] 换成 ()</h2>
+<div class="codebox"><button class="copy">复制</button><pre>nums = range(5)
+
+lst = [x * x for x in nums]
+gen = (x * x for x in nums)
+
+print(type(lst).__name__, lst)
+print(type(gen).__name__)
+print(list(gen))
+print("第二次 list:", list(gen))
+print("一百万个平方的和:", sum(x * x for x in range(1000000)))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">list [0, 1, 4, 9, 16]
+generator
+[0, 1, 4, 9, 16]
+第二次 list: []
+一百万个平方的和: 333332833333500000</pre></div>
+<table><tr><th>写法</th><th>返回</th><th>内存</th><th>什么时候用</th></tr><tr><td><code>[x*x for x in nums]</code></td><td>list</td><td>全部元素都在</td><td>要多次遍历、要下标、要 <code>len()</code></td></tr><tr><td><code>(x*x for x in nums)</code></td><td>generator</td><td><b>只占一个元素的位置</b></td><td>只遍历一次，直接喂给 <code>sum</code> / <code>max</code> / <code>any</code></td></tr></table>
+<div class="note"><b><code>sum(x*x for x in range(1000000))</code> 这一行值得记住。</b>如果用方括号，要先造一个一百万元素的列表再求和，内存瞬间涨到几十 MB；用圆括号，从头到尾只算一个加一个。<b>并且方括号也能跑，结果一样</b>——所以这个优化是零成本的，看到「生成一个临时列表只为了求和/求最大值」，就该换成圆括号。</div>
+<div class="warn"><b>只有一个参数时可以省掉一层括号：</b><code class="inline">sum(x*x for x in nums)</code>，但两个参数时不行：<code class="inline">sorted((x*x for x in nums), reverse=True)</code>。别为了省括号把可读性搞没了。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>itertools：把迭代器拼起来</h2>
+<p>标准库里有个模块专门做这件事，全部返回迭代器、全部省内存、全部是 C 实现（比自己写的快）。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import itertools
+
+print(list(itertools.islice(itertools.count(10, 5), 4)))
+print(list(itertools.chain([1, 2], "ab", (3,))))
+print(list(itertools.islice(itertools.cycle("AB"), 6)))
+print(list(itertools.product([1, 2], "ab")))
+print([(k, len(list(g))) for k, g in itertools.groupby("AAABBBCCA")])
+print(list(itertools.accumulate([1, 2, 3, 4])))
+print(list(itertools.combinations([1, 2, 3], 2)))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">[10, 15, 20, 25]
+[1, 2, 'a', 'b', 3]
+['A', 'B', 'A', 'B', 'A', 'B']
+[(1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')]
+[('A', 3), ('B', 3), ('C', 2), ('A', 1)]
+[1, 3, 6, 10]
+[(1, 2), (1, 3), (2, 3)]</pre></div>
+<table><tr><th>函数</th><th>作用</th><th>典型用途</th></tr><tr><td><code>count(start, step)</code></td><td>无限递增</td><td><b>必须配 <code>islice</code> 截断</b></td></tr><tr><td><code>islice(it, n)</code></td><td>只取前 n 个</td><td>给无限生成器套一个「取多少个」</td></tr><tr><td><code>chain(a, b)</code></td><td>把多个序列接起来</td><td>合并多份数据，不产生中间列表</td></tr><tr><td><code>cycle(it)</code></td><td>无限循环一个序列</td><td>轮询、轮流分配</td></tr><tr><td><code>groupby(it, key)</code></td><td>相邻相同的一组</td><td><b>必须先排序</b>才能全局分组</td></tr><tr><td><code>accumulate(it)</code></td><td>累积计算（默认累加）</td><td>前缀和、累计值</td></tr><tr><td><code>product</code> / <code>combinations</code></td><td>笛卡尔积 / 组合</td><td>暴力枚举、参数组合</td></tr></table>
+<div class="warn"><b><code>groupby</code> 只合并「相邻」的相同项。</b>上面 <code class="inline">"AAABBBCCA"</code> 的结果里 A 出现了两次（<code>('A', 3)</code> 和 <code>('A', 1)</code>），因为它中间的 C 打断了。<b>想要全局分组必须先 <code class="inline">sorted()</code></b>：<code class="inline">groupby(sorted(data))</code>。</div>
+<div class="note"><b>为什么这些要放在标准库里：</b>它们在 C 层实现，比自己写 <code class="inline">for</code> 循环快，而且不占内存。以后处理日志、文本、数据清洗会天天用到，现在不用背全表，<b>记住「有这个模块，缺什么去查」就够了</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 8 题是今天的产出</b>（不用 readlines 的日志统计脚本）。</p>
+<ol class="task"><li><b>手动遍历</b>：用 <code class="inline">iter()</code> / <code class="inline">next()</code> 遍历一个三元素列表，第四次进 <code class="inline">except StopIteration</code> 并打印「没有了」</li><li><b>手写迭代器</b>：<code class="inline">CountDown(start)</code> 用 <code class="inline">__iter__</code> + <code class="inline">__next__</code> 从 start 数到 1</li><li><b>yield 版</b>：用 <code class="inline">yield</code> 重写上一题，<b>数一下少了几行</b></li><li><b>无限序列</b>：斐波那契生成器，用 <code class="inline">islice</code> 取前 10 个、再取第 20 个</li><li><b>生成器表达式</b>：求 1 到 100 万里所有 3 的倍数的平方和（<b>不许建列表</b>）</li><li><b>分批</b>：<code class="inline">chunked(iterable, size)</code> 把任意序列切成固定大小的块，注意<b>最后一块不足也要交出去</b></li><li><b>itertools 五个</b>：<code class="inline">count+islice</code>、<code class="inline">chain</code>、<code class="inline">groupby</code>、<code class="inline">accumulate</code>、<code class="inline">combinations</code> 各跑一次</li><li><b>日志统计</b>（综合）：造一个 1000 行的日志文件，<b>逐行</b>统计行数、字段数、最长行，再统计每个 IP 的请求数，全程不用 <code class="inline">readlines()</code></li></ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<!--run-skip: 八份文件拼在一起展示-->
+<div class="codebox"><button class="copy">复制</button><pre>nums = [10, 20, 30]
+it = iter(nums)
+for i in range(4):
+    try:
+        print("第", i + 1, "次:", next(it))
+    except StopIteration:
+        print("第", i + 1, "次: 没有了")
+
+
+
+class CountDown:
+    def __init__(self, start):
+        self.n = start
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.n &lt;= 0:
+            raise StopIteration
+        self.n -= 1
+        return self.n + 1
+
+
+print(list(CountDown(5)))
+
+
+
+def countdown(start):
+    n = start
+    while n &gt; 0:
+        yield n
+        n -= 1
+
+
+print(list(countdown(5)))
+print([x * 10 for x in countdown(3)])
+
+
+
+import itertools
+
+
+def fib():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+
+print(list(itertools.islice(fib(), 10)))
+gen = fib()
+print([next(gen) for _ in range(5)])
+print("第 20 个:", next(itertools.islice(fib(), 19, 20)))
+
+
+
+total = sum(x * x for x in range(1, 1000001) if x % 3 == 0)
+print(total)
+print(len([x for x in range(1, 1001) if x % 3 == 0]))
+
+
+
+def chunked(iterable, size):
+    buf = []
+    for x in iterable:
+        buf.append(x)
+        if len(buf) == size:
+            yield buf
+            buf = []
+    if buf:
+        yield buf
+
+
+for c in chunked(range(7), 3):
+    print(c)
+print(list(chunked("abcdef", 2)))
+
+
+
+import itertools
+
+print(list(itertools.islice(itertools.count(1, 2), 5)))
+print(list(itertools.chain("ab", [1, 2])))
+print([(k, len(list(g))) for k, g in itertools.groupby("AABBBCC")])
+print(list(itertools.accumulate([1, 2, 3, 4])))
+print(list(itertools.combinations("abc", 2)))
+print(list(itertools.product([0, 1], repeat=2)))
+
+
+
+import os
+import tracemalloc
+
+with open("access.log", "w", encoding="utf-8") as f:
+    for i in range(1000):
+        f.write(f"10.0.0.{i % 10} GET /page/{i % 7} 200\n")
+
+tracemalloc.start()
+lines = words = longest = 0
+for line in open("access.log", encoding="utf-8"):
+    lines += 1
+    words += len(line.split())
+    longest = max(longest, len(line.rstrip("\n")))
+cur, peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+print("行数:", lines)
+print("字段总数:", words)
+print("最长一行:", longest, "字符")
+print("峰值内存小于 1MB:", peak &lt; 1024 * 1024)
+
+ip_counts = {}
+with open("access.log", encoding="utf-8") as f:
+    for line in f:
+        ip = line.split()[0]
+        ip_counts[ip] = ip_counts.get(ip, 0) + 1
+print("IP 数:", len(ip_counts))
+print("每个 IP 的请求数都相同:", len(set(ip_counts.values())) == 1)
+print("前 3 个 IP:", sorted(ip_counts)[:3])
+os.remove("access.log")</pre></div>
+<p>依次运行 p1–p8 的输出：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">第 1 次: 10
+第 2 次: 20
+第 3 次: 30
+第 4 次: 没有了
+[5, 4, 3, 2, 1]
+[5, 4, 3, 2, 1]
+[30, 20, 10]
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+[0, 1, 1, 2, 3]
+第 20 个: 4181
+111111277777611111
+333
+[0, 1, 2]
+[3, 4, 5]
+[6]
+[['a', 'b'], ['c', 'd'], ['e', 'f']]
+[1, 3, 5, 7, 9]
+['a', 'b', 1, 2]
+[('A', 2), ('B', 3), ('C', 2)]
+[1, 3, 6, 10]
+[('a', 'b'), ('a', 'c'), ('b', 'c')]
+[(0, 0), (0, 1), (1, 0), (1, 1)]
+行数: 1000
+字段总数: 4000
+最长一行: 24 字符
+峰值内存小于 1MB: True
+IP 数: 10
+每个 IP 的请求数都相同: True
+前 3 个 IP: ['10.0.0.0', '10.0.0.1', '10.0.0.2']</pre></div>
+</details>
+<div class="note"><b>第 3 题「数一下少了几行」不是修辞。</b>手写版要 <code class="inline">__init__</code>、<code class="inline">__iter__</code>、<code class="inline">__next__</code>、<code class="inline">raise StopIteration</code> 四件事；yield 版只有两件事：一个循环、一个 yield。<b>而且 yield 版还顺手解决了「第二次遍历是空的」这个 bug</b>——因为每次调用生成器函数都得到全新的生成器对象。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D012 笔记
+
+## for 背后
+- it = iter(nums) → next(it) 一个个取 → 取不到抛 StopIteration → for 接住并结束
+- 迭代器用「抛异常」表示结束，不是返回哨兵值
+
+## 可迭代 vs 迭代器
+- 可迭代：有 __iter__（list / str / dict / range / 生成器函数）
+- 迭代器：有 __iter__ + __next__（iter(list)、生成器对象、文件对象）
+- 可迭代可以反复遍历；迭代器一次性，走完就空
+- 坑：sum(gen) 之后再 max(gen) 永远是空 → 不报错但结果错
+
+## 手写迭代器
+- __iter__ 返回 self
+- __next__ 返回下一个值，没有了 raise StopIteration
+
+## yield
+- 函数里有 yield 就是生成器函数；调用只造对象，不执行
+- 每次 next() 跑到下一个 yield 停住，下次从那里继续
+- 好处：省内存、能表示无限序列、能边算边用
+- 限制：只能往前，不能下标、不能 len、不能回头
+
+## 惰性求值
+- for line in f  → 一次只装一行（文件对象本身就是迭代器）
+- f.readlines()  → 全部装进内存，5.4MB 文件峰值 18.5MB
+- 大文件一律用 for line in f
+
+## 生成器表达式
+- [x for x in ...]  → list，全部算出来
+- (x for x in ...)  → generator，算一个给一个
+- sum/max/min/any/all 直接用圆括号，零成本优化
+
+## itertools
+- count / islice     无限序列 + 截断（必须配 islice）
+- chain              拼接多个序列
+- cycle              无限循环
+- groupby            相邻分组！要全局分组先 sorted
+- accumulate         前缀和
+- product / combinations  笛卡尔积 / 组合
+
+## C 对比
+- 返回 NULL 当哨兵        vs  raise StopIteration
+- 手动 malloc 整个数组     vs  yield 一个算一个
+- 回调函数逐行处理        vs  for line in f
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D012 的产出是 <b>斐波那契无限生成器 + 分批工具 + 日志统计脚本 + 8 道练习 + 笔记</b>。</p>
+  <p>明天 D013：闭包与装饰器 —— 不用改函数内部就能给它加上计时、重试、日志。通讯录 v3 会用它记录每一次操作。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

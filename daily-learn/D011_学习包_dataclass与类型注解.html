@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D011 学习包 · dataclass 与类型注解</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 011 · 第 2 周</div>
+  <h1>dataclass 与类型注解</h1>
+  <p>今天把 D008–D010 手写的样板代码交出去：一行 @dataclass 换来 __init__、__repr__、__eq__，再加上枚举和类型注解。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：dataclass 版 Book / Contact</span>
+    <span>🔁 承接 D010</span>
+    <span>📦 Pydantic 预览</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1–2 节：@dataclass 与 field</span></div><div class="tl"><b>第 2 小时</b><span>读第 3 节：Enum 枚举</span></div><div class="tl"><b>第 3 小时</b><span>读 4–5 节：类型注解、Pydantic 预览</span></div><div class="tl"><b>第 4 小时</b><span>把 Contact 改成 dataclass + 八道练习 + 笔记</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day11
+cd ~/python-learn/day11</pre></div>
+<div class="note"><b>今天是「减负」的一天。</b>D008–D010 你手写了 <code class="inline">__init__</code>、<code class="inline">__repr__</code>、<code class="inline">__eq__</code>，一共三十多行。今天用 <code class="inline">@dataclass</code> 一行全部自动生成，而且生成得比你写得更全。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>@dataclass：把手写的样板代码交出去</h2>
+<p>先看你 D010 写过的那个类，光是为「能打印、能比较」就要写十几个方法。换成 dataclass：</p>
+<div class="codebox"><button class="copy">复制</button><pre>from dataclasses import dataclass
+
+
+@dataclass
+class Book:
+    title: str
+    price: float
+    count: int = 1
+
+
+b = Book("流畅的 Python", 128.0)
+print(b)
+print(b.title, b.price, b.count)
+print(b == Book("流畅的 Python", 128.0))
+print(b == Book("流畅的 Python", 99.0))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Book(title='流畅的 Python', price=128.0, count=1)
+流畅的 Python 128.0 1
+True
+False</pre></div>
+<p>三行字段声明，自动得到：</p>
+<table><tr><th>自动生成的东西</th><th>等价于 D010 手写的</th></tr><tr><td><code>__init__</code></td><td>按字段顺序写参数，带默认值</td></tr><tr><td><code>__repr__</code></td><td><code>Book(title='...', price=..., count=...)</code></td></tr><tr><td><code>__eq__</code></td><td>所有字段逐个比，「内容相同就相等」</td></tr></table>
+<!--run-skip: 对照用的手写版本-->
+<div class="codebox"><button class="copy">复制</button><pre># 等价的手写版本（D008–D010 的你）
+class Book:
+    def __init__(self, title, price, count=1):
+        self.title = title
+        self.price = price
+        self.count = count
+
+    def __repr__(self):
+        return f"Book(title={self.title!r}, price={self.price!r}, count={self.count!r})"
+
+    def __eq__(self, other):
+        if not isinstance(other, Book):
+            return NotImplemented
+        return (self.title, self.price, self.count) == (other.title, other.price, other.count)</pre></div>
+<div class="note"><b>注意 <code>@dataclass</code> 只生成「数据类」该有的东西。</b>你自己写的方法（像 D008 的 <code class="inline">line()</code>）照样写在里面，不会被覆盖。它管的是「存数据 + 打印 + 比较」这三件重复劳动，业务逻辑还是你的。</div>
+<div class="warn"><b>字段顺序 = 参数顺序，而且「有默认值的必须排在没默认值的后面」。</b><code class="inline">count: int = 1</code> 写在 <code class="inline">title: str</code> 前面会直接 <code class="inline">TypeError: non-default argument 'title' follows default argument</code>——和普通函数的默认参数规则一模一样（D005 学过）。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>field()：可变默认值的正规解</h2>
+<p>D005 和 D008 都踩过这个坑：<code class="inline">def f(x=[])</code> 只创建一次，所有调用共用。在 dataclass 里，Python 干脆<b>不让你写</b>：</p>
+<!--run-skip: 类定义时就报错-->
+<div class="codebox"><button class="copy">复制</button><pre>from dataclasses import dataclass
+
+
+@dataclass
+class Bad:
+    tags: list = []              # 想给个空列表当默认值</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">ValueError: mutable default &lt;class 'list'&gt; for field tags is not allowed: use default_factory</pre></div>
+<p><b>报错发生在「定义类的那一刻」，不是造对象的时候</b>——连 import 都会失败。第一次遇到会懵，因为屏幕上根本没有你的运行代码。解决办法就写在报错里：<code class="inline">use default_factory</code>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>from dataclasses import dataclass, field
+
+
+@dataclass
+class Good:
+    tags: list = field(default_factory=list)
+
+
+a = Good()
+a.tags.append("同学")
+b = Good()
+print(a.tags, b.tags, a.tags is b.tags)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">['同学'] [] False</pre></div>
+<table><tr><th>写法</th><th>含义</th></tr><tr><td><code>tags: list = field(default_factory=list)</code></td><td><b>每次造对象时调用一次 <code>list()</code></b>，人人拿到新的空列表</td></tr><tr><td><code>tags: list = []</code></td><td>被明令禁止：一个列表被所有实例共享，就是 D008 那个 bug</td></tr><tr><td><code>field(default=0, repr=False)</code></td><td>其他常用参数：<code>default</code> 普通默认值、<code>repr=False</code> 打印时不显示</td></tr></table>
+<div class="note"><b>为什么 dataclass 能拦、普通类拦不住？</b>因为普通类的默认值是在 <code class="inline">def __init__(self, tags=[])</code> 里求值的，Python 看不出来它可不可变；而 dataclass 的默认值是<b>声明式的</b>，它在定义类时就能检查类型。<b>能在这个位置报错，就已经是它最大的价值之一。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>Enum：一组固定的值</h2>
+<p>通讯录的「状态」如果只用字符串，就永远不知道有几种合法取值，也挡不住 <code class="inline">"actve"</code> 这种拼错。用枚举定死：</p>
+<div class="codebox"><button class="copy">复制</button><pre>from enum import Enum
+
+
+class Status(Enum):
+    ACTIVE = "active"
+    BLOCKED = "blocked"
+
+
+print(Status.ACTIVE)
+print(Status.ACTIVE.name, Status.ACTIVE.value)
+print(Status("active"))
+print(Status.ACTIVE == "active")
+print([s.name for s in Status])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Status.ACTIVE
+ACTIVE active
+Status.ACTIVE
+False
+['ACTIVE', 'BLOCKED']</pre></div>
+<table><tr><th>写法</th><th>结果</th><th>说明</th></tr><tr><td><code>Status.ACTIVE</code></td><td><code>Status.ACTIVE</code></td><td>打印出来带类名，一眼知道是哪一组的</td></tr><tr><td><code>.name</code> / <code>.value</code></td><td><code>'ACTIVE'</code> / <code>'active'</code></td><td>名字给程序用，值给存储/接口用</td></tr><tr><td><code>Status("active")</code></td><td><code>Status.ACTIVE</code></td><td>从值反查成员；值不存在会抛 <code>ValueError</code></td></tr><tr><td><code>== "active"</code></td><td><code>False</code></td><td><b>枚举成员不等于它的值</b>，要比就比 <code>.value</code></td></tr></table>
+<div class="ok"><b>什么时候该用枚举：</b>取值是<b>有限几个、你在代码里要写 if 判断</b>的时候——订单状态、星期、日志级别、文件类型。<br><b>什么时候不用：</b>取值无限或者来自外部数据（姓名、城市名），那些用字符串就对了。</div>
+<div class="note">好处很实际：写了 <code>if s == Status.PAID</code> 之后，拼错成 <code>Status.PADI</code> 会立刻 <code class="inline">AttributeError</code>；而用字符串拼错 <code class="inline">"padi"</code> 只会让这个分支永远不成立，程序照跑，结果是错的——又是那个「不报错的 bug」。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>类型注解：写给人和 IDE 看的说明书</h2>
+<p>你可能已经在 D008 见过 <code class="inline">def __init__(self, name: str, phone: str)</code> 里的冒号了。那不是类型声明，是<b>注解</b>——Python 会把它存起来，但<b>运行时不检查</b>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>from typing import Optional
+
+
+def find(name: str, data: dict[str, str]) -&gt; Optional[str]:
+    return data.get(name)
+
+
+data = {"张三": "13800001111"}
+print(find("张三", data))
+print(find("李四", data))
+print(find.__annotations__)
+print("传 int 也不报错：", find(123, data))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">13800001111
+None
+{'name': &lt;class 'str'&gt;, 'data': dict[str, str], 'return': typing.Optional[str]}
+传 int 也不报错： None</pre></div>
+<p>最后一行是重点：传了 <code class="inline">123</code> 进去，<b>没有任何报错</b>，只是查不到东西返回了 <code class="inline">None</code>。注解只是被塞进 <code class="inline">__annotations__</code> 这个字典里，没有任何强制力——这是 Python 的取舍：<b>灵活优先，检查交给工具</b>。</p>
+<table><tr><th>写法</th><th>意思</th><th>什么时候用</th></tr><tr><td><code>name: str</code></td><td>应该是字符串</td><td>所有函数参数和返回值</td></tr><tr><td><code>list[Contact]</code></td><td>里面装的是 Contact 对象</td><td>容器参数，比只写 <code>list</code> 有用得多</td></tr><tr><td><code>dict[str, int]</code></td><td>键是字符串、值是整数</td><td>同上</td></tr><tr><td><code>Optional[X]</code></td><td><b>可能是 X，也可能是 None</b></td><td>会返回 None 的函数<b>必须</b>标这个</td></tr><tr><td><code>X | None</code></td><td>同上，3.10 之后的简写</td><td>新代码可以这样写</td></tr></table>
+<div class="note"><b>注解真正的用处有三个，都不是「运行时检查」：</b><br>① <b>IDE 补全</b>：写完 <code class="inline">c.</code> VS Code 能列出 Contact 的字段，不用翻代码；<br>② <b>Pylance 查错</b>：传错类型会画波浪线（你装的扩展就是干这个的）；<br>③ <b>给人看</b>：一个月后回来看 <code class="inline">def find(contacts: list[Contact], name: str) -> Optional[Contact]</code>，不用读函数体就知道怎么用、会不会返回 None。</div>
+<div class="warn"><b>别把注解当校验用。</b>「用户输入必须是数字」这种事，仍然要用 D006 的 <code class="inline">try/except</code> 或者显式 <code class="inline">if</code> 判断。<b>注解管不了外部数据</b>——那是下一节 Pydantic 要解决的。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>Pydantic 预览：注解真的会被检查的版本</h2>
+<p>同一个思路（用类型描述数据），换一个会<b>真的执行检查</b>的库。这是业界用得最多的数据校验库，也是后面 RAG / Agent 阶段处理 API 返回、请求参数的标准工具。</p>
+<div class="warn"><b>这一节要装包，不是标准库。</b>用 uv 跑一次性的演示最省事：<br><div class="codebox"><button class="copy">复制</button><pre>uv run --with pydantic pydantic_demo.py</pre></div>第一种跑法会当场装依赖、跑完不留痕迹。<br>如果你已经在项目里建了虚拟环境，也可以 <code class="inline">pip install pydantic</code> 之后直接 <code class="inline">python3 pydantic_demo.py</code>。</div>
+<!--run-skip: 需第三方包，见下-->
+<div class="codebox"><button class="copy">复制</button><pre>from pydantic import BaseModel, ValidationError
+
+
+class Contact(BaseModel):
+    name: str
+    phone: str
+    age: int = 0
+
+
+c = Contact(name="张三", phone="13800001111", age="30")   # 字符串 "30"
+print(c)
+print(c.age, type(c.age).__name__)
+
+try:
+    Contact(name="李四", phone="139", age="abc")
+except ValidationError as e:
+    print("校验失败，错误条数:", e.error_count())
+    print("第一条:", e.errors()[0]["msg"])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">name='张三' phone='13800001111' age=30
+30 int
+校验失败，错误条数: 1
+第一条: Input should be a valid integer, unable to parse string as an integer</pre></div>
+<table><tr><th></th><th>dataclass</th><th>Pydantic BaseModel</th></tr><tr><td>是什么</td><td>标准库</td><td>第三方库</td></tr><tr><td>类型注解</td><td>只记录，不检查</td><td><b>每次实例化都检查</b></td></tr><tr><td>传 <code>"30"</code> 给 <code>int</code> 字段</td><td>原样留着，还是字符串</td><td><b>自动转成 30</b>（int）</td></tr><tr><td>传 <code>"abc"</code> 给 <code>int</code> 字段</td><td>原样留着</td><td><b>抛 <code>ValidationError</code></b>，还告诉你错在哪个字段</td></tr><tr><td>适合</td><td>自己程序内部的数据结构</td><td><b>外部进来的数据</b>：请求体、API 返回、配置文件</td></tr></table>
+<div class="note"><b>一句话分清两者：</b>dataclass 是「我信任的数据长这样」，Pydantic 是「我<b>不</b>信任的数据必须长这样」。前者省代码，后者防攻击和防脏数据。今天只要知道有这个东西、能看懂它报什么错就够了，真正用起来在阶段四（RAG）会大量出现。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>把通讯录的 Contact 换成 dataclass</h2>
+<p>D008 的 <code class="inline">Contact</code> 有 <code class="inline">__init__</code>、要手写 <code class="inline">to_dict</code>，还要记住哪些字段要存。换成 dataclass：</p>
+<div class="codebox"><button class="copy">复制</button><pre>from dataclasses import dataclass, field, asdict
+
+
+@dataclass
+class Contact:
+    name: str
+    phone: str
+    email: str = ""
+    tags: list = field(default_factory=list)
+
+    def line(self):
+        parts = [self.name, self.phone]
+        if self.email:
+            parts.append(self.email)
+        return "  ".join(parts)
+
+    def to_dict(self):
+        d = asdict(self)          # 一键转成字典
+        d.pop("name")             # 但 name 在 JSON 里是 key，不重复存
+        return d
+
+
+a = Contact("张三", "13800001111", "zs@example.com")
+b = Contact("张三", "13800001111", "zs@example.com")
+print(a)
+print("内容相等:", a == b)
+print(a.line())
+print(a.to_dict())
+
+c = Contact("李四", "13900002222", tags=["同事"])
+c.tags.append("常联系")
+d = Contact("王五", "13700003333")
+print(c.tags, d.tags)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Contact(name='张三', phone='13800001111', email='zs@example.com', tags=[])
+内容相等: True
+张三  13800001111  zs@example.com
+{'phone': '13800001111', 'email': 'zs@example.com', 'tags': []}
+['同事', '常联系'] []</pre></div>
+<table><tr><th>原来（D008）</th><th>现在（D011）</th></tr><tr><td>手写 <code>__init__</code> 三行</td><td>五行字段声明，还是这么长，但多了类型信息</td></tr><tr><td>手写 <code>__repr__</code> 才能打印</td><td><b>自动有了</b>，而且格式统一</td></tr><tr><td>自己实现 <code>__eq__</code> 才相等</td><td><b>自动有了</b>，逐字段比</td></tr><tr><td>手写 <code>to_dict()</code> 逐个字段抄</td><td><code>asdict(self)</code> 一键，再 <code>pop</code> 掉不需要的</td></tr><tr><td>加一个字段要改两处</td><td><b>加一行字段声明就行</b>，<code>asdict</code> 自动带上</td></tr></table>
+<div class="warn"><b><code>asdict</code> 会把 name 也带上，所以要 <code>pop</code> 掉。</b>这是设计问题不是 bug：JSON 里名字已经是 key 了，值里再存一遍就重复。<b>什么时候该让对象自己决定存哪些字段</b>——这正是 D008 说的「文件和内存是两件事」，今天只是把转换代码从 8 行缩到 3 行。</div>
+<div class="note">注意最后一行 <code>['同事', '常联系'] []</code>——两个实例的 <code class="inline">tags</code> 互不影响，说明 <code class="inline">default_factory</code> 生效了。如果这里输出两个一模一样的列表，就是又踩了可变默认值的坑。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 8 题是今天的产出</b>（用 dataclass 存盘再读回）。</p>
+<ol class="task"><li><b>第一个 dataclass</b>：<code class="inline">Book(title, price, count=1)</code>，造两本看 <code class="inline">__repr__</code> 自动长什么样</li><li><b>可变默认值</b>：加 <code class="inline">tags</code> 字段，用 <code class="inline">field(default_factory=list)</code>，验证两个实例的列表互不影响</li><li><b>能排序</b>：加 <code class="inline">order=True</code>，按价格排序；顺便试试 <code class="inline">books[0] > books[1]</code> 也能用</li><li><b>不可变</b>：<code class="inline">frozen=True</code> 的 <code class="inline">Point</code>，改属性看抛什么异常，并验证它能进 <code class="inline">set</code></li><li><b>枚举</b>：定义 <code class="inline">OrderStatus</code> 四个状态，验证 <code class="inline">name</code> / <code class="inline">value</code> / 按值反查 / 跟字符串比较的结果</li><li><b>类型注解</b>：写 <code class="inline">group_by_prefix(contacts: list[Contact]) -> dict[str, list[str]]</code>，打印 <code class="inline">__annotations__</code> 看看注解被存成了什么</li><li><b>转字典往返</b>：<code class="inline">asdict</code> → <code class="inline">json.dumps</code> → <code class="inline">json.loads</code> → <code class="inline">Book(**d)</code> 重建，验证两个对象相等</li><li><b>存盘再读回</b>（综合）：把两个 <code class="inline">Book</code> 存成 JSON 文件、读回来重建列表，验证整体相等、且 <code class="inline">tags</code> 是新的列表而不是同一个</li></ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<!--run-skip: 八份文件拼在一起展示-->
+<div class="codebox"><button class="copy">复制</button><pre>from dataclasses import dataclass
+
+
+@dataclass
+class Book:
+    title: str
+    price: float
+    count: int = 1
+
+
+b1 = Book("流畅的 Python", 128.0)
+b2 = Book("算法导论", 99.0, 3)
+print(b1)
+print(b2)
+print(b1.count, b2.count)
+
+
+
+from dataclasses import dataclass, field
+
+
+@dataclass
+class Book:
+    title: str
+    tags: list = field(default_factory=list)
+
+
+a = Book("流畅的 Python")
+a.tags.append("进阶")
+b = Book("算法导论")
+print(a.tags, b.tags, a.tags is b.tags)
+
+
+
+from dataclasses import dataclass
+
+
+@dataclass(order=True)
+class Book:
+    price: float
+    title: str
+
+
+books = [Book(128.0, "流畅的 Python"), Book(59.0, "C 程序设计"), Book(99.0, "算法导论")]
+for b in sorted(books):
+    print(b.price, b.title)
+print(books[0] &gt; books[1])
+
+
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+
+p = Point(1, 2)
+print(p)
+print(hash(p) is not None)
+try:
+    p.x = 10
+except Exception as e:
+    print(type(e).__name__ + ":", e)
+
+
+
+from enum import Enum
+
+
+class OrderStatus(Enum):
+    PENDING = "pending"
+    PAID = "paid"
+    SHIPPED = "shipped"
+    DONE = "done"
+
+
+print(OrderStatus.PENDING)
+print(OrderStatus.PENDING.name, OrderStatus.PENDING.value)
+print(OrderStatus("paid"))
+print(OrderStatus.PENDING == "pending")
+print([s.value for s in OrderStatus])
+
+
+
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
+class Contact:
+    name: str
+    phone: str
+
+
+def group_by_prefix(contacts: list[Contact]) -&gt; dict[str, list[str]]:
+    res: dict[str, list[str]] = {}
+    for c in contacts:
+        res.setdefault(c.phone[:3], []).append(c.name)
+    return res
+
+
+def find(contacts: list[Contact], name: str) -&gt; Optional[Contact]:
+    for c in contacts:
+        if c.name == name:
+            return c
+    return None
+
+
+data = [Contact("张三", "13800001111"), Contact("李四", "13900002222"), Contact("王五", "13800003333")]
+print(group_by_prefix(data))
+print(find(data, "李四"))
+print(find(data, "赵六"))
+print(group_by_prefix.__annotations__)
+
+
+
+import json
+from dataclasses import dataclass, asdict
+
+
+@dataclass
+class Book:
+    title: str
+    price: float
+
+
+b = Book("算法导论", 99.0)
+text = json.dumps(asdict(b), ensure_ascii=False)
+print(text)
+
+back = Book(**json.loads(text))
+print(back)
+print("往返后相等:", back == b)
+
+
+
+import json
+import os
+from dataclasses import dataclass, field, asdict
+
+FILE = "books.json"
+
+
+@dataclass
+class Book:
+    title: str
+    price: float
+    tags: list = field(default_factory=list)
+
+    def to_dict(self):
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(**d)
+
+
+books = [Book("流畅的 Python", 128.0, ["进阶"]), Book("算法导论", 99.0)]
+
+with open(FILE, "w", encoding="utf-8") as f:
+    json.dump([b.to_dict() for b in books], f, ensure_ascii=False, indent=2)
+
+with open(FILE, "r", encoding="utf-8") as f:
+    back = [Book.from_dict(d) for d in json.load(f)]
+
+print("读回来", len(back), "本")
+print(back[0])
+print("整体相等:", back == books)
+print("tags 也相等:", back[0].tags == books[0].tags)
+print("tags 不是同一个列表:", back[0].tags is not books[0].tags)
+os.remove(FILE)</pre></div>
+<p>依次运行 p1–p8 的输出：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Book(title='流畅的 Python', price=128.0, count=1)
+Book(title='算法导论', price=99.0, count=3)
+1 3
+['进阶'] [] False
+59.0 C 程序设计
+99.0 算法导论
+128.0 流畅的 Python
+True
+Point(x=1, y=2)
+True
+FrozenInstanceError: cannot assign to field 'x'
+OrderStatus.PENDING
+PENDING pending
+OrderStatus.PAID
+False
+['pending', 'paid', 'shipped', 'done']
+{'138': ['张三', '王五'], '139': ['李四']}
+Contact(name='李四', phone='13900002222')
+None
+{'contacts': list[__main__.Contact], 'return': dict[str, list[str]]}
+{"title": "算法导论", "price": 99.0}
+Book(title='算法导论', price=99.0)
+往返后相等: True
+读回来 2 本
+Book(title='流畅的 Python', price=128.0, tags=['进阶'])
+整体相等: True
+tags 也相等: True
+tags 不是同一个列表: True</pre></div>
+</details>
+<div class="note"><b>第 4 题的两个输出连起来看很有意思：</b><code class="inline">frozen=True</code> 的 <code class="inline">Point</code> 不能改，所以能算 <code class="inline">hash</code>、能进 <code class="inline">set</code>。<b>「不可变 → 可哈希」</b>是 Python 里一条稳定的规律（D010 的 <code class="inline">__hash__</code> 那节就是这个道理）。反过来，可变的 dataclass 默认就不可哈希，想进 set 要写 <code class="inline">eq=False</code> 或自己定义 <code class="inline">__hash__</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D011 笔记
+
+## @dataclass
+- 只写字段声明：name: str，__init__ / __repr__ / __eq__ 全自动
+- 有默认值的字段必须排在没默认值的后面
+- 自己写的方法照常写，不会被覆盖
+- 加字段只改一行声明
+
+## field()
+- 可变默认值（list/dict/set）必须用 field(default_factory=list)
+- 写成 tags: list = [] 会在【定义类的时候】就 ValueError，连 import 都失败
+- 其他参数：default=、repr=False
+
+## 常用开关
+- @dataclass(order=True)   自动生成 __lt__ 等，可以 sorted()、可以 &gt;
+- @dataclass(frozen=True)  不可变；改属性抛 FrozenInstanceError；能 hash、能进 set
+
+## Enum
+- class Status(Enum): ACTIVE = "active"
+- Status.ACTIVE 打印带类名；.name 是 'ACTIVE'，.value 是 'active'
+- Status("active") 按值反查，值不存在抛 ValueError
+- Status.ACTIVE == "active" 是 False ！要对比就 .value
+- 适合：订单状态、星期、日志级别；不适合：姓名、城市名这类无限取值
+
+## 类型注解
+- def f(x: str) -&gt; Optional[int]:   只是注解，运行时不检查！
+- list[Contact] / dict[str, int]    容器要写里面的类型
+- Optional[X] 或 X | None           可能返回 None 时必须标
+- 用处：IDE 补全、Pylance 查错、一个月后自己看得懂
+- 校验外部数据要靠 try/except 或 Pydantic，不能靠注解
+
+## Pydantic（预览）
+- 第三方库：uv run --with pydantic demo.py
+- class Contact(BaseModel): 字段注解 + 自动校验 + 自动类型转换
+- 脏数据抛 ValidationError，能说清是哪个字段、错在哪
+- 一句话：dataclass 信任数据，Pydantic 不信任
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D011 的产出是 <b>用 dataclass 重写 Book / Contact + 8 道练习 + 笔记</b>。</p>
+  <p>明天 D012：迭代器与生成器 —— <code>yield</code>、惰性求值、<code>itertools</code>，让程序处理「读不完的大文件」。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

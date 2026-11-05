@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D014 学习包 · 周复盘与通讯录 v3</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 014 · 第 2 周</div>
+  <h1>周复盘与通讯录 v3</h1>
+  <p>第 2 周收官：把前六天学的类、dataclass、装饰器拼成一个有测试的项目，还要能证明它是对的。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>🧪 pytest 9.2.0</span>
+    <span>📊 覆盖率 87% → 100%</span>
+    <span>📦 产出：通讯录 v3</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：2 小时复盘 + 2 小时项目</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>翻 D008–D010 的笔记，重看「类、继承、魔法方法」三段</span></div><div class="tl"><b>第 2 小时</b><span>翻 D011–D013，做下面 6 道自测题，答不上来的回去补</span></div><div class="tl"><b>第 3 小时</b><span>读 2–4 节：项目结构、数据模型、装饰器分层，跟着敲一遍</span></div><div class="tl"><b>第 4 小时</b><span>读 5–6 节：pytest 与覆盖率，然后完成八道练习</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day14/contacts
+cd ~/python-learn/day14</pre></div>
+<div class="note"><b>今天不学新语法。</b>前六天学的每一样东西都在今天这个项目里出现一次：类（D008）、继承（D009）、魔法方法（D010）、dataclass（D011）、生成器表达式（D012）、装饰器（D013）。<br>今天真正新的是<b>怎么证明代码是对的</b>——pytest 和覆盖率。前六天的代码都是「跑一下看着对」，从今天开始要能<b>反复自动验证</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>第 2 周复盘：六天各留下了什么</h2>
+<p>先看这张表，<b>每一行的「坑」都是你自己踩过的</b>，对照一下还记得当时的报错长什么样吗。</p>
+<table><tr><th>天</th><th>主题</th><th>一句话核心</th><th>最容易踩的坑</th></tr><tr><td>D008</td><td>类与对象</td><td>数据和对数据的操作放在一起，别再满屏幕传字典</td><td>忘写 <code>self</code>；类属性放了可变对象</td></tr><tr><td>D009</td><td>继承与多态</td><td>父类定契约，子类换实现——调用方不用改代码</td><td>为了「复用几行」硬套继承，结果继承来一堆用不上的东西</td></tr><tr><td>D010</td><td>魔法方法</td><td>让自己的对象用起来像内置类型（能 <code>print</code>、能 <code>==</code>、能 <code>for</code>）</td><td>改了 <code>__eq__</code> 忘改 <code>__hash__</code>，对象变得不可哈希</td></tr><tr><td>D011</td><td>dataclass 与类型注解</td><td>把 <code>__init__</code>/<code>__repr__</code>/<code>__eq__</code> 交给装饰器生成</td><td><code>tags: list = []</code> 在定义类时就报错，要用 <code>default_factory</code></td></tr><tr><td>D012</td><td>迭代器与生成器</td><td>一次产出一个，不把整个序列堆在内存里</td><td>生成器只能走一遍，第二次 <code>for</code> 是空的</td></tr><tr><td>D013</td><td>闭包与装饰器</td><td>不改函数内部，就能给它加计时、重试、日志</td><td>忘了 <code>*args, **kwargs</code>；忘了 <code>@functools.wraps</code></td></tr></table>
+<h3>六道自测题：答不上来就回去补那一天的笔记</h3>
+<ol class="task"><li><code class="inline">__eq__</code> 里 <code>return False</code> 和 <code>return NotImplemented</code> 有什么区别？</li><li>为什么 <code class="inline">@dataclass</code> 的 <code class="inline">tags: list = []</code> 会在<b>定义类的那一刻</b>就报错？</li><li>生成器为什么只能遍历一次？<code class="inline">list(gen)</code> 之后再 <code class="inline">for</code> 为什么是空的？</li><li><code class="inline">@deco</code> 之后，函数名指向的<b>还是原来那个函数</b>吗？</li><li>类属性里放一个列表，所有实例共享同一份，应该怎么改？</li><li><code class="inline">is</code> 和 <code class="inline">==</code> 分别该在什么时候用？</li></ol>
+<details>
+<summary>六道题的答案（先自己答，再对）</summary>
+<p><b>1. 两者的区别是「我不知道」，不是「不相等」。</b><br><code class="inline">False</code> 表示「我比较过了，结论是不相等」，比较到此结束；<code class="inline">NotImplemented</code> 表示「我不会跟这种类型比，你让别人试试」——Python 会去调对方的 <code class="inline">__eq__</code>，两边都放弃才退回到 <code class="inline">is</code>。<br><b>判断条件上有个坑：</b><code class="inline">NotImplemented</code> 是<b>真值</b>，<code class="inline">if not result: return False</code> 写不出正确的语义，必须写 <code class="inline">if result is NotImplemented</code>。</p>
+<p><b>2. 因为 dataclass 会检查默认值是不是可变对象。</b><br>类属性在<b>定义类时</b>只创建一次，所有实例共享它——一个人 <code class="inline">tags.append</code>，所有人的 tags 都变了。dataclass 干脆在生成 <code class="inline">__init__</code> 时直接抛 <code class="inline">ValueError: mutable default &lt;class 'list'&gt; for field tags is not allowed</code>，逼你用 <code class="inline">field(default_factory=list)</code>——<b>每次创建实例都调一次 list()，各拿各的</b>。</p>
+<p><b>3. 因为生成器函数体的状态只有一份。</b><br><code class="inline">yield</code> 会把函数「冻」在当前这一行，等你下次 <code class="inline">next()</code> 才继续。走到 <code class="inline">return</code> 之后就再也回不去了，再 <code class="inline">for</code> 只能拿到空。<br><b>要重复用就先存下来：</b><code class="inline">data = list(gen)</code>，代价就是 D012 说的内存。</p>
+<p><b>4. 不是。</b><code class="inline">@deco</code> 完全等价于 <code class="inline">f = deco(f)</code>，名字 <code>f</code> 现在指向的是 <b>装饰器里返回的那个 wrapper</b>。原函数还在，只是没名字指向它了（除非你把它存起来）。</p>
+<p><b>5. 搬进 <code class="inline">__init__</code> 里，或者用 <code class="inline">field(default_factory=list)</code>。</b><br><code class="inline">self.tags = []</code> 写在 <code class="inline">__init__</code> 里，就是<b>每个实例一份新的</b>。dataclass 里则写 <code class="inline">tags: list = field(default_factory=list)</code>。</p>
+<p><b>6. <code class="inline">==</code> 比「值」，<code class="inline">is</code> 比「是不是同一个对象」。</b><br>日常都用 <code class="inline">==</code>。必须用 <code class="inline">is</code> 的只有几种情况：和 <code class="inline">None</code> 比（<code class="inline">x is None</code>）、和 <code class="inline">True</code>/<code class="inline">False</code> 比、和 <code class="inline">NotImplemented</code> 比。<br><b>为什么必须：</b>你可以让 <code class="inline">__eq__</code> 返回任何东西，但一个对象「是不是 None」这件事没有含糊余地。</p>
+</details>
+</section>
+
+<section>
+  <h2><span class="n">2</span>项目结构：一个包，四个文件，各管一件事</h2>
+<p>通讯录 v1 是一个文件几百行（D007），v2 开始拆（D008）。今天拆到底：</p>
+<div class="tree">day14/
+├── contacts/               ← 包：把「通讯录」这件事关起来
+│   ├── __init__.py         ← 对外只开一扇门
+│   ├── models.py           ← 一个人长什么样（数据）
+│   ├── store.py            ← 一个通讯录能做什么（操作）
+│   └── decorators.py       ← 日志装饰器（跟业务无关的工具）
+├── test_contacts.py        ← 测试
+├── contacts.json           ← 运行时自动生成，不进 Git
+└── actions.log             ← 运行时自动生成，不进 Git</div>
+<table><tr><th>文件</th><th>负责什么</th><th>不该出现什么</th></tr><tr><td><code>models.py</code></td><td><code>Contact</code> 有哪些字段、怎么校验、怎么变成字典</td><td><b>不能有 <code>open()</code>、不能有文件路径</b></td></tr><tr><td><code>store.py</code></td><td><code>AddressBook</code> 的增删查、存盘读盘</td><td>不能有关系数据库/网络/SQL</td></tr><tr><td><code>decorators.py</code></td><td><code>@log</code>，只依赖 <code>functools</code></td><td>不能 import 本项目任何模块</td></tr><tr><td><code>__init__.py</code></td><td>决定外面能 <code class="inline">from contacts import ...</code> 拿到什么</td><td>不能写业务逻辑</td></tr></table>
+<p><b>先验证一下「一扇门」是什么意思：</b></p>
+<!--run-copy: run14-->
+<div class="codebox"><button class="copy">复制</button><pre>import contacts
+
+print(contacts.__doc__)
+print(contacts.__all__)
+print(contacts.Contact.__module__)
+print(contacts.AddressBook.__module__)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">通讯录 v3 —— 面向对象 + 装饰器日志 + 单元测试
+['Contact', 'AddressBook']
+contacts.models
+contacts.store</pre></div>
+<p><code class="inline">__all__</code> 是一份<b>白名单</b>：外面只应该通过包名拿这两个东西。至于它们在哪个文件里（<code class="inline">contacts.models</code> / <code class="inline">contacts.store</code>），是包内部的事。<br><b>好处很实际</b>——哪天你把 <code class="inline">models.py</code> 拆成 <code class="inline">models/</code> 两个文件，只要 <code class="inline">__init__.py</code> 里那句 <code class="inline">from .models import Contact</code> 还成立，外面一行都不用改。</p>
+<div class="note"><b>为什么现在就要拆？</b>因为今天的测试要单独测「数据」和「操作」，混在一个文件里，测 <code class="inline">Contact</code> 的时候会把整个通讯录的存盘逻辑一起拉进来。<b>能单独测，是拆分拆对了的标志。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>数据模型：三行 dataclass 顶 D008 的三十行</h2>
+<p><code class="inline">models.py</code> 的全部内容就三十来行，核心只有四行：</p>
+<div class="codebox"><button class="copy">复制</button><pre>@dataclass
+class Contact:
+    name: str
+    phone: str
+    email: str = ""
+    tags: list = field(default_factory=list)</pre></div>
+<!--run-copy: run14-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import Contact
+
+c1 = Contact("张三", "13800001111")
+c2 = Contact("李四", "13900002222", "ls@example.com", ["同事", "技术部"])
+
+print(c1)
+print(c2)
+print(c2.name, c2.phone, c2.email, c2.tags)
+print(c1.line())
+print(c2.line())</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Contact(name='张三', phone='13800001111', email='', tags=[])
+Contact(name='李四', phone='13900002222', email='ls@example.com', tags=['同事', '技术部'])
+李四 13900002222 ls@example.com ['同事', '技术部']
+张三  13800001111
+李四  13900002222  ls@example.com  同事/技术部</pre></div>
+<p>四行声明，自动得到了 D008 手写的 <code class="inline">__init__</code>、<code class="inline">__repr__</code>、<code class="inline">__eq__</code> 三个方法。<b>注意第 2 行和第 3 行：</b><code class="inline">print(c1)</code> 打出的是 <code class="inline">Contact(name='张三', ...)</code> 而不是 <code class="inline"><__main__.Contact object at 0x...></code>——这就是 D010 的 <code class="inline">__repr__</code> 和 D011 的 dataclass 连上了：<b>你手写过的那个 <code class="inline">__repr__</code>，dataclass 替你生成。</b></p>
+<h3>校验放 __post_init__，不覆盖 __init__</h3>
+<p>想在创建时检查数据，直觉是重写 <code class="inline">__init__</code>。但 dataclass 已经生成好了 <code class="inline">__init__</code>，覆盖它意味着你要把四个字段的赋值全部手写一遍——那用 dataclass 就白用了。<b>正确位置是 <code class="inline">__post_init__</code></b>：它在生成的 <code class="inline">__init__</code> 末尾被自动调用一次。</p>
+<div class="codebox"><button class="copy">复制</button><pre>    def __post_init__(self):
+        if not self.name.strip():
+            raise ValueError("姓名不能为空")
+        if not (self.phone.isdigit() and len(self.phone) == 11):
+            raise ValueError(f"电话必须是 11 位数字: {self.phone}")</pre></div>
+<!--run-copy: run14-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import Contact
+
+cases = [("  ", "13800001111"), ("张三", "138"), ("张三", "1380000111a")]
+for args in cases:
+    try:
+        Contact(*args)
+    except ValueError as e:
+        print("拒绝:", e)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">拒绝: 姓名不能为空
+拒绝: 电话必须是 11 位数字: 138
+拒绝: 电话必须是 11 位数字: 1380000111a</pre></div>
+<div class="warn"><b>为什么在「造出来的时候」就报错，比在后面某个函数里检查好？</b><br>因为错误离原因越近越好。<code class="inline">Contact("张三", "138")</code> 这一行直接炸，你就知道是这里传错了；如果放过去，等你第二天读 json 时才发现格式不对，根本查不到是哪一步写进去的。<br><b>这条规矩叫「快速失败」：宁可启动就崩，也不要带着坏数据跑三天。</b></div>
+<div class="note"><b>注意 <code class="inline">name.strip()</code> 那个写法：</b>只判 <code class="inline">if not self.name</code> 挡不住 <code class="inline">"  "</code>（两个空格字符串）。用户输入里这种「看着有、其实没有」的值特别多，去掉首尾空格再判空是必备动作。</div>
+<h3>存进 json 再读回来：to_dict / from_dict</h3>
+<p>json 只认识字典、列表、字符串、数字——<b>不认识 <code class="inline">Contact</code> 对象</b>。所以进出各要一次转换，这两个方法就放在 <code class="inline">models.py</code> 里，因为它们只关心「一个人怎么变成数据」，跟存哪儿无关。</p>
+<!--run-copy: run14-->
+<div class="codebox"><button class="copy">复制</button><pre>import json
+
+from contacts import Contact
+
+c = Contact("张三", "13800001111", "zs@example.com", ["同事"])
+d = c.to_dict()
+print(json.dumps(d, ensure_ascii=False, sort_keys=True))
+
+back = Contact.from_dict("张三", d)
+print("存进去再读回来一样吗:", back == c)
+
+old = Contact.from_dict("李四", "13900002222")
+print("v1 旧格式:", old)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">{"email": "zs@example.com", "phone": "13800001111", "tags": ["同事"]}
+存进去再读回来一样吗: True
+v1 旧格式: Contact(name='李四', phone='13900002222', email='', tags=[])</pre></div>
+<p>三个细节值得看：<br>① <code class="inline">asdict()</code> 把 dataclass 递归转成字典，但结果里<b>没有 <code class="inline">name</code></b>——因为 <code class="inline">to_dict()</code> 里 <code class="inline">pop</code> 掉了。姓名在 json 里是<b>键</b>（<code class="inline">{"张三": {...}}</code>），不用再存一遍。<br>② <code class="inline">back == c</code> 是 <code class="inline">True</code>——D010 学的 <code class="inline">__eq__</code> 在这里派上用场：<b>没有它，两个内容一样的对象比出来是 <code class="inline">False</code>。</b><br>③ <code class="inline">from_dict</code> 里有个 <code class="inline">isinstance(d, str)</code> 分支，专门兼容 v1 的老格式（<b>姓名 → 电话字符串</b>）。<b>这叫向后兼容</b>：老用户手里的 <code class="inline">contacts.json</code> 不能因为升级就废掉。</p>
+</section>
+
+<section>
+  <h2><span class="n">4</span>存储层：装饰器加在哪一层，是个判断题</h2>
+<p>先看效果——三段操作，日志自动出来，而 <code class="inline">add</code> 的函数体里<b>没有一行跟日志有关的代码</b>：</p>
+<!--run-copy: run14-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import AddressBook, Contact
+
+book = AddressBook(path="demo.json")
+print(book.add(Contact("张三", "13800001111")))
+print(book.add(Contact("李四", "13900002222", "ls@example.com")))
+print(book.remove("张三"))
+print("剩余:", [c.name for c in book])
+print("--- actions.log 全文 ---")
+print(open("actions.log", encoding="utf-8").read().strip())</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">已添加 张三
+已添加 李四
+已删除 张三
+剩余: ['李四']
+--- actions.log 全文 ---
+add: 已添加 张三
+add: 已添加 李四
+remove: 已删除 张三</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>    @log
+    def add(self, contact):
+        if contact.name in self.items:
+            raise ValueError(f"{contact.name} 已存在")
+        self.items[contact.name] = contact
+        self.save()
+        return f"已添加 {contact.name}"</pre></div>
+<h3>为什么 @log 加在 store 层，不加在 models 层？</h3>
+<table><tr><th>如果加在……</th><th>会发生什么</th><th>结论</th></tr><tr><td><code>Contact</code> 的方法上</td><td>「造一个联系人」被记一次日志。可造对象不等于改通讯录——校验失败重试三次会记三条日志，实际什么都没发生</td><td><b>日志记录的是「操作」，不是「数据」</b></td></tr><tr><td><code>AddressBook.add/remove</code> 上</td><td>一次成功的增删记一条，跟用户视角完全一致</td><td><b>选它</b></td></tr><tr><td><code>save()</code> 上</td><td>一次 <code>add</code> 里 <code>save</code> 只调一次，看着也行；但以后批量导入时 <code>save</code> 会被调很多次，日志就乱了</td><td><b>装饰器要加在「用户视角的一个动作」上</b></td></tr></table>
+<div class="note"><b>装饰器的粒度问题，判断标准就一句：日志里的一行，应该对应「用户做的一件事」。</b>用户点「添加」，日志就该多一行；用户在输入框里删了又改、最后校验没过，日志不该多三行。<br>这是设计问题，不是语法问题——<b>写得出装饰器之后，更难的是决定往哪儿放。</b></div>
+<h3>让对象用起来像容器：__len__ 和 __iter__</h3>
+<!--run-copy: run14-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import AddressBook, Contact
+
+book = AddressBook(path="demo2.json")
+for n in ["张三", "李四", "王五"]:
+    book.add(Contact(n, "13800001111"))
+
+print("find('张'):", [c.name for c in book.find("张")])
+print("len(book):", len(book))
+print("for 循环:", [c.name for c in book])
+print("有 __getitem__ 吗:", hasattr(book, "__getitem__"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">find('张'): ['张三']
+len(book): 3
+for 循环: ['张三', '李四', '王五']
+有 __getitem__ 吗: False</pre></div>
+<p>两个方法，让 <code class="inline">AddressBook</code> 直接支持 <code class="inline">len(book)</code> 和 <code class="inline">for c in book</code>——<b>调用方根本不需要知道里面有个 <code class="inline">items</code> 字典</b>（D010 的魔法方法）。<br>最后一行 <code class="inline">False</code> 是个提示：<code class="inline">book["张三"]</code> 现在还不行。<b>这是练习第 1 题。</b></p>
+<div class="warn"><b>别为了「像容器」把方法加满。</b><code class="inline">__getitem__</code>、<code class="inline">__len__</code>、<code class="inline">__iter__</code> 各有明确语义，加了就得对；<code class="inline">__add__</code> 这种「两个通讯录相加」看着酷，实际没人会用，还容易写出语义混乱的代码。<b>只加你真的会调用的。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>pytest 入门：把「跑一下看着对」变成「自动检查」</h2>
+<p>先看昨天的做法有多脆：写一段 <code class="inline">if c.name != "张三": print("错了")</code>，跑一遍，看到没打印「错了」就认为对。<b>问题有三个</b>：改完代码要重新看一眼；忘了看就漏了；没法一次检查三十个条件。</p>
+<table><tr><th></th><th>手写 if / print</th><th>pytest</th></tr><tr><td>怎么表示「对」</td><td><code>if ...: print("错了")</code></td><td><code>assert 条件</code>，不成立就抛异常</td></tr><tr><td>怎么知道全过了</td><td><b>肉眼看输出</b></td><td>结尾一行 <code>N passed</code></td></tr><tr><td>失败时看到什么</td><td>你自己 print 的那句话</td><td><b>哪一行、实际值、期望值、涉及的表达式</b></td></tr><tr><td>怎么只跑一个</td><td>没有这个概念</td><td>文件末尾加 <code>::测试名</code></td></tr><tr><td>一百个用例</td><td>不可维护</td><td>自动收集，<b>文件名以 <code>test_</code> 开头、函数以 <code>test_</code> 开头</b></td></tr></table>
+<h3>第一步：最小的一个测试</h3>
+<!--run-skip: pytest 文件，用 pytest 跑-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import Contact
+
+
+def test_正常创建():
+    c = Contact("张三", "13800001111")
+    assert c.name == "张三"
+    assert c.email == ""</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">.                                                                        [100%]
+1 passed in 0.03s</pre></div>
+<p><b>规矩只有两条：</b>文件名 <code class="inline">test_*.py</code>，函数名 <code class="inline">test_*</code>。pytest 自己去找，<b>不用注册、不用写 main、不用继承任何类</b>。（函数返回 <code class="inline">None</code> 就行，别在里面 <code class="inline">return</code> 东西。）<br>那个 <code class="inline">.</code> 就是一个通过的测试。跑多个测试会看到 <code class="inline">..F.</code> 这样的进度条，<b>F 就是 Failed，一眼能扫出失败在第几个</b>。</p>
+<h3>第二步：失败长什么样——这才是 pytest 值钱的地方</h3>
+<!--run-skip: pytest 文件，故意失败-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import Contact
+
+
+def test_电话长度():
+    c = Contact("张三", "13800001111")
+    assert len(c.phone) == 10, "电话应该是 10 位"</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">F                                                                        [100%]
+================================== FAILURES ===================================
+__________________________________ test_电话长度 __________________________________
+
+    def test_电话长度():
+        c = Contact("张三", "13800001111")
+&gt;       assert len(c.phone) == 10, "电话应该是 10 位"
+E       AssertionError: 电话应该是 10 位
+E       assert 11 == 10
+E        +  where 11 = len('13800001111')
+E        +    where '13800001111' = Contact(name='张三', phone='13800001111', email='', tags=[]).phone
+
+t_fail.py:6: AssertionError
+=========================== short test summary info ===========================
+FAILED t_fail.py::test_电话长度 - AssertionError: 电话应该是 10 位
+1 failed in 0.10s</pre></div>
+<p><b>逐行读这段报错：</b></p>
+<table><tr><th>这一行</th><th>含义</th></tr><tr><td><code>&gt;       assert ...</code></td><td><b>出错的是这一行</b>（<code>&gt;</code> 是 pytest 加的标记）</td></tr><tr><td><code>E       AssertionError: 电话应该是 10 位</code></td><td>你写的提示语，<b>所以 assert 后面写一句人话很值</b></td></tr><tr><td><code>E       assert 11 == 10</code></td><td>实际值 11，期望 10</td></tr><tr><td><code>E        +  where 11 = len('13800001111')</code></td><td><b>11 是怎么来的</b>——pytest 把中间表达式拆开算给你看</td></tr><tr><td><code>t_fail.py:6</code></td><td>文件:行号，<b>直接跳过去改</b></td></tr><tr><td><code>FAILED t_fail.py::test_电话长度</code></td><td>想单独重跑这一个，把这串粘到命令后面</td></tr></table>
+<div class="ok"><b>手写 print 最多告诉你「结果不对」，pytest 告诉你「哪个中间值不对」。</b>上面这段里，光看 <code class="inline">assert 11 == 10</code> 你可能会怀疑 <code class="inline">c.phone</code> 是空的、怀疑编码、怀疑类型；而 <code class="inline">where 11 = len('13800001111')</code> 直接把答案摊开：<b>字符串本身就 11 位，是你把期望值写错了。</b></div>
+<div class="note"><b>调试时间的大部分花在「猜」上。</b>pytest 的报错就是在替你做这个猜的过程——这也是为什么值得花半小时严格按它的规矩写测试文件名和函数名。</div>
+<h3>第三步：测「应该报错」这件事</h3>
+<p>正常路径好测，报错路径很多人就跳过不测了。pytest 给了 <code class="inline">pytest.raises</code>，专门断言「这里必须炸」：</p>
+<!--run-skip: pytest 文件，故意一个通过一个失败-->
+<div class="codebox"><button class="copy">复制</button><pre>import pytest
+
+from contacts import Contact
+
+
+def test_电话太短要报错():
+    with pytest.raises(ValueError):
+        Contact("张三", "138")
+
+
+def test_这条其实没报错():
+    with pytest.raises(ValueError):
+        Contact("张三", "13800001111")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">.F                                                                       [100%]
+================================== FAILURES ===================================
+________________________________ test_这条其实没报错 _________________________________
+
+    def test_这条其实没报错():
+&gt;       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+t_raises.py:12: Failed
+=========================== short test summary info ===========================
+FAILED t_raises.py::test_这条其实没报错 - Failed: DID NOT RAISE ValueError
+1 failed, 1 passed in 0.22s</pre></div>
+<p><b>第二个测试失败，恰恰证明测试在正常工作。</b><code class="inline">DID NOT RAISE</code> 的意思是「代码正常跑完了，没抛异常」——而你断言它应该抛。所以测试失败的信息是：<b>校验没生效</b>。<br>反过来说：<b>如果代码炸了但你没写 <code class="inline">pytest.raises</code>，测试同样会失败</b>（异常会一路冒出来）。所以「测异常」和「测正常」的区别，就是外面包不包这一层。</p>
+<div class="purple"><b>为什么一定要测报错路径：</b>校验逻辑只有两种结果，「该过的过」和「该拦的拦住」。只测前者，等于只验证了一半。<br>真实事故里，绝大多数是<b>该拦的没拦住</b>——脏数据进了库，三天后才发现。</div>
+<h3>第四步：fixture —— 每个测试都要一个干净的通讯录</h3>
+<p>麻烦来了：<code class="inline">AddressBook</code> 一创建就会 <code class="inline">load()</code>，<code class="inline">add()</code> 会 <code class="inline">save()</code>。如果所有测试共用 <code class="inline">contacts.json</code>，<b>上一个测试写进去的人会被下一个测试读到</b>。看这个对照：</p>
+<!--run-copy: run14-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import AddressBook, Contact
+
+for i in (1, 2):
+    book = AddressBook(path="shared.json")
+    print(f"第 {i} 次打开，已有 {len(book)} 条")
+    book.add(Contact(f"用户{i}", "13800001111"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">第 1 次打开，已有 0 条
+第 2 次打开，已有 1 条</pre></div>
+<p>第 2 次「打开」已经不是空的了。<b>这不是 bug，是文件本来就是持久的。</b>但测试要的是<b>每次从零开始</b>，否则<code class="inline">assert len(book) == 0</code> 这种断言就永远在碰运气——取决于你之前跑过什么。</p>
+<p><b>解法是两个内置工具：</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>@pytest.fixture
+def book(tmp_path, monkeypatch):
+    """每个测试都拿一个干净的空通讯录，日志写到临时目录"""
+    monkeypatch.setattr(decorators, "LOG", str(tmp_path / "actions.log"))
+    return AddressBook(path=str(tmp_path / "contacts.json"))</pre></div>
+<table><tr><th>东西</th><th>作用</th><th>为什么非它不可</th></tr><tr><td><code>@pytest.fixture</code></td><td>把「准备环境」这段抽出来，测试函数写个参数名就能用</td><td>每个测试<b>各执行一次</b>，互不影响</td></tr><tr><td><code>tmp_path</code></td><td>pytest 给每个测试<b>新建一个空目录</b>，用完自动清</td><td>写文件不污染你的项目目录，也不用自己 <code>os.remove</code></td></tr><tr><td><code>monkeypatch</code></td><td>临时改掉某个属性，测试结束<b>自动改回来</b></td><td><code>LOG</code> 是模块级变量，改了影响全局，必须能还原</td></tr></table>
+<div class="danger"><b>不写隔离的后果，比你想的严重：</b><br>① 测试有时过有时不过，你开始怀疑人生；<br>② 测试跑完发现项目里多了一堆 <code class="inline">contacts.json</code>、<code class="inline">actions.log</code>，还被 <code>git status</code> 提示；<br>③ 最坑的是<b>顺序依赖</b>——单独跑第 5 个测试通过，跑全套就失败。这种 bug 能查一整天。<br><b>规矩：凡是要读写文件的测试，必须先要一个 <code class="inline">tmp_path</code>。</b></div>
+<p><b>完整的测试文件里，第一个<code class="inline">def test_</code>之前的这一小段就是全部准备工作。</b>九个测试，三次 <code class="inline">pytest.raises</code>，一次存盘往返，一次读日志——覆盖了 v3 该有的行为：</p>
+<div class="codebox"><button class="copy">复制</button><pre>def test_添加后能查到(book):
+    book.add(Contact("张三", "13800001111"))
+    assert len(book) == 1
+    assert book.find("张")[0].name == "张三"
+
+
+def test_存盘再读回来(book, tmp_path):
+    book.add(Contact("张三", "13800001111", "zs@example.com"))
+    again = AddressBook(path=str(tmp_path / "contacts.json"))
+    assert len(again) == 1
+    assert again.items["张三"].email == "zs@example.com"</pre></div>
+<div class="note"><b>注意 <code class="inline">test_存盘再读回来</code> 这个测试的写法：它不检查 <code class="inline">book.save()</code> 有没有被调用，而是<b>新开一个 <code class="inline">AddressBook</code> 去看数据在不在</b>。<br>这是测试的一条重要原则：<b>验证「结果」，别验证「过程」。</b>你要是 mock 了 <code class="inline">save</code> 再断言「它被调用了一次」，那即使 <code class="inline">save</code> 里写的是 <code class="inline">json.dump({})</code>，测试照样通过。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>覆盖率：到底还有哪一行没跑过</h2>
+<p>测试跑通了，但「够不够」是另一个问题。覆盖率回答的就是这个：<b>我写测试的时候，跑过了代码的百分之几。</b></p>
+<!--run-skip: 命令行，不是 Python-->
+<div class="codebox"><button class="copy">复制</button><pre>$ python3 -m pytest -q --cov=contacts --cov-report=term-missing</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Name                     Stmts   Miss  Cover   Missing
+------------------------------------------------------
+contacts\__init__.py         3      0   100%
+contacts\decorators.py      10      0   100%
+contacts\models.py          28      7    75%   20-25, 35
+contacts\store.py           42      4    90%   39, 53-55
+------------------------------------------------------
+TOTAL                       83     11    87%
+9 passed in 0.43s</pre></div>
+<p>（上面这行平台信息我省了，路径在我这边显示成反斜杠，你在 Mac 上会看到 <code class="inline">contacts/models.py</code>，<b>数字完全一样</b>。）</p>
+<table><tr><th>列</th><th>含义</th><th>要看的重点</th></tr><tr><td><code>Stmts</code></td><td>这条语句算几行（空行、注释、纯 <code>def</code> 头不算）</td><td>总量，衡量模块大小</td></tr><tr><td><code>Miss</code></td><td><b>一次都没被执行过的语句数</b></td><td>这才是你要盯的数</td></tr><tr><td><code>Cover</code></td><td>跑到的比例</td><td>参考值，别当 KPI</td></tr><tr><td><code>Missing</code></td><td><b>具体是哪几行</b></td><td>★ 直接告诉你下一个测试该写什么</td></tr></table>
+<h3>读那两行 Missing</h3>
+<table><tr><th>文件</th><th>Missing</th><th>那几行是什么</th><th>为什么没被覆盖</th></tr><tr><td><code>models.py</code></td><td><code>20-25, 35</code></td><td><code>line()</code> 的方法体 + <code>from_dict</code> 的 <code class="inline">isinstance(d, str)</code> 分支</td><td><b>没有任何测试调用过它们</b></td></tr><tr><td><code>store.py</code></td><td><code>39, 53-55</code></td><td><code class="inline">__iter__</code> 的一行 + <code class="inline">except json.JSONDecodeError</code> 那个分支</td><td>测试里没有 <code class="inline">for c in book</code>，也没有故意传坏 json</td></tr></table>
+<div class="warn"><b>看到这几个数字之后，正确的反应不是「覆盖率低了真糟糕」，而是「哦，<code>line()</code> 我压根没测过，它有没有 bug 我其实不知道」。</b><br>覆盖率的最大价值不是百分比，是 <code>Missing</code> 那列——<b>它是一张「没被测过的代码清单」。</b></div>
+<h3>补测试是怎么把数字拉上去的</h3>
+<p>练习第 3、7、8 题写完，就是 13 个测试。同样的命令再跑一次：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Name                     Stmts   Miss  Cover   Missing
+------------------------------------------------------
+contacts\__init__.py         3      0   100%
+contacts\decorators.py      10      0   100%
+contacts\models.py          28      7    75%   20-25, 35
+contacts\store.py           42      1    98%   39
+------------------------------------------------------
+TOTAL                       83      8    90%
+13 passed in 0.41s</pre></div>
+<p><code class="inline">store.py</code> 从 90% 到 98%，补上的正是「坏 json 文件」那个分支——而这恰恰是最容易在真实环境里出现、又最容易被忘掉的一条路。</p>
+<p>再补两个测试（调 <code class="inline">line()</code> 和旧格式 <code class="inline">from_dict</code>，再加一个 <code class="inline">for c in book</code>）：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Name                     Stmts   Miss  Cover   Missing
+------------------------------------------------------
+contacts\__init__.py         3      0   100%
+contacts\decorators.py      10      0   100%
+contacts\models.py          28      0   100%
+contacts\store.py           42      0   100%
+------------------------------------------------------
+TOTAL                       83      0   100%
+15 passed in 0.41s</pre></div>
+<div class="ok"><b>从 87% 到 100%，一行业务代码都没改，只加了 6 个测试。</b>这 6 个里有 3 个测的是<b>平时根本走不到的分支</b>——数据文件损坏、日志目录不存在、v1 的旧数据格式。<b>这些分支在生产环境里出现的概率不高，但一旦出现就是事故。</b></div>
+<div class="danger"><b>别把 100% 当目标。</b>覆盖率只说明「这行代码被执行过」，<b>不说明「执行结果是对的」</b>。<br>下面这个测试能轻松刷到 100%，但它什么都没验证：<br><code class="inline">def test_all(): AddressBook().add(Contact("张三", "13800001111"))</code><br>没有一句 <code class="inline">assert</code> 的测试，覆盖率是满的，保护力是零。<br><b>真正的标准是：核心逻辑的每一条分支，都至少有一个测试在「断言」它的结果。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 1、3、8 题是今天的产出</b>。做的时候<b>先改 <code class="inline">contacts/</code> 里的文件，改完再跑 </b><code class="inline">python3 -m pytest -q</code> 确认九个老测试没挂。答案里我用子类演示，是为了不动你的原文件——<b>你自己写的时候应该直接加进 <code class="inline">store.py</code></b>。</p>
+<ol class="task"><li><b>按名字取人</b>：给 <code class="inline">AddressBook</code> 加 <code class="inline">__getitem__</code>，让 <code class="inline">book["张三"]</code> 返回 <code class="inline">Contact</code>，取不到要抛 <code class="inline">KeyError</code>；顺手加 <code class="inline">__contains__</code> 支持 <code class="inline">"张三" in book</code></li><li><b>邮箱校验</b>：邮箱非空时必须含 <code class="inline">@</code>，否则 <code class="inline">ValueError</code>。用子类跑 <code class="inline">super().__post_init__()</code> 再补一条</li><li><b>给上一题写测试</b>：两个用例——取得到（断言电话）、取不到（<code class="inline">pytest.raises(KeyError)</code>）</li><li><b>按标签找人</b>：<code class="inline">search_by_tag(tag)</code> 返回所有 tags 里含该标签的人</li><li><b>删除要返回被删的人</b>：把 <code class="inline">remove</code> 改成返回那个 <code class="inline">Contact</code>，删不存在的仍然 <code class="inline">KeyError</code></li><li><b>给查询加日志</b>：给 <code class="inline">find</code> 套上 <code class="inline">@log</code>，看日志里记下来的是什么（提示：记的是返回值，一个列表）</li><li><b>日志写失败会怎样</b>：用 <code class="inline">monkeypatch</code> 把 <code class="inline">LOG</code> 指到一个不存在的目录，写测试断言 <code class="inline">FileNotFoundError</code>，再想想生产环境该怎么改</li><li><b>补覆盖率</b>：用 <code class="inline">capfd</code> 抓 <code class="inline">store.py</code> 里「数据文件损坏」那句 print，断言空通讯录能启动；再补 <code class="inline">line()</code> 和旧格式 <code class="inline">from_dict</code>，把覆盖率推到 100%</li></ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<!--run-skip: 八份文件拼在一起展示-->
+<div class="codebox"><button class="copy">复制</button><pre>from contacts import AddressBook, Contact
+
+
+class Book(AddressBook):
+    """作业里直接把这几个方法写进 store.py 的 AddressBook，这里用子类演示"""
+
+    def __getitem__(self, name):
+        return self.items[name]
+
+    def __contains__(self, name):
+        return name in self.items
+
+
+book = Book(path="p1.json")
+book.add(Contact("张三", "13800001111"))
+
+print(book["张三"])
+print("张三 in book:", "张三" in book)
+print("李四 in book:", "李四" in book)
+try:
+    book["李四"]
+except KeyError as e:
+    print("KeyError:", e)
+
+
+
+from dataclasses import dataclass
+
+from contacts import Contact
+
+
+@dataclass
+class StrictContact(Contact):
+    def __post_init__(self):
+        super().__post_init__()          # 先跑父类的两条校验
+        if self.email and "@" not in self.email:
+            raise ValueError(f"邮箱格式不对: {self.email}")
+
+
+print(StrictContact("张三", "13800001111", "zs@example.com"))
+print(StrictContact("李四", "13900002222"))
+try:
+    StrictContact("王五", "13700003333", "wang_at_example")
+except ValueError as e:
+    print("拒绝:", e)
+
+
+
+import pytest
+
+from contacts import AddressBook, Contact, decorators
+
+
+class Book(AddressBook):
+    def __getitem__(self, name):
+        return self.items[name]
+
+
+@pytest.fixture
+def book(tmp_path, monkeypatch):
+    monkeypatch.setattr(decorators, "LOG", str(tmp_path / "actions.log"))
+    return Book(path=str(tmp_path / "c.json"))
+
+
+def test_按名字取值(book):
+    book.add(Contact("张三", "13800001111"))
+    assert book["张三"].phone == "13800001111"
+
+
+def test_取不存在的人报KeyError(book):
+    with pytest.raises(KeyError):
+        book["李四"]
+
+
+
+from contacts import AddressBook, Contact
+
+
+class Book(AddressBook):
+    def search_by_tag(self, tag):
+        return [c for c in self.items.values() if tag in c.tags]
+
+
+book = Book(path="p4.json")
+book.add(Contact("张三", "13800001111", "", ["同事"]))
+book.add(Contact("李四", "13900002222", "", ["同事", "技术部"]))
+book.add(Contact("王五", "13700003333"))
+
+print("同事:", [c.name for c in book.search_by_tag("同事")])
+print("技术部:", [c.name for c in book.search_by_tag("技术部")])
+print("客户:", [c.name for c in book.search_by_tag("客户")])
+
+
+
+from contacts import AddressBook, Contact
+
+
+class Book(AddressBook):
+    def remove(self, name):
+        contact = self.items[name]       # 不存在在这一行就 KeyError
+        super().remove(name)
+        return contact
+
+
+book = Book(path="p5.json")
+book.add(Contact("张三", "13800001111", "zs@example.com"))
+gone = book.remove("张三")
+print("被删掉的是:", gone.name, gone.phone, gone.email)
+print("现在还剩:", len(book))
+
+
+
+from contacts import AddressBook, Contact, decorators
+from contacts.decorators import log
+
+
+class Book(AddressBook):
+    @log
+    def find(self, keyword):
+        return super().find(keyword)
+
+
+book = Book(path="p6.json")
+book.add(Contact("张三", "13800001111"))
+book.find("张")
+book.find("李")
+
+print(open(decorators.LOG, encoding="utf-8").read().strip())
+
+
+
+import pytest
+
+from contacts import AddressBook, Contact, decorators
+
+
+def test_日志写不进去会连业务一起失败(tmp_path, monkeypatch):
+    # 指向一个不存在的目录
+    monkeypatch.setattr(decorators, "LOG", str(tmp_path / "nodir" / "a.log"))
+    book = AddressBook(path=str(tmp_path / "c.json"))
+    with pytest.raises(FileNotFoundError):
+        book.add(Contact("张三", "13800001111"))
+
+
+
+from contacts import AddressBook
+
+
+def test_数据文件损坏时按空通讯录启动(tmp_path, capfd):
+    p = tmp_path / "bad.json"
+    p.write_text("{这不是 json", encoding="utf-8")
+
+    book = AddressBook(path=str(p))
+    assert len(book) == 0
+
+    out, _ = capfd.readouterr()          # 抓住 print 出来的那行
+    assert "数据文件损坏" in out</pre></div>
+<p>依次运行 p1–p8 的输出（p3/p7/p8 是测试文件，用 pytest 跑）：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Contact(name='张三', phone='13800001111', email='', tags=[])
+张三 in book: True
+李四 in book: False
+KeyError: '李四'
+StrictContact(name='张三', phone='13800001111', email='zs@example.com', tags=[])
+StrictContact(name='李四', phone='13900002222', email='', tags=[])
+拒绝: 邮箱格式不对: wang_at_example
+同事: ['张三', '李四']
+技术部: ['李四']
+客户: []
+被删掉的是: 张三 13800001111 zs@example.com
+现在还剩: 0
+add: 已添加 张三
+find: [Contact(name='张三', phone='13800001111', email='', tags=[])]
+find: []
+--- p3 ---
+2 passed in 0.07s
+--- p7 ---
+1 passed in 0.05s
+--- p8 ---
+1 passed in 0.11s</pre></div>
+<h3>两处值得细看</h3>
+<p><b>第 7 题的结论比答案本身重要。</b><code class="inline">FileNotFoundError</code> 是从装饰器里抛出来的，但<b>它把整个 <code class="inline">add</code> 都带崩了</b>——联系人没加进去。<br>真实项目里日志、监控、埋点这类「附加动作」<b>绝不能影响主流程</b>，正确写法是把写日志包起来：</p>
+<div class="codebox"><button class="copy">复制</button><pre>def log(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        try:
+            with open(LOG, "a", encoding="utf-8") as f:
+                f.write(f"{func.__name__}: {result}\n")
+        except OSError:
+            pass          # 日志写不进去就算了，业务不能受影响
+        return result
+    return wrapper</pre></div>
+<p><b>第 8 题的 <code class="inline">capfd</code> 值得记住。</b>用 <code class="inline">print</code> 输出提示信息的地方，测试要怎么验？答案是把标准输出「抓」下来：<code class="inline">capfd.readouterr()</code> 返回两个值，第一个是 stdout，第二个是 stderr。<br><code class="inline">out, _ = capfd.readouterr()</code> —— 那个下划线就是「我不关心 stderr」。然后 <code class="inline">assert "数据文件损坏" in out</code>。<br><b>更规范的做法是把<code class="inline">print</code> 换成 <code class="inline">logging</code>，测试用 <code class="inline">caplog</code>——这是下下周的内容。</b></p>
+</details>
+<div class="note"><b>如果第 8 题最后停在 99%，大概率是 <code class="inline">store.py:39</code> 的 <code class="inline">__iter__</code> 还没被跑到。</b>因为有 <code class="inline">__iter__</code> 不等于有测试在用它——补一句 <code class="inline">assert [c.name for c in book] == ["张三"]</code> 就够了。<br><b>这个过程本身就是在教你怎么读 <code class="inline">Missing</code> 那列。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D014 笔记 · 第 2 周复盘与通讯录 v3
+
+## 第 2 周六天一句话
+- D008 类：数据 + 操作放在一起；忘写 self 会报 takes 1 positional argument
+- D009 继承：父类定契约，子类换实现；组合优于继承
+- D010 魔法方法：__str__ 给人看，__repr__ 给调试看；改 __eq__ 要连 __hash__
+- D011 dataclass：自动生成 __init__/__repr__/__eq__；可变默认值用 default_factory
+- D012 生成器：一次一个，省内存；只能走一遍
+- D013 装饰器：@deco 就是 f = deco(f)；必写 *args/**kwargs + functools.wraps
+
+## 项目分层
+- models.py：数据长什么样 + 校验 + 进出字典        （不许 open）
+- store.py ：能做什么（增删查、存盘读盘）
+- decorators.py：跟业务无关的横切逻辑（日志）
+- __init__.py：__all__ 白名单，对外只开一扇门
+- 判断标准：能不能单独测
+
+## 数据模型
+- dataclass 四行顶手写三个方法
+- 校验写 __post_init__，不覆盖 __init__（覆盖了等于放弃 dataclass）
+- 快速失败：创建时就报错，别带着坏数据跑
+- 判空要 name.strip()，纯空格字符串挡不住
+- to_dict 用 asdict()；from_dict 要兼容旧格式（向后兼容）
+
+## 装饰器加在哪一层
+- 日志记录的是「操作」，不是「数据」→ 加在 store 层，不加 models 层
+- 加在 save() 上会失控（批量导入时一次操作记很多行）
+- 一行的粒度 = 用户做的一件事
+- 附加动作（日志/监控）绝不能被它们影响主流程：包 try/except
+
+## pytest
+- 文件名 test_*.py，函数名 test_*，不写 main
+- assert 条件，不成立就抛异常；assert 后面写一句人话
+- 读报错：&gt; 是出错行，E assert 11 == 10 是实际 vs 期望，
+  E + where 11 = len(...) 是中间值怎么来的
+- pytest.raises(ValueError)：断言这里必须炸；没炸就 FAILED: DID NOT RAISE
+- fixture：抽公共准备；每个测试各执行一次
+- tmp_path：每个测试一个空目录，用完自动清 —— 读写文件必须用
+- monkeypatch：临时改属性，测试结束自动还原
+- 验证结果，别验证过程（别 mock save 再断言它被调用）
+
+## 覆盖率
+- Stmts 语句数 / Miss 没跑到 / Cover 比例 / Missing 哪几行 ★
+- 真正该看的是 Missing —— 那是「没被测过的代码清单」
+- 87% → 90%（补坏 json 分支）→ 100%（补 line、旧格式、__iter__）
+- 100% 不等于没 bug：只说明被执行过，不说明断言过结果
+- 没有 assert 的测试能刷满覆盖率，但保护力是零
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D014 的产出是 <b>通讯录 v3 + 9 个测试 + 覆盖率截图</b>。这是简历上第一个有测试的项目。</p>
+  <p>明天 D015 进第 3 周：<b>正则表达式</b>——从日志文件里把 IP、时间、状态码抠出来。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

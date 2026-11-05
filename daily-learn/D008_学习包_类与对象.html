@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D008 学习包 · 类与对象</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 008 · 第 2 周</div>
+  <h1>类与对象</h1>
+  <p>今天开始，你的数据不再是「一堆字段拼起来的字典」，而是「一个知道自己是什么的东西」。通讯录从 v1 长到 v2。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 产出：通讯录 v2（Contact 类）</span>
+    <span>🔁 承接 D007</span>
+    <span>🧱 里程碑 1 之后第一步</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配与准备工作</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1–3 节：class、__init__、self、实例属性</span></div><div class="tl"><b>第 2 小时</b><span>读 4–5 节：类属性、类方法、静态方法</span></div><div class="tl"><b>第 3 小时</b><span>读第 6 节：把通讯录 v1 改成 v2</span></div><div class="tl"><b>第 4 小时</b><span>八道练习 + 笔记 + 提交</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day08
+cd ~/python-learn/day08</pre></div>
+<div class="note"><b>从今天开始，每一天都是在给同一个项目加东西。</b>D007 的 <code class="inline">contacts_v1.py</code> 不要删，把它复制成 <code class="inline">contacts_v2.py</code> 再改——这样你能随时回头对比「字典版」和「对象版」的差别，那才是这一天真正的收获。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>class 是什么：从字典到对象</h2>
+<p>D003 你用字典存一个人的信息，D007 用它做了通讯录。<code class="inline">{"name": "张三", "phone": "138..."}</code> 这个写法能用，但它有一个根本问题：<b>字典不知道「一个人应该有哪几个字段」</b>。</p>
+<p>今天换一种存法：</p>
+<div class="codebox"><button class="copy">复制</button><pre># D007 的写法：一个字典
+c = {"name": "张三", "phone": "13800001111"}
+print(c["name"], c["phone"])
+
+# 今天：一个类
+class Contact:
+    def __init__(self, name, phone):
+        self.name = name
+        self.phone = phone
+
+c = Contact("张三", "13800001111")
+print(c.name, c.phone)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">张三 13800001111
+张三 13800001111</pre></div>
+<p>两段输出一模一样。<b>那为什么要换？</b>因为下面这张表里的事，字典做不到：</p>
+<table><tr><th>能力</th><th>字典 <code>{name: ..., phone: ...}</code></th><th>类 <code>Contact(...)</code></th></tr><tr><td>字段有没有定义</td><td>没有。随便往里塞 key，谁也不知道标准字段是哪几个</td><td>有，全写在 <code>__init__</code> 里</td></tr><tr><td>拼错字段名</td><td><code>c["nmae"]</code> 到运行时才报 KeyError</td><td>访问时就报 <code>AttributeError</code>，且 IDE 会自动补全</td></tr><tr><td>带自己的行为</td><td>只能写 <code>show(c)</code> 这种外部函数</td><td><code>c.line()</code>，动作和数据在一起</td></tr><tr><td>加一个字段</td><td>每个用到它的函数都要改</td><td>改 <code>__init__</code> 一处，缺的字段自动有默认值</td></tr></table>
+<div class="note"><b>C 里你已经见过这件事。</b><code class="inline">struct Contact { char name[32]; char phone[16]; };</code> 定义的是一个<b>形状</b>，然后你写 <code class="inline">void show(struct Contact *c)</code> 来操作它。Python 的 <code class="inline">class</code> 把「形状」和「操作它的函数」装在了一起，并且额外送你默认值、继承、运算符重载——D009 到 D010 会一个个见到。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>__init__ 与 self</h2>
+<p>一个类里最重要的两样东西，第一天就要弄清楚。</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Contact:
+    def __init__(self, name):
+        self.name = name
+
+    def hello(self):
+        return f"我是 {self.name}"
+
+a = Contact("张三")
+b = Contact("李四")
+print(a.hello())
+print(b.hello())
+print(a is b)
+print(a.name, b.name)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">我是 张三
+我是 李四
+False
+张三 李四</pre></div>
+<p>逐行看这段发生了什么：</p>
+<table><tr><th>代码</th><th>发生了什么</th></tr><tr><td><code>class Contact:</code></td><td>定义了一个<b>模板</b>，此时还没有任何对象</td></tr><tr><td><code>a = Contact("张三")</code></td><td>调用模板造出一个对象；<code>()</code> 会自动去找 <code>__init__</code></td></tr><tr><td><code>def __init__(self, name)</code></td><td>对象的<b>初始化方法</b>，造对象时自动执行，不用手动调</td></tr><tr><td><code>self.name = name</code></td><td>把参数存到<b>这个对象自己</b>身上</td></tr><tr><td><code>def hello(self)</code></td><td><b>实例方法</b>，调用时 <code>a.hello()</code> 会自动把 <code>a</code> 传给 <code>self</code></td></tr><tr><td><code>a is b</code></td><td>两个独立对象，所以是 <code>False</code></td></tr></table>
+<div class="note"><b>self 不是关键字，只是约定俗成的第一个参数名。</b>写成 <code class="inline">def __init__(this, name): this.name = name</code> 一样能跑，但全世界的 Python 代码都写 <code class="inline">self</code>，你改了就没人看得懂。就像 C 里 <code class="inline">for (int i = 0; ...)</code> 的 i，没人规定必须叫 i。</div>
+<h3>少写 self 会怎样</h3>
+<!--run-skip: 报错示例-->
+<div class="codebox"><button class="copy">复制</button><pre>class Bad:
+    def __init__(name):        # 少写了 self
+        self.name = name
+
+Bad("张三")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">TypeError: Bad.__init__() takes 1 positional argument but 2 were given</pre></div>
+<p>报错说「只要 1 个参数却给了 2 个」，看着莫名其妙——你明明只传了 <code class="inline">"张三"</code> 一个。原因是 <code class="inline">Bad("张三")</code> 这一步<b>自动把新对象当第一个参数塞进去了</b>，而你的 <code class="inline">__init__</code> 只有一个名叫 <code class="inline">name</code> 的坑位，接收 <code class="inline">"张三"</code> 之后就多出来一个。</p>
+<div class="warn"><b>看到 <code>takes 1 positional argument but 2 were given</code>，第一反应就是「方法少写了 self」。</b>这是 Python 新手报错频率最高的一条，比 C 里的 <code>expected ';' before '}'</code> 还常见。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>实例属性、以及一个和 C 一致的坑</h2>
+<p>D003 学过「列表赋值不是复制，是指向同一个对象」。类的对象完全一样，而且更危险——因为它看起来像一个值。</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Contact:
+    def __init__(self, name, phone):
+        self.name = name
+        self.phone = phone
+
+a = Contact("张三", "13800001111")
+b = a                       # 不是复制，是给同一个对象再起一个名字
+b.name = "李四"
+print(a.name, a is b)
+
+c = Contact("李四", "13800001111")
+print(a == c, a is c)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">李四 True
+False False</pre></div>
+<p>改了 <code class="inline">b.name</code>，<code class="inline">a.name</code> 也变了，因为 <code class="inline">a</code> 和 <code class="inline">b</code> 是<b>同一个对象</b>的两个名字。而 <code class="inline">a == c</code> 是 <code class="inline">False</code>——它们内容完全一样却不相等，因为默认的 <code class="inline">==</code> 比的是「是不是同一个对象」，和 <code class="inline">is</code> 一个意思。<b>这不是 bug，是还没教它怎么比。</b>D010 会用 <code class="inline">__eq__</code> 把这件事改掉。</p>
+<h3>直接 print 一个对象</h3>
+<!--run-skip: 地址不可复现-->
+<div class="codebox"><button class="copy">复制</button><pre>class Contact:
+    def __init__(self, name):
+        self.name = name
+
+print(Contact("张三"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">&lt;__main__.Contact object at 0x102a3c350&gt;</pre></div>
+<p>这行 <code class="inline"><__main__.Contact object at 0x...></code> 是 Python 的默认打印方式：<b>类名 + 内存地址</b>，和 C 里 <code class="inline">printf("%p", p)</code> 输出一个指针值是一个性质。地址每次运行都不同，所以它不是给人看的。D010 的 <code class="inline">__str__</code> 就是专门解决这个的。</p>
+</section>
+
+<section>
+  <h2><span class="n">4</span>类属性 vs 实例属性</h2>
+<p>属性有两种存放位置：放在<b>每个对象</b>身上，还是放在<b>类</b>上被所有对象共用。</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Contact:
+    count = 0                       # 类属性：所有实例共用一份
+
+    def __init__(self, name):
+        self.name = name            # 实例属性：每个对象各有一份
+        Contact.count += 1          # 注意：要改类属性，得写类名
+
+a = Contact("张三")
+b = Contact("李四")
+print(Contact.count, a.count, b.count)
+
+a.count = 100                       # 这一句新建了 a 自己的实例属性
+print(Contact.count, a.count, b.count)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">2 2 2
+2 100 2</pre></div>
+<p>关键在于最后两行：<code class="inline">a.count = 100</code> <b>并没有修改类属性</b>，它给 <code class="inline">a</code> 新建了一个同名实例属性，把这个类属性「遮住」了。所以 <code class="inline">Contact.count</code> 和 <code class="inline">b.count</code> 还是 2，只有 <code class="inline">a.count</code> 变成 100。</p>
+<div class="note">读的时候有顺序：<b>先找实例属性，找不到再找类属性</b>。写的时候永远写在你指定的那一层——<code class="inline">a.count = 100</code> 写实例，<code class="inline">Contact.count = 100</code> 写类。</div>
+<div class="warn"><b>要改类属性必须写类名：<code class="inline">Contact.count += 1</code>。</b>写成 <code class="inline">self.count += 1</code> 就变成了给这个实例新建属性，计数器永远不会涨——这个 bug 不报错，只是数字不对。</div>
+<h3>更隐蔽的一种：可变类属性</h3>
+<div class="codebox"><button class="copy">复制</button><pre>class Contact:
+    tags = []                       # 类属性是可变对象 → 所有实例共用一个列表
+
+    def __init__(self, name):
+        self.name = name
+
+a = Contact("张三")
+b = Contact("李四")
+a.tags.append("同学")
+print(a.tags, b.tags, Contact.tags)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">['同学'] ['同学'] ['同学']</pre></div>
+<div class="danger"><b>给张三加的标签，李四也看见了。</b>因为 <code class="inline">tags = []</code> 只在<b>类定义时创建一次</b>，所有实例共用这一个列表——和 D005 的 <code class="inline">def f(x=[])</code> 是同一个坑，只是换了个位置。<br><br><b>规则：类属性只放不可变的东西</b>（数字、字符串、元组）。列表、字典、集合这类，一律在 <code class="inline">__init__</code> 里用 <code class="inline">self.tags = []</code> 创建。</div>
+<p>构造函数里的可变默认参数，同样的病，同样的药：</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Bad:
+    def __init__(self, tags=[]):        # 可变默认参数
+        self.tags = tags
+
+a = Bad()
+a.tags.append("同学")
+b = Bad()
+print(a.tags, b.tags, a.tags is b.tags)
+
+
+class Good:
+    def __init__(self, tags=None):
+        self.tags = [] if tags is None else tags
+
+a = Good()
+a.tags.append("同学")
+b = Good()
+print(a.tags, b.tags, a.tags is b.tags)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">['同学'] ['同学'] True
+['同学'] [] False</pre></div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>类方法与静态方法</h2>
+<p>类里能写三种方法，区别只在第一个参数收到什么。</p>
+<div class="codebox"><button class="copy">复制</button><pre>class Contact:
+    total = 0
+
+    def __init__(self, name, phone):
+        self.name = name
+        self.phone = phone
+        Contact.total += 1
+
+    @classmethod
+    def from_text(cls, line):
+        """从 '张三,13800001111' 这样的一行构造对象"""
+        name, phone = line.split(",")
+        return cls(name.strip(), phone.strip())
+
+    @staticmethod
+    def is_phone(s):
+        """纯校验，不需要 self 也不需要 cls"""
+        return s.isdigit() and len(s) == 11
+
+c = Contact.from_text("张三, 13800001111")
+print(c.name, c.phone, Contact.total)
+print(Contact.is_phone("13800001111"), Contact.is_phone("abc"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">张三 13800001111 1
+True False</pre></div>
+<table><tr><th>写法</th><th>第一个参数</th><th>调用方式</th><th>什么时候用</th></tr><tr><td><code>def m(self)</code></td><td>实例</td><td><code>obj.m()</code></td><td>要读写这个对象的数据 —— 绝大多数情况</td></tr><tr><td><code>@classmethod<br>def m(cls)</code></td><td>类本身</td><td><code>Contact.m()</code></td><td><b>另一个构造入口</b>，比如从一行文本、一个字典造对象</td></tr><tr><td><code>@staticmethod<br>def m()</code></td><td>什么都不给</td><td><code>Contact.m()</code></td><td>跟这个类有关、但不需要对象数据的工具函数</td></tr></table>
+<div class="note"><b><code class="inline">from_text</code> 是今天最值钱的写法。</b>读 CSV、读 JSON、解析一行日志，都会遇到「手里是一堆散装数据，想变出一个对象」。用 <code class="inline">@classmethod</code> 把它做成第二个构造函数，调用方就不用知道内部字段怎么排：<code class="inline">Contact.from_text(line)</code> 比 <code class="inline">Contact(line.split(",")[0], line.split(",")[1])</code> 好读得多。</div>
+<div class="note">为什么写 <code class="inline">cls</code> 而不是直接写 <code class="inline">Contact</code>？因为将来 <code class="inline">Contact</code> 有了子类（D009），<code class="inline">cls</code> 会自动变成子类，构造出来的是子类对象。写死类名就没有这个能力了。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>把通讯录 v1 改成 v2</h2>
+<p>现在动手。v1 是 <code class="inline">{"张三": "138..."}</code>，v2 是 <code class="inline">{"张三": Contact(...)}</code>——<b>外层还是字典，值从字符串变成了对象</b>。这样 <code class="inline">data[name]</code> 的 O(1) 查找一点没丢，但拿到的东西从「一个电话号码」变成了「一个完整的人」。</p>
+<h3>第一步：Contact 类</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import json
+
+class Contact:
+    def __init__(self, name, phone, email=""):
+        self.name = name
+        self.phone = phone
+        self.email = email
+
+    def line(self):
+        parts = [self.name, self.phone]
+        if self.email:
+            parts.append(self.email)
+        return "  ".join(parts)
+
+    def to_dict(self):
+        return {"phone": self.phone, "email": self.email}
+
+    @classmethod
+    def from_dict(cls, name, d):
+        if isinstance(d, str):          # v1 留下的旧格式
+            return cls(name, d)
+        return cls(name, d.get("phone", ""), d.get("email", ""))
+
+c = Contact("张三", "13800001111", "zs@example.com")
+print(c.line())
+print(json.dumps(c.to_dict(), ensure_ascii=False))
+
+raw = {"张三": "13800001111", "李四": {"phone": "13900002222", "email": ""}}
+for name, d in raw.items():
+    print(Contact.from_dict(name, d).line())</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">张三  13800001111  zs@example.com
+{"phone": "13800001111", "email": "zs@example.com"}
+张三  13800001111
+李四  13900002222</pre></div>
+<p>这里有三个设计决定，都值得停一下：</p>
+<table><tr><th>决定</th><th>为什么</th></tr><tr><td><code>to_dict()</code> / <code>from_dict()</code></td><td><b>对象不能直接塞进 JSON</b>。<code>json.dump</code> 只认 dict / list / str / 数字 / 布尔 / None，遇到自定义对象会抛 <code>TypeError</code>。必须自己转</td></tr><tr><td><code>isinstance(d, str)</code> 分支</td><td>v1 存的是「名字 → 电话字符串」，v2 存的是「名字 → 字典」。<b>旧文件要还能读</b>，否则你 D007 加的人全丢了</td></tr><tr><td><code>line()</code> 而不是 <code>print()</code></td><td>函数只负责<b>返回</b>字符串，打印交给调用方。这样以后想写进文件、想加颜色、想输出成网页，都只改一处</td></tr></table>
+<div class="note"><b>注意一个分层：文件里的格式，和内存里的表示，是两件事。</b><code class="inline">contacts.json</code> 里躺着的始终是 JSON 能表达的东西；程序运行时才把它变成对象。这两层之间只靠 <code class="inline">to_dict</code> / <code class="inline">from_dict</code> 两个函数连接。以后换成数据库，只要改这两个函数，其余代码一行不动。这就是 D006 说的「数据层」。</div>
+<h3>第二步：完整文件</h3>
+<p>复制 D007 的 <code class="inline">contacts_v1.py</code> 为 <code class="inline">contacts_v2.py</code>，把数据层、功能层照下面改。</p>
+<!--run-skip: 完整文件，需交互输入-->
+<div class="codebox"><button class="copy">复制</button><pre># contacts_v2.py 通讯录 v2：Contact 类 + JSON 持久化 + 菜单循环
+import json
+import os
+
+FILE = "contacts.json"
+
+
+class Contact:
+    def __init__(self, name, phone, email=""):
+        self.name = name
+        self.phone = phone
+        self.email = email
+
+    @staticmethod
+    def is_phone(s):
+        return s.isdigit() and len(s) == 11
+
+    def line(self):
+        parts = [self.name, self.phone]
+        if self.email:
+            parts.append(self.email)
+        return "  ".join(parts)
+
+    def to_dict(self):
+        return {"phone": self.phone, "email": self.email}
+
+    @classmethod
+    def from_dict(cls, name, d):
+        if isinstance(d, str):                  # v1 格式：名字 -&gt; 电话字符串
+            return cls(name, d)
+        return cls(name, d.get("phone", ""), d.get("email", ""))
+
+
+def load():
+    if not os.path.exists(FILE):
+        return {}
+    try:
+        with open(FILE, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+    except json.JSONDecodeError:
+        print("  数据文件损坏，按空通讯录启动")
+        return {}
+    return {name: Contact.from_dict(name, d) for name, d in raw.items()}
+
+
+def save(data):
+    with open(FILE, "w", encoding="utf-8") as f:
+        json.dump({n: c.to_dict() for n, c in data.items()},
+                  f, ensure_ascii=False, indent=2)
+
+
+def add_contact(data):
+    name = input("  姓名: ").strip()
+    if not name:
+        print("  姓名不能为空")
+        return
+    if name in data:
+        print(f"  {name} 已存在，电话是 {data[name].phone}")
+        return
+    phone = input("  电话: ").strip()
+    if not Contact.is_phone(phone):
+        print("  电话必须是 11 位数字")
+        return
+    email = input("  邮箱（可回车跳过）: ").strip()
+    data[name] = Contact(name, phone, email)
+    save(data)
+    print(f"  已添加 {name}")
+
+
+def delete_contact(data):
+    name = input("  要删除的姓名: ").strip()
+    if name not in data:
+        print(f"  没找到 {name}")
+        return
+    del data[name]
+    save(data)
+    print(f"  已删除 {name}")
+
+
+def find_contact(data):
+    kw = input("  要查找的姓名: ").strip()
+    if not kw:
+        print("  姓名不能为空")
+        return
+    hits = [c for n, c in data.items() if kw in n]
+    if not hits:
+        print("  没有匹配的联系人")
+        return
+    for c in hits:
+        print("  " + c.line())
+
+
+def show_all(data):
+    if not data:
+        print("  通讯录是空的")
+        return
+    for c in data.values():
+        print("  " + c.line())
+
+
+def main():
+    data = load()
+    menu = ["添加联系人", "删除联系人", "查找联系人", "显示全部", "退出"]
+    while True:
+        print("\n" + "=" * 30)
+        for i, item in enumerate(menu, start=1):
+            print(f"  {i}) {item}")
+        print("=" * 30)
+        choice = input("请选择: ").strip()
+
+        if choice == "1":
+            add_contact(data)
+        elif choice == "2":
+            delete_contact(data)
+        elif choice == "3":
+            find_contact(data)
+        elif choice == "4":
+            show_all(data)
+        elif choice == "5":
+            print("  再见")
+            break
+        else:
+            print("  无效选项，请输入 1-5")
+
+
+if __name__ == "__main__":
+    main()</pre></div>
+<p>跑起来是这样（第一次运行，加两个人）：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">==============================
+  1) 添加联系人
+  2) 删除联系人
+  3) 查找联系人
+  4) 显示全部
+  5) 退出
+==============================
+请选择: 1
+  姓名: 张三
+  电话: 13800001111
+  邮箱（可回车跳过）:
+  已添加 张三
+
+请选择: 4
+  张三  13800001111
+
+请选择: 5
+  再见</pre></div>
+<p>选 5 退出、重新运行，人还在——<code class="inline">contacts.json</code> 长这样：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">{
+  "张三": {
+    "phone": "13800001111",
+    "email": ""
+  },
+  "李四": {
+    "phone": "13900002222",
+    "email": "ls@example.com"
+  }
+}</pre></div>
+<div class="warn"><b>注意这里的 <code>contacts.json</code> 格式和 v1 不一样了。</b>v1 是 <code class="inline">{"张三": "13800001111"}</code>，v2 是每个名字下面套一个字典。因为加了 <code class="inline">from_dict</code> 里的 <code class="inline">isinstance</code> 分支，直接拿 v1 的文件来读也能正常显示（电话读得到，邮箱为空）。<b>反过来不行</b>：v1 的程序读 v2 的文件会崩——所以改完记得把整个目录切到 v2，别再回头跑 v1。</div>
+<div class="note">跑之前先 <b>cd 进 day08</b>。<code class="inline">open("contacts.json")</code> 用的是当前工作目录，站在 <code class="inline">~/python-learn</code> 里跑，文件就落到根目录去了——这个坑你已经踩过三次。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 7、8 题是今天的产出</b>（通讯录 v2）。前 6 题是把类的每个部件单独练一遍。</p>
+<ol class="task"><li><b>第一个类</b>：<code class="inline">Book</code> 类，两个属性 <code class="inline">title</code> / <code class="inline">price</code>，造两本书并打印</li><li><b>默认参数</b>：给 <code class="inline">Contact</code> 加第三个属性 <code class="inline">email</code>，不传时是空字符串</li><li><b>计数器</b>：用类属性 <code class="inline">count</code> 统计一共造了多少个 <code class="inline">Contact</code>，造 3 个看数字</li><li><b>类方法</b>：<code class="inline">Contact.from_text("张三,13800001111")</code> 从一行文本造对象，两边空格要去掉</li><li><b>静态方法</b>：<code class="inline">Contact.is_phone(s)</code>，11 位纯数字才算合法，测 4 个输入</li><li><b>避开可变陷阱</b>：<code class="inline">Contact(name, tags=None)</code>，<code class="inline">tags</code> 不传时每个人都拿到自己的空列表</li><li><b>转字典往返</b>：给 <code class="inline">Contact</code> 加 <code class="inline">to_dict()</code> / <code class="inline">from_dict()</code>，转成 JSON 字符串再读回来，验证电话和邮箱都没变</li><li><b>通讯录 v2</b>（综合）：复制 v1，把值换成 <code class="inline">Contact</code> 对象，加 email 字段与电话校验，保存成新的 JSON 格式，并保证能读 v1 的旧文件</li></ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<!--run-skip: 八份文件拼在一起展示-->
+<div class="codebox"><button class="copy">复制</button><pre>class Book:
+    def __init__(self, title, price):
+        self.title = title
+        self.price = price
+
+b1 = Book("流畅的 Python", 128.0)
+b2 = Book("Python 编程：从入门到实践", 89.9)
+print(b1.title, b1.price)
+print(b2.title, b2.price)
+
+
+
+class Contact:
+    def __init__(self, name, phone, email=""):
+        self.name = name
+        self.phone = phone
+        self.email = email
+
+a = Contact("张三", "13800001111")
+b = Contact("李四", "13900002222", "ls@example.com")
+print(a.name, a.phone, repr(a.email))
+print(b.name, b.phone, b.email)
+
+
+
+class Contact:
+    count = 0
+
+    def __init__(self, name, phone):
+        self.name = name
+        self.phone = phone
+        Contact.count += 1
+
+for n, p in [("张三", "13800001111"), ("李四", "13900002222"), ("王五", "13700003333")]:
+    Contact(n, p)
+
+print("一共创建了", Contact.count, "个联系人")
+
+
+
+class Contact:
+    def __init__(self, name, phone):
+        self.name = name
+        self.phone = phone
+
+    @classmethod
+    def from_text(cls, line):
+        name, phone = line.split(",")
+        return cls(name.strip(), phone.strip())
+
+c = Contact.from_text("  张三 , 13800001111 ")
+print(repr(c.name), repr(c.phone))
+
+
+
+class Contact:
+    def __init__(self, name, phone):
+        self.name = name
+        self.phone = phone
+
+    @staticmethod
+    def is_phone(s):
+        return s.isdigit() and len(s) == 11
+
+for s in ["13800001111", "1380000111", "1380000111a", ""]:
+    print(repr(s), Contact.is_phone(s))
+
+
+
+class Contact:
+    def __init__(self, name, tags=None):
+        self.name = name
+        self.tags = [] if tags is None else tags
+
+a = Contact("张三")
+a.tags.append("同学")
+b = Contact("李四")
+print(a.tags, b.tags)
+print(a.tags is b.tags)
+
+
+
+import json
+
+class Contact:
+    def __init__(self, name, phone, email=""):
+        self.name = name
+        self.phone = phone
+        self.email = email
+
+    def to_dict(self):
+        return {"phone": self.phone, "email": self.email}
+
+    @classmethod
+    def from_dict(cls, name, d):
+        return cls(name, d["phone"], d.get("email", ""))
+
+c = Contact("张三", "13800001111", "zs@example.com")
+text = json.dumps(c.to_dict(), ensure_ascii=False)
+print(text)
+
+back = Contact.from_dict("张三", json.loads(text))
+print(back.name, back.phone, back.email)
+print("属性一致吗:", back.phone == c.phone and back.email == c.email)</pre></div>
+<p>依次运行 p1–p7 的输出：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">流畅的 Python 128.0
+Python 编程：从入门到实践 89.9
+张三 13800001111 ''
+李四 13900002222 ls@example.com
+一共创建了 3 个联系人
+'张三' '13800001111'
+'13800001111' True
+'1380000111' False
+'1380000111a' False
+'' False
+['同学'] []
+False
+{"phone": "13800001111", "email": "zs@example.com"}
+张三 13800001111 zs@example.com
+属性一致吗: True</pre></div>
+</details>
+<div class="note"><b>第 7 题的 <code>属性一致吗: True</code> 是关键。</b>它证明「对象 → JSON → 对象」这一圈走下来没有丢东西。以后接数据库、接 API、写缓存，走的都是这个圈。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D008 笔记
+
+## class 三件套
+- class 名字:           定义模板，此时还没有对象
+- def __init__(self,...):  造对象时自动执行，用来存属性
+- def 方法(self):        实例方法，调用时 self 自动是那个对象
+
+## self
+- 不是关键字，是约定（第一个参数名）
+- 少写 self → TypeError: takes 1 positional argument but 2 were given
+- a.hello()  等价于  Contact.hello(a)
+
+## 两种属性
+- 实例属性：self.x = ...     每个对象各一份（绝大多数用它）
+- 类属性：  count = 0        所有对象共用，改的时候必须写类名
+- 读：先找实例，再找类；写：写在你指定的那层
+
+## 三个坑
+- 可变类属性 tags = []  → 所有实例共用一个列表
+- 构造函数的可变默认参数 def __init__(self, tags=[])  → 同上
+  → 都改用 None + if None 判断
+- a = b 不是复制；a == b 默认比的还是「是不是同一个」
+
+## 三种方法
+- 普通方法     第一个参数 self     obj.m()
+- @classmethod 第一个参数 cls      第二个构造入口（from_text / from_dict）
+- @staticmethod 没有自动参数       和类相关但不用数据的工具函数
+
+## 对象 ↔ JSON
+- json.dump 不认自定义对象 → 必须自己 to_dict()
+- 读回来用 @classmethod from_dict(cls, name, d)
+- 文件格式和内存表示是两件事，靠两个函数连接
+
+## C 对比
+- struct 定义形状，函数在外面      vs  class 把数据和动作装一起
+- struct Contact *p                vs  self 就是那个 p
+- printf("%p", p) 打地址            vs  print(obj) 打 &lt;类名 object at 0x...&gt;
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D008 的产出是 <b>通讯录 v2（Contact 类）+ 8 道练习 + 笔记</b>。从今天起这个项目每天长大一点。</p>
+  <p>明天 D009：继承与多态 —— <code>super()</code>、方法重写、抽象基类、MRO，产出 Shape 基类加三个图形子类。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>
