@@ -22,7 +22,7 @@ class Contact:
         return cls(name, d.get("phone", ""), d.get("email", ""))
 
 c = Contact("张三", "13800001111", "zs@example.com")
-print(c.line)
+print(c.line())
 print(json.dumps(c.to_dict(), ensure_ascii=False))
 
 raw = {"张三": "13800001111", "李四": {"phone": "13800002222", "email": ""}}

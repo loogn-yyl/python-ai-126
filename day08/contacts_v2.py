@@ -38,7 +38,7 @@ class Contact:
     @classmethod
     def from_dict(cls, name, d):
         if isinstance(d, str):
-            return cls(name, d)
+            return cls(name, d, "")
         return cls(name, d.get("phone", ""), d.get("email", ""))
 
 def load():
@@ -63,9 +63,9 @@ def show_all(data):
     if not data:
         print("  通讯录是空的")
         return
-    print("  " + pad("序号", 5) + pad("姓名", 12) + "电话")
-    for i, (name, phone) in enumerate(data.items(), start=1):
-        print("  " + pad(str(i), 5) + pad(name, 12) + phone)
+    print("  " + pad("序号", 5) + pad("姓名", 12) + pad("电话", 12) + "邮箱")
+    for i, (name, c) in enumerate(data.items(), start=1):
+        print("  " + pad(str(i), 5) + pad(name, 12) + pad(c.phone, 12) + c.email)
 
 def add_contact(data):
     name = input("  要添加的姓名: ").strip()
@@ -73,7 +73,7 @@ def add_contact(data):
         print("  姓名不能为空")
         return
     if name in data:
-        print(f"  {name} 已存在, 电话是 {data[name]}")
+        print(f"  {name} 已存在, 电话是 {data[name].phone}")
         return
     phone = input("  电话: ").strip()
     if not Contact.is_phone(phone):
@@ -101,7 +101,7 @@ def find_contact(data):
     if not keyword:
         print("  姓名不能为空")
         return
-    hits = {c for n, c in data.items() if keyword in n}
+    hits = [c for n, c in data.items() if keyword in n]
     if not hits:
         print("  没有匹配的联系人")
         return
