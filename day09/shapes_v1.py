@@ -19,7 +19,7 @@ class Rect:
         return self.w * self.h
 
     def describe(self):
-        return f"矩阵, 面积 {self.area():.2f}"
+        return f"矩形, 面积 {self.area():.2f}"
 
 for s in [Circle(2), Rect(3, 4)]:
     print(s.describe())
