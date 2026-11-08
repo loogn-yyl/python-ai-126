@@ -5,7 +5,7 @@ class Book:
         self.price = price
 
     def __eq__(self, other):
-        return isinstance(other, Book) and self.price == other.price
+        return isinstance(other, Book) and self.title == other.title
 
 a = Book("钢铁是怎样炼成的", 29.9)
 b = Book("钢铁是怎样炼成的", 49.9)

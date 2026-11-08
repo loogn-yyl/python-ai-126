@@ -14,7 +14,7 @@ class Book:
         return self.price < other.price
 
     def __eq__(self, other):
-        return isinstance(other, Book) and self.price == other.price
+        return isinstance(other, Book) and self.title == other.title
 
     def __hash__(self):
         return hash(self.title)

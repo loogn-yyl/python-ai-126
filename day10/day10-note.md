@@ -10,6 +10,7 @@
 
 ## 比较
 - 默认 == 和 is 一个意思，比的是「是不是同一个对象」
+  只在自定义类没写 __eq__ 时成立, 2 == 2.0 -> True, 2 is 2.0 -> False
 - __eq__ 里先 isinstance 检查，比不了就 return NotImplemented（不是 False）
 - 定义了 __eq__ 不定义 __hash__ → 类变成不可哈希，不能进 set、不能当 dict key
 - __hash__ 要和 __eq__ 用同一个字段算
@@ -23,7 +24,8 @@
 - __len__      → len(obj)
 - __getitem__  → obj[0] / obj[-1] / obj[0:2]（切片收到 slice 对象）
 - __iter__     → for x in obj / in / 推导式 / list()
-- 只写 __getitem__ 也能 for，但慢；能写 __iter__ 就写
+- 只写 __getitem__ 也能 for, 必须从 0 连续递增, 靠越界报错停 
+  因此能写 __iter__ 就写
 
 ## 让它像函数
 - __call__ → obj(x)

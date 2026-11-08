@@ -20,7 +20,7 @@ s.add("钢铁是怎样炼成的")
 s.add("假如给我三天光明")
 print(len(s))
 print(s[0])
-print(s[-2])
+print(s[-1])
 print(s[0: 2])
 for name in s:
     print("  读完了:", name)
