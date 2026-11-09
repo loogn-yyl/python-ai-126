@@ -13,3 +13,6 @@ try:
     p.x = 10
 except Exception as e:
     print(type(e).__name__ + ":", e)
+
+print(len({Point(1, 2), Point(1, 2)}))
+print(len({Point(1, 2), Point(1, 3)}))

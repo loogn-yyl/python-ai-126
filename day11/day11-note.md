@@ -30,12 +30,14 @@
 - 校验外部数据要靠 try/except 或 Pydantic，不能靠注解
 
 ## Pydantic（预览）
-- 第三方库：uv run --with pydantic demo.py
+- 第三方库：uv run --with pydantic no5_pydantic.py
 - class Contact(BaseModel): 字段注解 + 自动校验 + 自动类型转换
 - 脏数据抛 ValidationError，能说清是哪个字段、错在哪
 - 一句话：dataclass 信任数据，Pydantic 不信任
 
 ## 踩过的坑
-- @dataclass(order=True) 表示按字段声明顺序逐个比较, 第一个不相等的字段决定结果, 并且可以不指明关键字来传参
+- @dataclass(order=True) 表示按字段声明顺序逐个比较, 第一个不相等的字段决定结果
 - 对比 @dataclass(order=True, kw_only=True) 排序只看字段顺序, 但必须指明关键字来传参, 且关键字顺序可以变
 - title: str = field(compare=False) 可以让这一字段退出比较, 包括排序、 == 和 hash 计算, 且不依赖 order
+- frozen=True 的 Point 不能改, 所以能算 hash、能进 set。「不可变 → 可哈希」是 Python 里一条稳定的规律。
+  反过来, 可变的 dataclass 默认就不可哈希, 想进 set 要写 eq=False 或自己定义 __hash__。
