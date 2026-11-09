@@ -4,7 +4,7 @@
 # @dataclass
 # class Bad:
     # tags: list = []
-    # 给空列表当默认值, 会报错 ValueType
+    # 给空列表当默认值, 会报错 ValueError
 
 # no.2-2
 from dataclasses import dataclass, field
