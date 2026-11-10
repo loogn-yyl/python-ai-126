@@ -6,4 +6,4 @@ def countdown(start):
         n -= 1
 
 print(list(countdown(5)))
-# 少了 7 行
+# 类共 12 行(含 2 空行) -> 函数体 5行, 少了 7 行
