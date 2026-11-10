@@ -6,3 +6,4 @@ def countdown(start):
         n -= 1
 
 print(list(countdown(5)))
+# 少了 7 行

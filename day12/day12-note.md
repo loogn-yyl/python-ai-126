@@ -8,7 +8,7 @@
 - 可迭代：有 __iter__（list / str / dict / range / 生成器函数）
 - 迭代器：有 __iter__ + __next__（iter(list)、生成器对象、文件对象）
 - 可迭代可以反复遍历；迭代器一次性，走完就空
-- 坑：sum(gen) 之后再 max(gen) 永远是空 → 不报错但结果错
+- 坑：sum、list、any、all 静默给出错误结果, max、min 直接抛 ValueError
 
 ## 手写迭代器
 - __iter__ 返回 self
@@ -31,7 +31,7 @@
 - sum/max/min/any/all 直接用圆括号，零成本优化
 
 ## itertools
-- count(start, stop) / islice(it, n)     无限序列 + 截断(必须配 islice)
+- count(start, step) / islice(it, n)     无限序列 + 截断(必须配 islice)
 - chain(a, b)                            拼接多个序列
 - cycle(it)                              无限循环
 - groupby(it)                            相邻分组！要全局分组先 sorted

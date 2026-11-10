@@ -2,7 +2,7 @@
 import itertools
 
 print(list(itertools.islice(itertools.count(10, 5), 4)))
-# count(start, stop) 无限递增, 搭配 islice 截断
+# count(start, step) 无限递增, 搭配 islice 截断
 # islice(it, n) 只取前 n 个
 
 print(list(itertools.chain([1, 2], "ab", (3,))))
