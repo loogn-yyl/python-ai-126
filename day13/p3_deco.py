@@ -2,9 +2,9 @@
 def deco(func):
     def wrapper():
         print("  调用前, ", func.__name__)
-        func()
+        result = func()
         print("  调用后, ", func.__name__)
-        return func
+        return result
 
     return wrapper
 
