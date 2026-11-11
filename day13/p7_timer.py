@@ -18,8 +18,7 @@ def build_list(n):
 
 @timer
 def build_gen(n):
-    return (x * x for x in range(n))
+    return sum(x * x for x in range(n))
 
 print(build_list(20000)[-1])
 print(build_gen(20000))
-print(list(build_gen(20000))[-1])

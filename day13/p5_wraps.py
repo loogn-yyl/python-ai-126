@@ -9,18 +9,18 @@ def plain(func):
 def kept(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
+        return func(*args, **kwargs)
     return wrapper
 
 @plain
 def a(x):
-     """a 的文档字符串"""
-     return x
+    """a 的文档字符串"""
+    return x
 
 @kept
 def b(x):
-     """b 的文档字符串"""
-     return x
+    """b 的文档字符串"""
+    return x
 
 print("没有 wraps:", a.__name__, repr(a.__doc__))
 print("有 wraps:", b.__name__, repr(b.__doc__))

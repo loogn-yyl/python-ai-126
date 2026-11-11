@@ -35,6 +35,7 @@ print(add("李四"))
 print(delete("王五"))
 print("剩余:", sorted(contacts))
 print("--- 日志 ---")
-print(open(LOG, encoding="utf-8").read().strip())
+with open(LOG, encoding="utf-8") as f:
+    print(f.read().strip())
 
 os.remove(LOG)

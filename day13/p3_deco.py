@@ -4,6 +4,7 @@ def deco(func):
         print("  调用前, ", func.__name__)
         func()
         print("  调用后, ", func.__name__)
+        return func
 
     return wrapper
 
