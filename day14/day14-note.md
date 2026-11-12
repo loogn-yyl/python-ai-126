@@ -15,6 +15,20 @@
 - __init__.py：__all__ 白名单，对外只开一扇门
 - 判断标准：能不能单独测
 
+## 虚拟环境启动及测试
+- 第一步: 建(只做一次)
+  cd 进入项目根目录 + python3 -m vent .venv -> 无任何输出即成功
+  (Ls .venv -> # bin include lib pyvenv.cfg)
+- 第二步: 开(每个新终端都要执行一次)
+  cd 进入项目根目录 + source .venv/bin/active -> 提示符前多了一段 (.venv)
+  (Which python -> 路径中包含.venv)
+- 第三步: 装(每个环境一次)
+  python -m pip install -U pip
+  Python -m pip install pytest pytest-cov
+- 第四步: 跑
+  cd 进入本次任务目录
+  python -m pytest -q (--cov=contacts --cov-report=term-missing)
+
 ## 数据模型
 - dataclass 四行顶手写三个方法
 - 校验写 __post_init__，不覆盖 __init__（覆盖了等于放弃 dataclass）
