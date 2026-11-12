@@ -385,7 +385,7 @@ def test_存盘再读回来(book, tmp_path):
     again = AddressBook(path=str(tmp_path / "contacts.json"))
     assert len(again) == 1
     assert again.items["张三"].email == "zs@example.com"</pre></div>
-<div class="note"><b>注意 <code class="inline">test_存盘再读回来</code> 这个测试的写法：它不检查 <code class="inline">book.save()</code> 有没有被调用，而是<b>新开一个 <code class="inline">AddressBook</code> 去看数据在不在</b>。<br>这是测试的一条重要原则：<b>验证「结果」，别验证「过程」。</b>你要是 mock 了 <code class="inline">save</code> 再断言「它被调用了一次」，那即使 <code class="inline">save</code> 里写的是 <code class="inline">json.dump({})</code>，测试照样通过。</div>
+<div class="note"><b>注意 <code class="inline">test_存盘再读回来</code> 这个测试的写法</b>：它不检查 <code class="inline">book.save()</code> 有没有被调用，而是<b>新开一个 <code class="inline">AddressBook</code> 去看数据在不在</b>。<br>这是测试的一条重要原则：<b>验证「结果」，别验证「过程」。</b>你要是 mock 了 <code class="inline">save</code> 再断言「它被调用了一次」，那即使 <code class="inline">save</code> 里写的是 <code class="inline">json.dump({})</code>，测试照样通过。</div>
 </section>
 
 <section>

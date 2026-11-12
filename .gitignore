@@ -8,3 +8,13 @@ Icon?
 Icon
 day06/log.txt
 contacts.json
+.venv/
+
+# 运行时产物
+*.log
+demo.json
+
+# 工具缓存
+.pytest_cache/
+.coverage
+htmlcov/

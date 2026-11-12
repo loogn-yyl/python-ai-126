@@ -206,7 +206,7 @@ def add(a, b):
 
 print(add(1, 2))</pre></div>
 <div class="codebox light"><button class="copy">复制</button><pre class="out">TypeError: deco.&lt;locals&gt;.wrapper() takes 0 positional arguments but 2 were given</pre></div>
-<p>你调的是 <code class="inline">add(1, 2)</code>，但 <code class="inline">add</code> 现在指向 <code class="inline">wrapper</code>，而 <code class="inline">wrapper</code> 的定义是 <code class="inline">def wrapper():</code>——<b>一个参数都不收</b>。报错信息里的 <code class="inline">deco.<locals>.wrapper</code> 就是在提醒你「这是装饰器里那个 wrapper」。</p>
+<p>你调的是 <code class="inline">add(1, 2)</code>，但 <code class="inline">add</code> 现在指向 <code class="inline">wrapper</code>，而 <code class="inline">wrapper</code> 的定义是 <code class="inline">def wrapper():</code>——<b>一个参数都不收</b>。报错信息里的 <code class="inline">deco.&lt;locals&gt;.wrapper</code> 就是在提醒你「这是装饰器里那个 wrapper」。</p>
 <div class="codebox"><button class="copy">复制</button><pre>def wrapper(*args, **kwargs):
     return func(*args, **kwargs)</pre></div>
 <p><b>标准答案就是这两个星号。</b><code class="inline">*args</code> 接所有位置参数，<code class="inline">**kwargs</code> 接所有关键字参数，原样转给 <code class="inline">func</code>。写装饰器时这两行<b>默认就要写上</b>，除非你明确只想装饰无参函数。</p>
