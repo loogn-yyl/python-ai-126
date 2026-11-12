@@ -183,7 +183,7 @@ Contact(name='李四', phone='13900002222', email='ls@example.com', tags=['同�
 李四 13900002222 ls@example.com ['同事', '技术部']
 张三  13800001111
 李四  13900002222  ls@example.com  同事/技术部</pre></div>
-<p>四行声明，自动得到了 D008 手写的 <code class="inline">__init__</code>、<code class="inline">__repr__</code>、<code class="inline">__eq__</code> 三个方法。<b>注意第 2 行和第 3 行：</b><code class="inline">print(c1)</code> 打出的是 <code class="inline">Contact(name='张三', ...)</code> 而不是 <code class="inline"><__main__.Contact object at 0x...></code>——这就是 D010 的 <code class="inline">__repr__</code> 和 D011 的 dataclass 连上了：<b>你手写过的那个 <code class="inline">__repr__</code>，dataclass 替你生成。</b></p>
+<p>四行声明，自动得到了 D008 手写的 <code class="inline">__init__</code>、<code class="inline">__repr__</code>、<code class="inline">__eq__</code> 三个方法。<b>注意第 2 行和第 3 行：</b><code class="inline">print(c1)</code> 打出的是 <code class="inline">Contact(name='张三', ...)</code> 而不是 <code class="inline">&lt;__main__.Contact object at 0x...&gt;</code>——这就是 D010 的 <code class="inline">__repr__</code> 和 D011 的 dataclass 连上了：<b>你手写过的那个 <code class="inline">__repr__</code>，dataclass 替你生成。</b></p>
 <h3>校验放 __post_init__，不覆盖 __init__</h3>
 <p>想在创建时检查数据，直觉是重写 <code class="inline">__init__</code>。但 dataclass 已经生成好了 <code class="inline">__init__</code>，覆盖它意味着你要把四个字段的赋值全部手写一遍——那用 dataclass 就白用了。<b>正确位置是 <code class="inline">__post_init__</code></b>：它在生成的 <code class="inline">__init__</code> 末尾被自动调用一次。</p>
 <div class="codebox"><button class="copy">复制</button><pre>    def __post_init__(self):
@@ -436,7 +436,7 @@ TOTAL                       83      0   100%
 <section>
   <h2><span class="n">7</span>八道练习</h2>
 <p><b>第 1、3、8 题是今天的产出</b>。做的时候<b>先改 <code class="inline">contacts/</code> 里的文件，改完再跑 </b><code class="inline">python3 -m pytest -q</code> 确认九个老测试没挂。答案里我用子类演示，是为了不动你的原文件——<b>你自己写的时候应该直接加进 <code class="inline">store.py</code></b>。</p>
-<ol class="task"><li><b>按名字取人</b>：给 <code class="inline">AddressBook</code> 加 <code class="inline">__getitem__</code>，让 <code class="inline">book["张三"]</code> 返回 <code class="inline">Contact</code>，取不到要抛 <code class="inline">KeyError</code>；顺手加 <code class="inline">__contains__</code> 支持 <code class="inline">"张三" in book</code></li><li><b>邮箱校验</b>：邮箱非空时必须含 <code class="inline">@</code>，否则 <code class="inline">ValueError</code>。用子类跑 <code class="inline">super().__post_init__()</code> 再补一条</li><li><b>给上一题写测试</b>：两个用例——取得到（断言电话）、取不到（<code class="inline">pytest.raises(KeyError)</code>）</li><li><b>按标签找人</b>：<code class="inline">search_by_tag(tag)</code> 返回所有 tags 里含该标签的人</li><li><b>删除要返回被删的人</b>：把 <code class="inline">remove</code> 改成返回那个 <code class="inline">Contact</code>，删不存在的仍然 <code class="inline">KeyError</code></li><li><b>给查询加日志</b>：给 <code class="inline">find</code> 套上 <code class="inline">@log</code>，看日志里记下来的是什么（提示：记的是返回值，一个列表）</li><li><b>日志写失败会怎样</b>：用 <code class="inline">monkeypatch</code> 把 <code class="inline">LOG</code> 指到一个不存在的目录，写测试断言 <code class="inline">FileNotFoundError</code>，再想想生产环境该怎么改</li><li><b>补覆盖率</b>：用 <code class="inline">capfd</code> 抓 <code class="inline">store.py</code> 里「数据文件损坏」那句 print，断言空通讯录能启动；再补 <code class="inline">line()</code> 和旧格式 <code class="inline">from_dict</code>，把覆盖率推到 100%</li></ol>
+<ol class="task"><li><b>按名字取人</b>：给 <code class="inline">AddressBook</code> 加 <code class="inline">__getitem__</code>，让 <code class="inline">book["张三"]</code> 返回 <code class="inline">Contact</code>，取不到要抛 <code class="inline">KeyError</code>；顺手加 <code class="inline">__contains__</code> 支持 <code class="inline">"张三" in book</code></li><li><b>邮箱校验</b>：邮箱非空时必须含 <code class="inline">@</code>，否则 <code class="inline">ValueError</code>。用子类跑 <code class="inline">super().__post_init__()</code> 再补一条</li><li><b>给上一题写测试</b>：两个用例——取得到（断言电话）、取不到（<code class="inline">pytest.raises(KeyError)</code>）</li><li><b>按标签找人</b>：<code class="inline">search_by_tag(tag)</code> 返回所有 tags 里含该标签的人</li><li><b>删除要返回被删的人</b>：把 <code class="inline">remove</code> 改成返回那个 <code class="inline">Contact</code>，删不存在的仍然 <code class="inline">KeyError</code></li><li><b>给查询加日志</b>：给 <code class="inline">find</code> 套上 <code class="inline">@log</code>，看日志里记下来的是什么（提示：记的是返回值，一个列表）</li><li><b>日志写失败会怎样</b>：用 <code class="inline">monkeypatch</code> 把 <code class="inline">LOG</code> 指到一个不存在的目录。先看 <code class="inline">FileNotFoundError</code> 会不会把调用方带崩、<b>以及数据到底有没有写进去</b>；再给 <code class="inline">log</code> 加上异常守卫，把测试改成断言「业务照常成功、日志没写成」</li><li><b>补覆盖率</b>：用 <code class="inline">capfd</code> 抓 <code class="inline">store.py</code> 里「数据文件损坏」那句 print，断言空通讯录能启动；再补 <code class="inline">line()</code> 和旧格式 <code class="inline">from_dict</code>，把覆盖率推到 100%</li></ol>
 <details>
 <summary>参考答案（先自己写，卡 15 分钟再看）</summary>
 <!--run-skip: 八份文件拼在一起展示-->
@@ -576,12 +576,24 @@ import pytest
 from contacts import AddressBook, Contact, decorators
 
 
-def test_日志写不进去会连业务一起失败(tmp_path, monkeypatch):
+def test_7a_无守卫时异常会传到调用方(tmp_path, monkeypatch):
     # 指向一个不存在的目录
     monkeypatch.setattr(decorators, "LOG", str(tmp_path / "nodir" / "a.log"))
     book = AddressBook(path=str(tmp_path / "c.json"))
     with pytest.raises(FileNotFoundError):
         book.add(Contact("张三", "13800001111"))
+    # 反直觉的地方：人早就加进去了，异常是加完才抛的
+    assert len(book) == 1
+
+
+# 给 log 加上 try/except OSError 之后，同一个场景要这么断言。
+# 7a 和 7b 二选一——你的 log 是哪一版，就留哪个测试。
+def test_7b_有守卫时业务照常日志静默(tmp_path, monkeypatch):
+    monkeypatch.setattr(decorators, "LOG", str(tmp_path / "nodir" / "a.log"))
+    book = AddressBook(path=str(tmp_path / "c.json"))
+    book.add(Contact("张三", "13800001111"))      # 不再抛异常
+    assert len(book) == 1
+    assert not (tmp_path / "nodir").exists()      # 日志确实没写成
 
 
 
@@ -620,7 +632,7 @@ find: []
 --- p8 ---
 1 passed in 0.11s</pre></div>
 <h3>两处值得细看</h3>
-<p><b>第 7 题的结论比答案本身重要。</b><code class="inline">FileNotFoundError</code> 是从装饰器里抛出来的，但<b>它把整个 <code class="inline">add</code> 都带崩了</b>——联系人没加进去。<br>真实项目里日志、监控、埋点这类「附加动作」<b>绝不能影响主流程</b>，正确写法是把写日志包起来：</p>
+<p><b>第 7 题的结论比答案本身重要，而且有一半是反直觉的。</b><code class="inline">FileNotFoundError</code> 确实是从装饰器里抛出来的，但<b>联系人已经加进去了</b>——<code class="inline">func(*args, **kwargs)</code> 在写日志<b>之前</b>就跑完了，内存里有了、<code class="inline">json</code> 也落盘了，装饰器才因为 <code class="inline">open</code> 失败抛异常。<code class="inline">assert len(book) == 1</code> 就是用来实证这一点的。<br>于是调用方看到的是「报错」，实际状态却是「<b>数据已经进去了</b>」。这种「做完了却告诉你失败了」最难查——用户重试一次，立刻撞上 <code class="inline">已存在</code>。<br>真实项目里日志、监控、埋点这类「附加动作」<b>绝不能影响主流程</b>，正确写法是把写日志整个包起来：</p>
 <div class="codebox"><button class="copy">复制</button><pre>def log(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -632,6 +644,7 @@ find: []
             pass          # 日志写不进去就算了，业务不能受影响
         return result
     return wrapper</pre></div>
+<p><b>加了守卫，练习 7 的测试就得跟着改。</b>原来那句 <code class="inline">pytest.raises(FileNotFoundError)</code> 断言的是「异常会传出去」；现在异常被 <code class="inline">except OSError</code> 吃掉了，同一个测试会报 <code class="inline">Failed: DID NOT RAISE FileNotFoundError</code>——<b>这不是你写错了，是断言的前提变了</b>。<br>改成验「业务照常成功 + 日志确实没写成」，也就是答案里的 7b：断言方向反过来了，验证的意图一步没变。</p>
 <p><b>第 8 题的 <code class="inline">capfd</code> 值得记住。</b>用 <code class="inline">print</code> 输出提示信息的地方，测试要怎么验？答案是把标准输出「抓」下来：<code class="inline">capfd.readouterr()</code> 返回两个值，第一个是 stdout，第二个是 stderr。<br><code class="inline">out, _ = capfd.readouterr()</code> —— 那个下划线就是「我不关心 stderr」。然后 <code class="inline">assert "数据文件损坏" in out</code>。<br><b>更规范的做法是把<code class="inline">print</code> 换成 <code class="inline">logging</code>，测试用 <code class="inline">caplog</code>——这是下下周的内容。</b></p>
 </details>
 <div class="note"><b>如果第 8 题最后停在 99%，大概率是 <code class="inline">store.py:39</code> 的 <code class="inline">__iter__</code> 还没被跑到。</b>因为有 <code class="inline">__iter__</code> 不等于有测试在用它——补一句 <code class="inline">assert [c.name for c in book] == ["张三"]</code> 就够了。<br><b>这个过程本身就是在教你怎么读 <code class="inline">Missing</code> 那列。</b></div>

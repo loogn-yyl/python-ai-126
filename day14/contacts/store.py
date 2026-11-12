@@ -48,28 +48,17 @@ class AddressBook:
     def find(self, keyword: str):
         return [c for c in self.items.values() if keyword in c.name or keyword in c.phone]
 
+    def search_by_tag(self, tag):
+        return [c for c in self.items.values() if tag in c.tags]
+
     def __len__(self):
         return len(self.items)
 
     def __iter__(self):
         return iter(self.items.values())
 
-class Book(AddressBook):
     def __getitem__(self, name: str):
         return self.items[name]
 
     def __contains__(self, name: str):
         return name in self.items
-
-    
-    def search_by_tag(self, tag):
-        return [c for c in self.items.values() if tag in c.tags]
-
-    def remove(self, name: str):
-        contact = self.items[name]
-        super().remove(name)
-        return contact
-
-    @log
-    def find(self, keyword: str):
-        return super().find(keyword)

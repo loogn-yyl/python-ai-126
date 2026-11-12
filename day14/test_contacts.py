@@ -25,6 +25,12 @@ def test_电话必须11位数字():
     with pytest.raises(ValueError):
         Contact("张三", "1380000111a")
 
+def test_邮箱格式不对报错():
+    with pytest.raises(ValueError):
+        Contact("张三", "13800001111", "zs_at_example.com")
+    # 邮箱为空时不校验, 这是默认值
+    assert Contact("张三", "13800001111").email == ""
+
 def test_两个实例不共享tags():
     a, b = Contact("张三", "13800001111"), Contact("李四", "13900002222")
     a.tags.append("同事")
@@ -45,6 +51,17 @@ def test_存盘再读回来(book, tmp_path):
     again = AddressBook(path=str(tmp_path / "contacts.json"))
     assert len(again) == 1
     assert again.items["张三"].email == "zs@example.com"
+
+def test_旧格式字符串能读回来(tmp_path):
+    """v1 的 contacts.json 里值是纯字符串, 不是字典"""
+    import json
+
+    p = tmp_path / "old.json"
+    p.write_text(json.dumps({"张三": "13800001111"}, ensure_ascii==False), encoding="utf-8")
+    old = AddressBook(path=str(p))
+    assert old.items["张三"].phone == "13800001111"
+    assert old.items["张三"].tags == []
+
 
 def test_删除(book):
     book.add(Contact("张三", "13800001111"))
@@ -68,9 +85,27 @@ def test_取不存在的人报KeyError(book):
     with pytest.raises(KeyError):
         book["李四"]
 
+def test_in判断(book):
+    book.add(Contact("张三", "13800001111"))
+    assert "张三" in book
+    assert "李四" not in book
+
 def test_遍历查询(book):
     book.add(Contact("张三", "13800001111"))
-    assert [c.name for c in book] == "张三"
+    book.add(Contact("李四", "13900002222"))
+    assert [c.name for c in book] == ["张三", "李四"]
+
+def test_按标签找人(book):
+    book.add(Contact("张三", "13800001111", ["同事"]))
+    book.add(Contact("李四", "13900002222", ["同事", "技术部"]))
+    book.add(Contact("王五", "13700003333"))
+    assert [c.name for c in book.search_by_tag("同事")] == ["张三", "李四"]
+    assert [c.name for c in book.search_by_tag("客户")] == []
+
+def test_line格式():
+    c = Contact("张三", "13800001111", "zs@example.com", ["同事"])
+    assert c.line() == "张三 | 13800001111 | zs@example.com | 同事"
+    assert Contact("李四", "13900002222").line() == "李四 | 13900002222"
 
 def test_日志写不进去不影响业务(tmp_path, monkeypatch):
     # 指向一个不存在的目录, open() 会抛 FileNotFoundError

@@ -13,6 +13,8 @@ class Contact:
             raise ValueError("姓名不能为空")
         if not (self.phone.isdigit() and len(self.phone) == 11):
             raise ValueError(f"电话必须是 11 位数字: {self.phone}")
+        if self.email and "@" not in self.email:
+            raise ValueError(f"邮箱格式不对: {self.email}")
 
     def to_dict(self):
         d = asdict(self)
@@ -32,10 +34,3 @@ class Contact:
         if self.tags:
             parts.append("/".join(self.tags))
         return " | ".join(parts)
-
-@dataclass
-class StrictContact(Contact):
-    def __post_init__(self):
-        super().__post_init__()
-        if self.email and "@" not in self.email:
-            raise ValueError(f"邮箱格式不对: {self.email}")
