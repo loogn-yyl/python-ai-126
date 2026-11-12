@@ -36,6 +36,5 @@
 - 返回多个值：C 要传指针，Python 返回元组
 
 ## 踩过的坑
-- 降序可以写成 sorted(nums, key=lambda x: -x)
-
+- 降序可以写成 sorted(nums, key=lambda x: -x)  
   也可以写成 sorted(students, key=lambda s: s[1], reverse=True)

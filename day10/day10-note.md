@@ -3,13 +3,13 @@
 ## 打印
 - __str__  → print(obj) / str(obj) / f"{obj}"     
   给人看
-- __repr__ → repr(obj) / 打印列表 / 调试器
+- __repr__ → repr(obj) / 打印列表 / 调试器  
   给开发者看，最好能重建对象
 - print([obj]) 走的是 __repr__，不是 __str__ → 两个都要写
 - repr 里用 !r：f"Book({title!r})" → Book('书名')
 
 ## 比较
-- 默认 == 和 is 一个意思，比的是「是不是同一个对象」
+- 默认 == 和 is 一个意思，比的是「是不是同一个对象」  
   只在自定义类没写 __eq__ 时成立, 2 == 2.0 -> True, 2 is 2.0 -> False
 - __eq__ 里先 isinstance 检查，比不了就 return NotImplemented（不是 False）
 - 定义了 __eq__ 不定义 __hash__ → 类变成不可哈希，不能进 set、不能当 dict key
@@ -24,7 +24,7 @@
 - __len__      → len(obj)
 - __getitem__  → obj[0] / obj[-1] / obj[0:2]（切片收到 slice 对象）
 - __iter__     → for x in obj / in / 推导式 / list()
-- 只写 __getitem__ 也能 for, 必须从 0 连续递增, 靠越界报错停 
+- 只写 __getitem__ 也能 for, 必须从 0 连续递增, 靠越界报错停   
   因此能写 __iter__ 就写
 
 ## 让它像函数
@@ -39,9 +39,9 @@
 - 调用时不加括号！d.total 不是 d.total()
 
 ## 三种装饰器
-- @classmethod  cls    第二个构造函数
-- @staticmethod 无参数  工具函数
-- @property    不加括号 当属性用
+- @classmethod —— cls —— 第二个构造函数
+- @staticmethod —— 无参数 —— 工具函数
+- @property —— 不加括号 —— 当属性用
 
 ## 踩过的坑
 - callable 判断类型上有没有 __call__

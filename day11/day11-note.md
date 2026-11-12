@@ -12,8 +12,8 @@
 - 其他参数：default=、repr=False
 
 ## 常用开关
-- @dataclass(order=True)   自动生成 __lt__ 等，可以 sorted()、可以 >
-- @dataclass(frozen=True)  不可变；改属性抛 FrozenInstanceError；能 hash、能进 set
+- @dataclass(order=True) —— 自动生成 __lt__ 等，可以 sorted()、可以 >
+- @dataclass(frozen=True) —— 不可变；改属性抛 FrozenInstanceError；能 hash、能进 set
 
 ## Enum
 - class Status(Enum): ACTIVE = "active"
@@ -24,8 +24,8 @@
 
 ## 类型注解
 - def f(x: str) -> Optional[int]:   只是注解，运行时不检查！
-- list[Contact] / dict[str, int]    容器要写里面的类型
-- Optional[X] 或 X | None           可能返回 None 时必须标
+- list[Contact] / dict[str, int] —— 容器要写里面的类型
+- Optional[X] 或 X | None —— 可能返回 None 时必须标
 - 用处：IDE 补全、Pylance 查错、一个月后自己看得懂
 - 校验外部数据要靠 try/except 或 Pydantic，不能靠注解
 
@@ -39,5 +39,5 @@
 - @dataclass(order=True) 表示按字段声明顺序逐个比较, 第一个不相等的字段决定结果
 - 对比 @dataclass(order=True, kw_only=True) 排序只看字段顺序, 但必须指明关键字来传参, 且关键字顺序可以变
 - title: str = field(compare=False) 可以让这一字段退出比较, 包括排序、 == 和 hash 计算, 且不依赖 order
-- frozen=True 的 Point 不能改, 所以能算 hash、能进 set。「不可变 → 可哈希」是 Python 里一条稳定的规律。
+- frozen=True 的 Point 不能改, 所以能算 hash、能进 set。「不可变 → 可哈希」是 Python 里一条稳定的规律。  
   反过来, 可变的 dataclass 默认就不可哈希, 想进 set 要写 eq=False 或自己定义 __hash__。

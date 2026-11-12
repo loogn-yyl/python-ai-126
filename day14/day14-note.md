@@ -16,18 +16,18 @@
 - 判断标准：能不能单独测
 
 ## 虚拟环境启动及测试
-- 第一步: 建(只做一次)
-  cd 进入项目根目录 + python3 -m venv .venv -> 无任何输出即成功
-  (ls .venv -> # bin include lib pyvenv.cfg)
-- 第二步: 开(每个新终端都要执行一次)
-  cd 进入项目根目录 + source .venv/bin/activate -> 提示符前多了一段 (.venv)
-  (which python -> 路径中包含.venv)
-- 第三步: 装(每个环境一次)
-  python -m pip install -U pip
-  python -m pip install pytest pytest-cov
-- 第四步: 跑
-  cd 进入本次任务目录
-  python -m pytest -q --cov=contacts --cov-report=term-missing
+- 第一步: 建(只做一次)  
+  cd 进入项目根目录 + python3 -m venv .venv -> 无任何输出即成功  
+  (ls .venv -> # bin include lib pyvenv.cfg)  
+- 第二步: 开(每个新终端都要执行一次)  
+  cd 进入项目根目录 + source .venv/bin/activate -> 提示符前多了一段 (.venv)  
+  (which python -> 路径中包含.venv)  
+- 第三步: 装(每个环境一次)  
+  python -m pip install -U pip  
+  python -m pip install pytest pytest-cov  
+- 第四步: 跑  
+  cd 进入本次任务目录  
+  python -m pytest -q --cov=contacts --cov-report=term-missing  
 
 ## 数据模型
 - dataclass 四行顶手写三个方法
@@ -45,7 +45,7 @@
 ## pytest
 - 文件名 test_*.py，函数名 test_*，不写 main
 - assert 条件，不成立就抛异常；assert 后面写一句人话
-- 读报错：> 是出错行，E assert 11 == 10 是实际 vs 期望，
+- 读报错：> 是出错行，E assert 11 == 10 是实际 vs 期望，  
   E + where 11 = len(...) 是中间值怎么来的
 - pytest.raises(ValueError)：断言这里必须炸；没炸就 FAILED: DID NOT RAISE
 - fixture：抽公共准备；每个测试各执行一次
@@ -56,7 +56,6 @@
 ## 覆盖率
 - Stmts 语句数 / Miss 没跑到 / Cover 比例 / Missing 哪几行 ★
 - 真正该看的是 Missing —— 那是「没被测过的代码清单」
-- 87% → 90%（补坏 json 分支）→ 100%（补 line、旧格式、__iter__）
 - 100% 不等于没 bug：只说明被执行过，不说明断言过结果
 - 没有 assert 的测试能刷满覆盖率，但保护力是零
 

@@ -31,17 +31,19 @@
 - sum/max/min/any/all 直接用圆括号，零成本优化
 
 ## itertools
-- count(start, step) / islice(it, n)     无限序列 + 截断(必须配 islice)
-- chain(a, b)                            拼接多个序列
-- cycle(it)                              无限循环
-- groupby(it)                            相邻分组！要全局分组先 sorted
-- accumulate(it)                         前缀和
-- product(a, b) / combinations(it, a)    笛卡尔积 / 组合
+| 函数 | 意义 |
+| --- | --- |
+| count(start, step) / islice(it, n) | 无限序列 + 截断(必须配 islice) |
+| chain(a, b) | 拼接多个序列 |
+| cycle(it) | 无限循环 |
+| groupby(it) | 相邻分组！要全局分组先 sorted |
+| accumulate(it) | 前缀和 |
+| product(a, b) / combinations(it, a) | 笛卡尔积 / 组合 |
 
 ## C 对比
-- 返回 NULL 当哨兵        vs  raise StopIteration
-- 手动 malloc 整个数组     vs  yield 一个算一个
-- 回调函数逐行处理        vs  for line in f
+- 返回 NULL 当哨兵   → raise StopIteration
+- 手动 malloc 整个数组  → yield 一个算一个
+- 回调函数逐行处理  → for line in f
 
 ## 踩过的坑
 - print([(k, len(list(g))) for k, g in itertools.groupby("AAABBBCCA")])

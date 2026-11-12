@@ -35,6 +35,6 @@
 
 ## 踩过的坑
 - 内外层函数都可以传参
-- def repeat(n) 可以不指定次数, 在 @repeat(2) 中指定
+- def repeat(n) 可以不指定次数, 在 @repeat(2) 中指定  
   也可以 def repeat(times=2) 指定次数, 那么 @repeat(2) 中只能是 2
 - 注意三层嵌套漏写括号不报错, return func() 也要记得 () 括号

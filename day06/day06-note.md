@@ -44,6 +44,6 @@
 ## 踩过的坑
 - open("scores.csv", "w", newline="", encoding="utf-8") 中    
   newline="" 必须加, 关掉 Python 自己的换行符转换, 交给 csv 模块
-- json.dump(data, f, ensure_ascii=False, indent=2) 中
+- json.dump(data, f, ensure_ascii=False, indent=2) 中  
   indent=2 表示每个层级缩进2个空格, 并且每个元素都换行
 - 注意 json.dump 和 json.dumps 是两个函数

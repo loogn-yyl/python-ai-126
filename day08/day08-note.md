@@ -11,8 +11,8 @@
 - a.hello()  等价于  Contact.hello(a)
 
 ## 两种属性
-- 实例属性：self.x = ...     每个对象各一份（绝大多数用它）
-- 类属性：  count = 0        所有对象共用，改的时候必须写类名
+- 实例属性：self.x = ...   → 每个对象各一份（绝大多数用它）
+- 类属性：  count = 0      → 所有对象共用，改的时候必须写类名
 - 读：先找实例，再找类；写：写在你指定的那层
 
 ## 三个坑
@@ -22,9 +22,9 @@
 - a = b 不是复制；a == b 默认比的还是「是不是同一个」
 
 ## 三种方法
-- 普通方法     第一个参数 self     obj.m()
-- @classmethod 第一个参数 cls      第二个构造入口（from_text / from_dict）
-- @staticmethod 没有自动参数       和类相关但不用数据的工具函数
+- 普通方法：     第一个参数 self  →  obj.m()
+- @classmethod 第一个参数 cls   →  第二个构造入口（from_text / from_dict）
+- @staticmethod 没有自动参数    →  和类相关但不用数据的工具函数
 
 ## 对象 ↔ JSON
 - json.dump 不认自定义对象 → 必须自己 to_dict()
@@ -32,13 +32,12 @@
 - 文件格式和内存表示是两件事，靠两个函数连接
 
 ## C 对比
-- struct 定义形状，函数在外面      vs  class 把数据和动作装一起
-- struct Contact *p                vs  self 就是那个 p
-- printf("%p", p) 打地址            vs  print(obj) 打 <类名 object at 0x...>
+- struct 定义形状，函数在外面 —— class 把数据和动作装一起
+- struct Contact *p        —— self 就是那个 p
+- printf("%p", p) 打地址    —— print(obj) 打 <类名 object at 0x...>
 
 ## 踩过的坑
 - 注意 def __init__ 参数有没有默认值, 没有需要之后赋 ""
 - 需要使用 self 的函数, 一律写在 def __init__(self) 之后
 - 要造对象、要读类属性的函数, 需要写在 @classmethod 之后
-- 不需要 self 也不需要 cls, 但属于这个类的规则或工具, 需要写在 
-  @staticmethod 之后
+- 不需要 self 也不需要 cls, 但属于这个类的规则或工具, 需要写在 @staticmethod 之后
