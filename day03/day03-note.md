@@ -13,10 +13,10 @@
 - 遍历字典用 d.items() 同时拿 key 和 value
 
 ## 语法
-- [x * x for x in range(1,6)]           列表推导式
-- [x for x in nums if x % 2 == 0]       带条件
-- name, age = ("张三", 18)              元组解包
-- a, b = b, a                           交换不用临时变量
+- [x * x for x in range(1,6)] —— 列表推导式
+- [x for x in nums if x % 2 == 0] —— 带条件
+- name, age = ("张三", 18) —— 元组解包
+- a, b = b, a —— 交换不用临时变量
 - (5,) 才是单元素元组，(5) 是 int
 
 ## 集合

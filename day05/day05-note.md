@@ -9,6 +9,7 @@
 ## 参数
 - 默认参数必须放在后面
 - **默认参数不能写 [] {} set()** —— 只会创建一次，所有调用共用
+
   正确写法：默认 None，函数里 if x is None: x = []
 - *args 收成元组，**kwargs 收成字典
 - 反向用：max(*nums) 把列表拆成参数
@@ -36,4 +37,5 @@
 
 ## 踩过的坑
 - 降序可以写成 sorted(nums, key=lambda x: -x)
+
   也可以写成 sorted(students, key=lambda s: s[1], reverse=True)
