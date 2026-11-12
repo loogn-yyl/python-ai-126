@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D017 学习包 · 网络编程</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 017 · 第 3 周</div>
+  <h1>网络编程：从 socket 到 requests</h1>
+  <p>你写过 C 的 socket。今天先看 Python 里一模一样的那五个函数，再看为什么实际项目里没人直接用它们。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📦 requests</span>
+    <span>🎯 产出：抓标题脚本</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：一小时底层的，三小时上层的</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1–2 节：socket 五个函数 + HTTP 报文。<b>你在 C 里全写过</b></span></div><div class="tl"><b>第 2 小时</b><span>读 3–4 节：手发一次请求，再看 requests 怎么把它变成三行</span></div><div class="tl"><b>第 3 小时</b><span>读 5–6 节：六个必设参数、异常处理、抓标题</span></div><div class="tl"><b>第 4 小时</b><span>八道练习。第 7、8 题会直接进 D018 的异步对比</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day17
+cd ~/python-learn/day17
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+python -m pip install requests</pre></div>
+<div class="note"><b>今天第一次装第三方库。</b><code class="inline">requests</code> 不是标准库，必须装。<br>注意是 <code class="inline">python -m pip</code> 而不是 <code class="inline">pip</code>——D014 讲过，直接写 <code class="inline">pip</code> 可能装到另一个 Python 下，然后 <code class="inline">import</code> 不到。<br><b>装完验证一下：</b><code class="inline">python -c "import requests; print(requests.__version__)"</code></div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>socket：你 C 里那五个函数，Python 一个没少</h2>
+<p>先看对照表。<b>你会发现除了写法变了，调用顺序一模一样。</b></p>
+<table>
+<tr><th>C</th><th>Python</th><th>作用</th></tr>
+<tr><td><code>socket(AF_INET, SOCK_STREAM, 0)</code></td><td><code>socket.socket(socket.AF_INET, socket.SOCK_STREAM)</code></td><td>创建一个 IPv4 的 TCP 套接字</td></tr>
+<tr><td><code>connect(fd, &amp;addr, len)</code></td><td><code>s.connect((host, port))</code></td><td>发起三次握手</td></tr>
+<tr><td><code>send(fd, buf, n, 0)</code></td><td><code>s.sendall(b"...")</code></td><td>发数据</td></tr>
+<tr><td><code>recv(fd, buf, n, 0)</code></td><td><code>s.recv(4096)</code></td><td>收数据</td></tr>
+<tr><td><code>close(fd)</code></td><td><code>s.close()</code></td><td>关闭（或 <code>with</code> 自动关）</td></tr>
+</table>
+<p><b>三处真正的差别，都在「谁帮你管内存」上：</b></p>
+<ul>
+<li><b>不用传长度。</b>C 里 <code class="inline">connect</code> 要传 <code class="inline">sizeof(struct sockaddr_in)</code>，Python 传个元组就行。</li>
+<li><b>不用管缓冲区大小。</b>C 里你得自己 <code class="inline">malloc</code> 一块 <code class="inline">char buf[4096]</code>；Python 的 <code class="inline">recv(4096)</code> 直接返回 <code class="inline">bytes</code> 对象，长度就是实际收到的字节数。</li>
+<li><b>不用手动 <code class="inline">htons</code>。</b>字节序转换 Python 内部做了，你写端口号就写 <code class="inline">80</code>。</li>
+</ul>
+<div class="codebox"><button class="copy">复制</button><pre>import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(5)
+
+print("family:", s.family, "-> AF_INET =", socket.AF_INET)
+print("type  :", s.type, "-> SOCK_STREAM =", socket.SOCK_STREAM)
+
+s.close()
+print("已关闭")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">family: 2 -&gt; AF_INET = 2
+type  : 1 -&gt; SOCK_STREAM = 1
+已关闭</pre></div>
+<p><b><code class="inline">AF_INET</code> 就是数字 2，<code class="inline">SOCK_STREAM</code> 就是数字 1。</b>这些常量在 C 里也是 <code class="inline">#define</code> 出来的整数，Python 只是把它们做成了模块属性。所以你看到 <code class="inline">print(s.family)</code> 输出 <code class="inline">2</code> 不用奇怪。</p>
+<div class="warn"><b><code class="inline">settimeout(5)</code> 这行别省。</b><br>不加的话，<code class="inline">connect</code> 和 <code class="inline">recv</code> 会<b>永久阻塞</b>——对方不响应，你的程序就一直卡在那儿，<code class="inline">Ctrl+C</code> 都不一定管用。<b>网络编程里「超时」不是可选项，是必需品。</b>C 里对应 <code class="inline">setsockopt(SO_RCVTIMEO)</code>，麻烦得多。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>HTTP 报文：说到底就是一个字符串</h2>
+<p>很多人觉得 HTTP 很神秘，其实<b>它就是「几行文本 + 一个空行 + 正文」</b>。你自己拼一个出来看看：</p>
+<div class="codebox"><button class="copy">复制</button><pre>host = "example.com"
+
+request = (
+    f"GET / HTTP/1.1\r\n"
+    f"Host: {host}\r\n"
+    f"Connection: close\r\n"
+    f"\r\n"
+)
+
+print("报文长度:", len(request), "字节")
+print("逐行拆开（repr 让 \\r\\n 显形）:")
+for line in request.split("\r\n"):
+    print("   ", repr(line))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">报文长度: 56 字节
+逐行拆开（repr 让 \r\n 显形）:
+    'GET / HTTP/1.1'
+    'Host: example.com'
+    'Connection: close'
+    ''
+    ''</pre></div>
+<p>五段内容，每一段都有存在的理由：</p>
+<table>
+<tr><th>内容</th><th>含义</th><th>漏了会怎样</th></tr>
+<tr><td><code>GET / HTTP/1.1</code></td><td>请求行：方法 + 路径 + 版本</td><td>服务器直接断开</td></tr>
+<tr><td><code>Host: example.com</code></td><td><b>HTTP/1.1 必填</b>，指明要哪个网站</td><td>返回 <code>400 Bad Request</code>——<b>一个 IP 上可能挂了几十个网站，服务器靠它分流</b></td></tr>
+<tr><td><code>Connection: close</code></td><td>收完就断，别保持长连接</td><td>不算错，但你的 <code>recv</code> 会一直等对方关连接</td></tr>
+<tr><td>（空行）</td><td><b>头部结束的标志</b></td><td>服务器会一直等更多头部，然后超时</td></tr>
+</table>
+<div class="danger"><b>那个空行是 <code class="inline">\r\n\r\n</code>——两个换行，不是一行。</b><br>最后一行 <code class="inline">Connection: close\r\n</code> 结束了这个头部字段，<b>再来一个 <code class="inline">\r\n</code> 才是「头部结束」</b>。你上面看到输出里有两个空字符串 <code class="inline">''</code>，就是这个原因：<code class="inline">split("\r\n")</code> 在末尾切出了两个空段。<br><b>漏掉这个空行是最经典的错误</b>：程序不报错，只是服务器一直不回你，直到超时。</div>
+<h3>响应也是同样的结构</h3>
+<div class="codebox"><button class="copy">复制</button><pre>raw = (
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Type: text/html; charset=utf-8\r\n"
+    "Content-Length: 61\r\n"
+    "\r\n"
+    "&lt;html&gt;&lt;head&gt;&lt;title&gt;示例站点&lt;/title&gt;&lt;/head&gt;&lt;body&gt;hi&lt;/body&gt;&lt;/html&gt;"
+)
+
+head, _, body = raw.partition("\r\n\r\n")
+lines = head.split("\r\n")
+
+print("状态行:", lines[0])
+print("版本  :", lines[0].split()[0])
+print("状态码:", lines[0].split()[1])
+print()
+headers = {}
+for line in lines[1:]:
+    k, _, v = line.partition(": ")
+    headers[k] = v
+print("头部  :", headers)
+print("编码  :", headers["Content-Type"].split("charset=")[1])
+print()
+print("正文  :", body)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">状态行: HTTP/1.1 200 OK
+版本  : HTTP/1.1
+状态码: 200
+
+头部  : {'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '61'}
+编码  : utf-8
+
+正文  : &lt;html&gt;&lt;head&gt;&lt;title&gt;示例站点&lt;/title&gt;&lt;/head&gt;&lt;body&gt;hi&lt;/body&gt;&lt;/html&gt;</pre></div>
+<p><b><code class="inline">partition("\r\n\r\n")</code> 这一句是全部的关键。</b>它把原始文本切成「头部 / 分隔符 / 正文」三段，比 <code class="inline">split</code> 好用<b>——正文里也可能出现 <code class="inline">\r\n\r\n</code>，而 <code class="inline">partition</code> 只切第一个</b>。</p>
+<div class="note"><b>状态码第一位是类别：</b>2xx 成功 / 3xx 重定向 / 4xx 你错了 / 5xx 服务器错了。<b>4 和 5 的区别很重要</b>——看到 404 别去查服务器日志，看到 500 别去改自己的参数。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>亲手发一次，你就知道 requests 替你做了什么</h2>
+<p>这段要联网，<b>你按自己情况跑</b>。跑不通也没关系，看懂它在做什么就行。</p>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>import socket
+
+host, port = "example.com", 80
+req = f"GET / HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n"
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.settimeout(10)
+    s.connect((host, port))
+    s.sendall(req.encode("ascii"))
+
+    chunks = []
+    while True:
+        buf = s.recv(4096)
+        if not buf:
+            break
+        chunks.append(buf)
+
+raw = b"".join(chunks)
+text = raw.decode("utf-8", errors="replace")
+print("收到", len(raw), "字节")
+print("首行:", text.split("\r\n")[0])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">收到 1256 字节
+首行: HTTP/1.1 200 OK</pre></div>
+<p><b>这段代码里有六个地方会出错，每一个都是真实项目里踩过的：</b></p>
+<table>
+<tr><th>写法</th><th>不加会怎样</th></tr>
+<tr><td><code>s.settimeout(10)</code></td><td>对方不响应时永久阻塞</td></tr>
+<tr><td><code>req.encode("ascii")</code></td><td><code>sendall</code> 只收 <code>bytes</code>，传 <code>str</code> 报 <code>TypeError</code></td></tr>
+<tr><td><code>with ... as s</code></td><td>异常时 socket 句柄泄漏（和 C 里忘记 <code>close(fd)</code> 一个道理）</td></tr>
+<tr><td><code>while True</code> + <code>if not buf: break</code></td><td><b>只 <code>recv</code> 一次会拿到半截数据</b>——TCP 是字节流，不保证一次收完</td></tr>
+<tr><td><code>b"".join(chunks)</code></td><td>大文件下把 <code>bytes</code> 反复 <code>+</code> 是 O(n²)</td></tr>
+<tr><td><code>errors="replace"</code></td><td>服务器返回 gbk 编码的页面时直接 <code>UnicodeDecodeError</code></td></tr>
+</table>
+<div class="danger"><b>那个 <code class="inline">while True</code> 循环是最容易被低估的一条。</b><br>很多人以为 <code class="inline">recv(4096)</code> 会把整个响应一次收完。<b>不会。</b>TCP 只保证「字节按顺序到达」，不保证「一次到齐」。一个 100KB 的页面，你可能要 <code class="inline">recv</code> 二三十次。<br><b>这也是为什么实际项目没人手写这一层</b>——这些边界情况 requests 全替你处理了。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>requests：把上面那一整段变成三行</h2>
+<p>同样一件事，用 <code class="inline">requests</code> 写：</p>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>import requests
+
+r = requests.get("https://example.com", timeout=10)
+
+print("状态码:", r.status_code)
+print("编码  :", r.encoding)
+print("长度  :", len(r.text), "字符")
+print("首 60 :", r.text[:60].replace("\n", " "))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">状态码: 200
+编码  : utf-8
+长度  : 1256 字符
+首 60 : &lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;    &lt;title&gt;Example Domain&lt;/title&gt;    &lt;style&gt;</pre></div>
+<p>刚才那六个坑，它全处理了：超时、编码、连接复用、分块接收、自动解压、<code class="inline">Host</code> 头自动填。<b>这就是「库」的价值——不是帮你省几行，是帮你避开你不知道自己不知道的坑。</b></p>
+<table>
+<tr><th>属性 / 方法</th><th>给你什么</th><th>注意</th></tr>
+<tr><td><code>r.status_code</code></td><td>整数状态码</td><td><b>4xx/5xx 不会抛异常</b>，要自己判</td></tr>
+<tr><td><code>r.text</code></td><td>按 <code>r.encoding</code> 解码后的字符串</td><td><b><code>r.encoding</code> 可能是猜的</b>，猜错就乱码</td></tr>
+<tr><td><code>r.content</code></td><td>原始 <code>bytes</code></td><td>下图片、下文件必须用它，不能用 <code>text</code></td></tr>
+<tr><td><code>r.json()</code></td><td>把正文当 JSON 解析成字典</td><td>正文不是 JSON 时抛 <code>JSONDecodeError</code></td></tr>
+<tr><td><code>r.headers</code></td><td>响应头，大小写不敏感</td><td>拿 <code>r.headers["content-type"]</code> 也能取到</td></tr>
+<tr><td><code>r.url</code></td><td>最终地址</td><td><b>发生重定向后它和请求的不一样</b></td></tr>
+</table>
+<h3>中文乱码：<code class="inline">r.encoding</code> 猜错了</h3>
+<p><code class="inline">requests</code> 判断编码的依据是响应头里的 <code class="inline">Content-Type: ...charset=xxx</code>。<b>如果服务器没写这一项，它会退而求其次猜一个 <code class="inline">ISO-8859-1</code></b>，于是中文全变问号。</p>
+<div class="codebox"><button class="copy">复制</button><pre># 遇到乱码，第一件事是盯住这两行
+#   print(r.encoding)          -> 如果是 ISO-8859-1 或 None，基本就是它
+#   r.encoding = "utf-8"       -> 手动改，然后再读 r.text
+#
+# 更稳的做法：从正文里找声明
+#   requests 有个内置推断，但它只在 headers 没写 charset 时才用
+#   手动指定最可靠：r.encoding = r.apparent_encoding
+
+# 顺序记牢：
+#   1. r.encoding       —— headers 里写的，可能是错的
+#   2. r.apparent_encoding —— 从正文猜的，比较慢但通常更准
+#   3. 都不对 —— 那就自己试 gbk / utf-8-sig
+print("改 r.encoding 之后必须重新读 r.text，值不会自动刷新")</pre></div>
+<div class="warn"><b>为什么强调「先赋值、再读 <code class="inline">r.text</code>」？</b><br>不是不生效，而是 <code class="inline">r.text</code> 每次读的时候<b>才</b>用当时 <code class="inline">r.encoding</code> 的值去解码——所以顺序必须是「先赋值，再读 <code class="inline">r.text</code>」。<br>如果你先读了 <code class="inline">r.text</code>（此时已经用错的编码解过一次），再改 <code class="inline">r.encoding</code>，下次读 <code class="inline">r.text</code> 会重新解码，是对的。<b>但如果你把 <code class="inline">r.text</code> 存进了变量，那个变量不会变。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>六个必须设的东西：不设一定会出问题</h2>
+<table>
+<tr><th>参数</th><th>怎么写</th><th>不设的后果</th></tr>
+<tr><td><b><code>timeout</code></b></td><td><code>timeout=10</code> 或 <code>timeout=(3, 10)</code></td><td><b>永久挂起</b>。默认值是没有超时——这是 requests 最坑的设计</td></tr>
+<tr><td><b><code>headers</code></b></td><td><code>{"User-Agent": "Mozilla/5.0 ..."}</code></td><td>很多站点直接 403，因为默认 UA 是 <code>python-requests/2.x</code>，一眼就被认出来</td></tr>
+<tr><td><b><code>raise_for_status()</code></b></td><td><code>r.raise_for_status()</code></td><td>404 / 500 页面被当成正常内容去解析，报一堆莫名其妙的错</td></tr>
+<tr><td><code>params</code></td><td><code>params={"q": "python"}</code></td><td>自己拼 URL 时忘了转义，中文和空格直接炸</td></tr>
+<tr><td><code>verify</code></td><td>默认 <code>True</code>，<b>别改成 False</b></td><td>改了就没法防中间人</td></tr>
+<tr><td><code>Session</code></td><td><code>s = requests.Session()</code></td><td>每次请求重新握手 + 重新登录（登录态丢了）</td></tr>
+</table>
+<h3><code class="inline">timeout</code> 那个元组是两个超时</h3>
+<p><code class="inline">timeout=(3, 10)</code> 意思是：<b>连接最多等 3 秒，连上之后每次读最多等 10 秒</b>。写一个数字则两处都用它。</p>
+<div class="warn"><b>为什么「服务器慢」和「服务器没响应」要分开？</b><br>连接超时短一点（3 秒），可以快速跳过已经挂掉的站点；读取超时长一点（10 秒），因为有些接口确实要算很久。<b>写成一个数，只能取折中值，两头都不合适。</b></div>
+<h3>异常要分四类抓</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import requests
+from requests.exceptions import (
+    ConnectionError, HTTPError, Timeout, TooManyRedirects,
+)
+
+
+def fetch(url):
+    try:
+        r = requests.get(url, timeout=(3, 10))
+        r.raise_for_status()
+        return r.text
+    except Timeout:
+        print(f"超时     : {url}")
+    except HTTPError as e:
+        print(f"状态码错 : {e.response.status_code}")
+    except ConnectionError:
+        print(f"连不上   : {url}")
+    except TooManyRedirects:
+        print(f"跳转太多 : {url}")
+    return None
+
+
+print("四种异常各对应一类失败，抓的时候要分开")
+print("顺序也有讲究：Timeout 和 ConnectionError 都是 ConnectionError 的子类关系要理清")</pre></div>
+<div class="note"><b>为什么不能只写 <code class="inline">except Exception</code>？</b><br>因为「超时」和「状态码 500」的处理方式完全不同：<b>超时可以重试，500 重试也没用</b>（服务器本身有问题）。只抓一个 <code class="inline">Exception</code>，你就分不出该不该重试。<br><b>异常分类的价值不在「接住」，而在「分开处理」。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>实战：抓一个网页的标题</h2>
+<p>今天要交付的就是这个。<b>核心只有一行正则，难点全在外围。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+html = """&lt;html&gt;&lt;head&gt;&lt;title&gt;Python 官方教程&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;&lt;h1&gt;欢迎&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;"""
+
+m = re.search(r"&lt;title&gt;(.*?)&lt;/title&gt;", html, re.S | re.I)
+print("标题:", m.group(1).strip() if m else None)
+
+dirty = "&lt;title&gt;\n   多个空格   的标题\n&lt;/title&gt;"
+m2 = re.search(r"&lt;title&gt;(.*?)&lt;/title&gt;", dirty, re.S | re.I)
+print("原始:", repr(m2.group(1)))
+print("清理:", " ".join(m2.group(1).split()))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">标题: Python 官方教程
+原始: '\n   多个空格   的标题\n'
+清理: 多个空格 的标题</pre></div>
+<p>三个细节：</p>
+<ul>
+<li><b><code class="inline">re.S | re.I</code></b>：<code class="inline">S</code> 让 <code class="inline">.</code> 吃换行（标题可能跨行），<code class="inline">I</code> 让 <code class="inline">title</code> 不区分大小写（有的是 <code class="inline">&lt;TITLE&gt;</code>）。</li>
+<li><b><code class="inline">.*?</code> 非贪婪</b>：一个页面里可能有多个 <code class="inline">&lt;title&gt;</code>，贪婪会一路吃到最后一个。</li>
+<li><b><code class="inline">" ".join(s.split())</code></b>：这是「把所有连续空白压成一个空格」的标准写法。<code class="inline">strip()</code> 只去两头，中间的换行和多余空格去不掉。</li>
+</ul>
+<div class="note"><b>为什么不用 BeautifulSoup？</b>因为今天的重点是「网络」不是「解析」。<b>抓标题这种单一字段用正则足够</b>，等你需要按 DOM 结构提取（比如「第二个表格的第三行」），再用解析库。<b>先别为一行需求引入一个框架。</b></div>
+<h3>把它变成完整脚本</h3>
+<div class="codebox"><button class="copy">复制</button><pre># fetch_title.py —— 今天的产出
+import re
+import sys
+
+import requests
+from requests.exceptions import HTTPError, RequestException, Timeout
+
+TITLE = re.compile(r"&lt;title[^&gt;]*&gt;(.*?)&lt;/title&gt;", re.S | re.I)
+UA = {"User-Agent": "Mozilla/5.0 (compatible; learn-bot/1.0)"}
+
+
+def fetch_title(url, timeout=(3, 10)):
+    """返回标题字符串；失败返回 None（不抛异常，让调用方决定怎么办）"""
+    try:
+        r = requests.get(url, headers=UA, timeout=timeout)
+        r.raise_for_status()
+    except Timeout:
+        print(f"[超时] {url}", file=sys.stderr)
+        return None
+    except HTTPError as e:
+        print(f"[HTTP {e.response.status_code}] {url}", file=sys.stderr)
+        return None
+    except RequestException as e:
+        print(f"[失败] {url} -> {type(e).__name__}", file=sys.stderr)
+        return None
+
+    if not r.encoding or r.encoding.lower() == "iso-8859-1":
+        r.encoding = r.apparent_encoding
+    m = TITLE.search(r.text)
+    return " ".join(m.group(1).split()) if m else None
+
+
+if __name__ == "__main__":
+    for u in sys.argv[1:]:
+        t = fetch_title(u)
+        print(f"{u}\n    -> {t}")</pre></div>
+<p>三段结构值得注意：</p>
+<table>
+<tr><th>片段</th><th>为什么这么写</th></tr>
+<tr><td><code>except RequestException</code></td><td><b>它是 requests 所有异常的基类</b>。前面三个具体异常抓完了，剩下的用基类兜底，保证函数<b>永远不抛异常</b></td></tr>
+<tr><td><code>return None</code></td><td>失败返回 <code>None</code> 而不是抛异常——<b>批量抓取时，一个站点失败不该中断整批</b></td></tr>
+<tr><td><code>r.encoding = r.apparent_encoding</code></td><td>只在「没写 charset」或「猜成 ISO-8859-1」时才改，<b>能少一次全文扫描</b></td></tr>
+</table>
+<div class="danger"><b>不要在循环里 <code class="inline">except</code> 之后 <code class="inline">continue</code> 什么也不记。</b><br>批量抓 100 个链接，失败了 5 个，你要能说出来是哪 5 个。<b>把失败列表收集起来，和分析日志时收集「解析失败行」是同一条纪律。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 7、8 题是明天异步对比的地基</b>——明天要拿今天的函数做「同步版」，再写一个异步版对比耗时。</p>
+<ol class="task">
+<li><b>拆 URL</b>：用 <code class="inline">urlparse</code> 拆出 <code class="inline">scheme / hostname / port / path / query</code>，并用 <code class="inline">parse_qs</code> 把查询串转成字典</li>
+<li><b>拼请求报文</b>：写一个 <code class="inline">build_request(method, path, host, headers)</code>，返回完整的 HTTP 请求字符串。<b>注意末尾那个空行</b></li>
+<li><b>拆响应报文</b>：给一段原始响应文本，返回 <code class="inline">(状态码, 头部字典, 正文)</code></li>
+<li><b>给抓取加重试</b>：失败时重试 3 次，每次间隔递增（1s / 2s / 4s）。<b>别真 sleep，把要等的时间打印出来就行</b></li>
+<li><b>合并多个页面的标题</b>：抓 3 个页面（用假 html 代替），输出成 csv，两列 <code class="inline">url,title</code></li>
+<li><b>处理没有 title 的页面</b>：正则匹配不到时返回什么？写一个用例证明你的处理方式</li>
+<li><b>并发前的准备</b>：写 <code class="inline">fetch_all(urls)</code>，<b>串行</b>请求（用 <code class="inline">time.sleep(0.1)</code> 模拟网络延迟），打印总耗时</li>
+<li><b>加超时分类统计</b>：给 <code class="inline">fetch_all</code> 加返回值，统计「成功 / 超时 / 其他失败」各几个</li>
+</ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<h3>第 1 题 · 拆 URL</h3>
+<div class="codebox"><button class="copy">复制</button><pre>from urllib.parse import urlparse, parse_qs, urljoin
+
+u = "https://example.com:8443/search?q=python&amp;page=2#top"
+p = urlparse(u)
+
+print("scheme  :", p.scheme)
+print("host    :", p.hostname)
+print("port    :", p.port)
+print("path    :", p.path)
+print("query   :", p.query)
+print("fragment:", p.fragment)
+print()
+print("参数    :", parse_qs(p.query))
+print("拼回去  :", urljoin("https://example.com/a/b", "../c/d"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">scheme  : https
+host    : example.com
+port    : 8443
+path    : /search
+query   : q=python&amp;page=2
+fragment: top
+
+参数    : {'q': ['python'], 'page': ['2']}
+拼回去  : https://example.com/c/d</pre></div>
+<p><b>两个细节：</b><code class="inline">p.hostname</code> 是小写且不含端口（<code class="inline">p.netloc</code> 才含端口）；<code class="inline">parse_qs</code> 返回的值<b>永远是列表</b>，因为同一个参数可以出现多次（<code class="inline">?tag=a&amp;tag=b</code>）。</p>
+<h3>第 2 题 · 拼请求报文</h3>
+<div class="codebox"><button class="copy">复制</button><pre>def build_request(method, path, host, headers=None):
+    lines = [f"{method} {path} HTTP/1.1", f"Host: {host}"]
+    for k, v in (headers or {}).items():
+        lines.append(f"{k}: {v}")
+    lines.append("")
+    lines.append("")
+    return "\r\n".join(lines)
+
+
+req = build_request("GET", "/index.html", "example.com",
+                    {"User-Agent": "test/1.0", "Accept": "*/*"})
+print(repr(req))
+print()
+print("以空行结尾:", req.endswith("\r\n\r\n"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">'GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: test/1.0\r\nAccept: */*\r\n\r\n'
+
+以空行结尾: True</pre></div>
+<p><b>为什么 <code class="inline">lines</code> 里要 append 两次空字符串？</b><br>最后一行头部后面需要一个 <code class="inline">\r\n</code>，空行再需要一个 <code class="inline">\r\n</code>。<code class="inline">"\r\n".join([..., "", ""])</code> 正好产生 <code class="inline">...\r\n\r\n</code>。<b>只 append 一个的话，结尾是 <code class="inline">\r\n</code>，服务器会一直等头部。</b><br>更直观的写法是 <code class="inline">"\r\n".join(lines) + "\r\n\r\n"</code>，但那样要多拼一次。</p>
+<h3>第 3 题 · 拆响应报文</h3>
+<div class="codebox"><button class="copy">复制</button><pre>def parse_response(raw):
+    head, _, body = raw.partition("\r\n\r\n")
+    lines = head.split("\r\n")
+    status = int(lines[0].split()[1])
+    headers = {}
+    for line in lines[1:]:
+        k, _, v = line.partition(": ")
+        headers[k.lower()] = v
+    return status, headers, body
+
+
+raw = ("HTTP/1.1 404 Not Found\r\n"
+       "Content-Type: text/plain\r\n"
+       "\r\n"
+       "not here")
+status, headers, body = parse_response(raw)
+print("状态码:", status)
+print("头部  :", headers)
+print("正文  :", body)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">状态码: 404
+头部  : {'content-type': 'text/plain'}
+正文  : not here</pre></div>
+<p><b>头部键统一转小写</b>是个好习惯——HTTP 规范说头部名不区分大小写，但不同服务器发出来的大小写不一样（<code class="inline">Content-Type</code> / <code class="inline">content-type</code> 都见过）。统一 <code class="inline">.lower()</code> 之后，取值就不用猜了。</p>
+<h3>第 4 题 · 重试</h3>
+<div class="codebox"><button class="copy">复制</button><pre>def fetch_with_retry(url, retries=3):
+    for attempt in range(1, retries + 1):
+        ok = attempt == 3 and "bad" not in url   # 假装前两次失败，bad 的永远失败
+        if ok:
+            print(f"第 {attempt} 次成功: {url}")
+            return "内容"
+        if attempt &lt; retries:
+            print(f"第 {attempt} 次失败，等 {2 ** (attempt - 1)} 秒后重试")
+        else:
+            print(f"第 {attempt} 次失败，已是最后一次")
+    print("放弃")
+    return None
+
+
+print(fetch_with_retry("https://example.com"))
+print()
+print(fetch_with_retry("https://bad.example"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">第 1 次失败，等 1 秒后重试
+第 2 次失败，等 2 秒后重试
+第 3 次成功: https://example.com
+内容
+
+第 1 次失败，等 1 秒后重试
+第 2 次失败，等 2 秒后重试
+第 3 次失败，已是最后一次
+放弃
+None</pre></div>
+<p><b><code class="inline">2 ** (attempt - 1)</code> 就是指数退避</b>：1、2、4、8…… 刚失败时对方可能只是瞬间抖动，等太久没意义；连续失败说明对方压力大，<b>这时候越等越久反而更容易成功</b>——你退一步，给它喘口气。</p>
+<h3>第 5 题 · 标题汇总成 csv</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import csv
+import io
+import re
+
+TITLE = re.compile(r"&lt;title[^&gt;]*&gt;(.*?)&lt;/title&gt;", re.S | re.I)
+
+pages = [
+    ("https://a.com", "&lt;title&gt;站点 A&lt;/title&gt;"),
+    ("https://b.com", "&lt;TITLE&gt;站点 B&lt;/TITLE&gt;"),
+    ("https://c.com", "&lt;p&gt;没有标题&lt;/p&gt;"),
+]
+
+rows = []
+for url, html in pages:
+    m = TITLE.search(html)
+    rows.append({"url": url, "title": " ".join(m.group(1).split()) if m else ""})
+
+buf = io.StringIO()
+w = csv.DictWriter(buf, fieldnames=["url", "title"])
+w.writeheader()
+w.writerows(rows)
+print("\n".join(buf.getvalue().splitlines()))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">url,title
+https://a.com,站点 A
+https://b.com,站点 B
+https://c.com,</pre></div>
+<p><b>注意 <code class="inline">&lt;TITLE&gt;</code> 大写那个能匹配上，是因为加了 <code class="inline">re.I</code>。</b>去掉它试试——会变成空字符串。<b>真实网页里大小写混用很常见。</b></p>
+<h3>第 6 题 · 没有 title 怎么办</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+TITLE = re.compile(r"&lt;title[^&gt;]*&gt;(.*?)&lt;/title&gt;", re.S | re.I)
+
+
+def get_title(html):
+    m = TITLE.search(html)
+    return " ".join(m.group(1).split()) if m else ""
+
+
+print("有标题  :", repr(get_title("&lt;title&gt;Hi&lt;/title&gt;")))
+print("空标题  :", repr(get_title("&lt;title&gt;&lt;/title&gt;")))
+print("没标题  :", repr(get_title("&lt;p&gt;x&lt;/p&gt;")))
+print("空输入  :", repr(get_title("")))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">有标题  : 'Hi'
+空标题  : ''
+没标题  : ''
+空输入  : ''</pre></div>
+<p><b>返回空字符串而不是 <code class="inline">None</code>，是因为 csv 里 <code class="inline">None</code> 会被写成 <code class="inline">None</code> 四个字母。</b>统一成空字符串，「没有」和「空」在数据里的表示一致，下游处理不用两种分支。</p>
+<h3>第 7 题 · 串行版（明天要对比的基准）</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import time
+
+
+def fetch(url):
+    time.sleep(0.1)          # 模拟一次网络往返
+    return f"{url} 的内容"
+
+
+def fetch_all(urls):
+    return [fetch(u) for u in urls]
+
+
+urls = [f"https://site{i}.com" for i in range(1, 6)]
+
+start = time.perf_counter()
+results = fetch_all(urls)
+elapsed = time.perf_counter() - start
+
+print("抓到", len(results), "个页面")
+print(f"总耗时 {elapsed:.2f} 秒")
+print(f"平均每个 {elapsed / len(urls) * 1000:.0f} ms")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">抓到 5 个页面
+总耗时 0.50 秒
+平均每个 100 ms</pre></div>
+<div class="warn"><b>计时数字每次跑都会有微小差异</b>（0.49~0.52 都有可能）。<b>你在自己机器上跑出 <code class="inline">0.51 秒</code> 是对的，不是出错。</b><br>所以写进笔记时<b>只记结论</b>（「5 个请求 ≈ 5 × 单次延迟」），别记具体数字。</div>
+<h3>第 8 题 · 分类统计</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from collections import Counter
+
+
+def fetch(url):
+    time.sleep(0.1)
+    if "timeout" in url:
+        return "timeout"
+    if "bad" in url:
+        return "error"
+    return "ok"
+
+
+def fetch_all(urls):
+    stats = Counter()
+    for u in urls:
+        stats[fetch(u)] += 1
+    return stats
+
+
+urls = [
+    "https://a.com", "https://timeout1.com", "https://b.com",
+    "https://bad1.com", "https://timeout2.com",
+]
+s = fetch_all(urls)
+print("成功:", s["ok"], "超时:", s["timeout"], "其他:", s["error"])
+print("总数对得上:", sum(s.values()) == len(urls))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">成功: 2 超时: 2 其他: 1
+总数对得上: True</pre></div>
+<p><b>最后那行 <code class="inline">sum(s.values()) == len(urls)</code> 是个便宜的自检。</b>批量任务里最怕的不是失败，是<b>「丢了几条你还不知道」</b>。加一句总数校验，问题当场暴露。</p>
+</details>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D017 笔记 · 网络编程
+
+## socket：和 C 一模一样的五个函数
+socket(AF_INET, SOCK_STREAM) → connect((host, port)) → sendall/recv → close
+不用传长度、不用 malloc 缓冲、不用 htons
+settimeout 必设（C 里是 setsockopt(SO_RCVTIMEO)）
+
+## HTTP 报文
+请求 = 请求行 + 头 + 空行 + 正文
+  GET / HTTP/1.1
+  Host: example.com        ★HTTP/1.1 必填，否则 400
+  Connection: close
+  (空行)                   ★是 \r\n\r\n 两个换行，漏了服务器一直等
+响应 = 状态行 + 头 + 空行 + 正文
+  HTTP/1.1 200 OK
+  Content-Type: ...; charset=utf-8
+  (空行)
+partition("\r\n\r\n") 切头部和正文（比 split 好：只切第一个）
+
+## 手写 socket 的六个坑（requests 全替你处理）
+1 不设 timeout          → 永久阻塞
+2 sendall 传 str        → TypeError，必须 encode
+3 不用 with             → 句柄泄漏
+4 recv 只调一次         → 拿到半截（TCP 是字节流）
+5 bytes 反复 +          → O(n²)
+6 硬 decode utf-8       → 服务器发 gbk 就崩
+
+## requests
+r.status_code / r.text / r.content / r.json() / r.headers / r.url
+★4xx 5xx 不抛异常，要 raise_for_status()
+★r.encoding 可能猜成 ISO-8859-1 → 手动改 r.encoding = r.apparent_encoding
+  （改了之后重新读 r.text 才生效；已存进变量的不会变）
+
+## 六个必设
+timeout=(3, 10)   连接 3s / 读取 10s，默认无超时是最大的坑
+headers           User-Agent 不设，很多站点 403
+raise_for_status  否则 404 页面被当正常内容解析
+params            自动转义
+verify=True       别关
+Session()         复用连接 + 保持登录态
+
+## 异常四类
+Timeout / HTTPError / ConnectionError / TooManyRedirects
+最后用 RequestException 兜底 → 函数永远不抛异常
+超时可重试，500 重试没用 → 必须分类
+
+## 抓标题
+r"&lt;title[^&gt;]*&gt;(.*?)&lt;/title&gt;" + re.S | re.I
+" ".join(s.split()) 压掉所有连续空白（strip 只去两头）
+urlparse / parse_qs；parse_qs 的值永远是列表
+
+## 纪律
+- 批量任务收集失败列表，别 continue 了事
+- 加总数自检：sum(统计) == 输入条数
+- 计时结论只记量级，别记具体数字
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D017 的产出是 <b>fetch_title.py</b>：输入 URL，输出标题，失败分类记录。</p>
+  <p>明天 D018：<b>异步编程</b>——把今天这些「等 0.1 秒」的串行请求，改成同时发出去。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

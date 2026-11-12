@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D016 学习包 · 正则实战与文本处理</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 016 · 第 3 周</div>
+  <h1>正则实战与文本处理：做一份日志分析报告</h1>
+  <p>昨天学会了从一行里抠字段，今天把它变成「能回答业务问题」的东西：Top IP、Top URL、错误率、按小时分布。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>📚 re / csv / json</span>
+    <span>📦 产出：日志分析报告</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：先补三个知识缺口，再做完整报告</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1 节：多行匹配。<b><code>re.M</code> 和 <code>re.S</code> 是两件事，别混</b></span></div><div class="tl"><b>第 2 小时</b><span>读 2–3 节：csv / json / 编码。这三样每天都会碰到</span></div><div class="tl"><b>第 3 小时</b><span>读 4 节，把报告脚本跑通，<b>再加一个「最慢的 3 个请求」</b></span></div><div class="tl"><b>第 4 小时</b><span>八道练习。第 5–8 题连起来就是 D020 的雏形</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day16
+cd ~/python-learn/day16
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate</pre></div>
+<div class="note"><b>今天仍然不需要第三方库。</b><code class="inline">re</code>、<code class="inline">csv</code>、<code class="inline">json</code>、<code class="inline">collections</code> 全是标准库。<br><b>这三样东西合起来的用途是「把非结构化变成结构化」</b>——日志是一行行文本，报告是一张表，中间那道工序就是今天的全部内容。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>多行匹配：<code class="inline">re.M</code> 改的是 <code class="inline">^$</code>，<code class="inline">re.S</code> 改的是 <code class="inline">.</code></h2>
+<p>这两个标志经常被混为一谈，其实它们改的是完全不同的东西。<b>一个管「<code class="inline">^</code> <code class="inline">$</code> 认哪一行」，一个管「<code class="inline">.</code> 吃不吃换行」。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+text = """200 OK
+404 Not Found
+500 Error"""
+
+print("不加标志:", re.findall(r"^\d+", text))
+print("re.M    :", re.findall(r"^\d+", text, re.M))
+print("re.M + $:", re.findall(r"^\d+$", text, re.M))
+print()
+block = """&lt;div class="a"&gt;
+  内容
+&lt;/div&gt;"""
+print("不加标志:", re.findall(r'&lt;div class="a"&gt;(.*)&lt;/div&gt;', block))
+print("re.S    :", re.findall(r'&lt;div class="a"&gt;(.*)&lt;/div&gt;', block, re.S))
+print("re.S 非贪婪:", re.findall(r'&lt;div class="a"&gt;(.*?)&lt;/div&gt;', block, re.S))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">不加标志: ['200']
+re.M    : ['200', '404', '500']
+re.M + $: []
+
+不加标志: []
+re.S    : ['\n  内容\n']
+re.S 非贪婪: ['\n  内容\n']</pre></div>
+<table>
+<tr><th>标志</th><th>它改动的东西</th><th>不加时</th><th>加了以后</th></tr>
+<tr><td><code>re.M</code></td><td><code>^</code> 和 <code>$</code></td><td>只认<b>整段文本</b>的开头和结尾</td><td>认<b>每一行</b>的开头和结尾</td></tr>
+<tr><td><code>re.S</code></td><td><code>.</code></td><td><code>.</code> 不吃换行，遇到 <code>\n</code> 就停</td><td><code>.</code> 把换行也当普通字符吃掉</td></tr>
+</table>
+<h3>第三行那个空列表，是个容易看走眼的地方</h3>
+<p><code class="inline">re.M + $</code> 那行返回 <code class="inline">[]</code>，看着像「<code class="inline">re.M</code> 不起作用」，其实是因为 <code class="inline">^\d+$</code> 要求<b>整行只有数字</b>，而 <code class="inline">200 OK</code> 后面还有 <code class="inline">OK</code>。<b><code class="inline">re.M</code> 只是让 <code class="inline">$</code> 认行尾，不会让 <code class="inline">$</code> 变松。</b></p>
+<p>第二个例子更能说明 <code class="inline">re.S</code> 的必要性：不加标志时，<code class="inline">(.*)</code> 遇到第一个换行就停了，而后面还要求有 <code class="inline">&lt;/div&gt;</code>，接不上，于是整体失败——<b>返回空列表，一个报错都没有</b>。</p>
+<div class="warn"><b>加了 <code class="inline">re.S</code> 之后，<code class="inline">.*</code> 的贪婪问题会放大。</b><br>上面那个例子里非贪婪和贪婪结果一样，因为只有一个 <code class="inline">div</code>。但换成一整页 HTML（有几十个 <code class="inline">&lt;/div&gt;</code>），<code class="inline">.*</code> 会从第一个 div 一路吃到最后一个。<b>用 <code class="inline">re.S</code> 的时候，几乎总要配非贪婪 <code class="inline">.*?</code>。</b></div>
+<div class="note"><b>速记：<code class="inline">re.M</code> 的 M 是 Multi-line，管「行」；<code class="inline">re.S</code> 的 S 是 DOTALL，管「点」。<br></b>一个改锚点，一个改点号，互不相干。真要两个都改，写成 <code class="inline">re.M | re.S</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>csv 与 json：两种「表格」怎么互转</h2>
+<p>日志解析完是一堆字典，接下来要么给人看（csv，能直接用 Excel 打开），要么给程序看（json）。<b><code class="inline">csv</code> 模块最容易踩的坑是：读出来全是字符串。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>import csv
+import io
+import json
+
+CSV_TEXT = """ip,path,status,size
+127.0.0.1,/index.html,200,512
+10.0.0.5,/api/login,200,128
+10.0.0.5,/api/user,401,64"""
+
+rows = list(csv.DictReader(io.StringIO(CSV_TEXT)))
+print("读 csv :", len(rows), "行")
+print("第一行 :", rows[0])
+print()
+for r in rows:
+    r["status"] = int(r["status"])
+    r["size"] = int(r["size"])
+print("转 int :", rows[0])
+print("总流量 :", sum(r["size"] for r in rows))
+print()
+as_json = json.dumps(rows, ensure_ascii=False)
+print(as_json)
+print("再读回来一样吗:", json.loads(as_json) == rows)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">读 csv : 3 行
+第一行 : {'ip': '127.0.0.1', 'path': '/index.html', 'status': '200', 'size': '512'}
+
+转 int : {'ip': '127.0.0.1', 'path': '/index.html', 'status': 200, 'size': 512}
+总流量 : 704
+
+[{"ip": "127.0.0.1", "path": "/index.html", "status": 200, "size": 512}, {"ip": "10.0.0.5", "path": "/api/login", "status": 200, "size": 128}, {"ip": "10.0.0.5", "path": "/api/user", "status": 401, "size": 64}]
+再读回来一样吗: True</pre></div>
+<div class="danger"><b>看第一行：<code class="inline">'status': '200'</code>——带引号，是字符串。</b><br>csv 没有类型系统，所有值都是文本。你要拿它算数（<code class="inline">sum(r["size"])</code>），必须先转 <code class="inline">int</code>。<br><b>不转的后果：</b><code class="inline">sum()</code> 会直接抛 <code class="inline">TypeError: unsupported operand type(s) for +: 'int' and 'str'</code>；但如果只是比较大小或者排序，它会<b>按字符串排</b>——<code class="inline">"100"</code> 排在 <code class="inline">"20"</code> 前面，而且不报错。</div>
+<table>
+<tr><th>操作</th><th>写法</th><th>注意</th></tr>
+<tr><td>读 csv → 字典列表</td><td><code>csv.DictReader(f)</code></td><td>列名来自第一行；值全是字符串</td></tr>
+<tr><td>写字典列表 → csv</td><td><code>csv.DictWriter(f, fieldnames=[...])</code></td><td><b>必须调 <code>writeheader()</code></b>，否则没有表头</td></tr>
+<tr><td>字典 → json 文本</td><td><code>json.dumps(obj, ensure_ascii=False)</code></td><td><b>不加 <code>ensure_ascii=False</code> 中文会变成 <code>\u4e2d\u6587</code></b></td></tr>
+<tr><td>json 文本 → 字典</td><td><code>json.loads(s)</code></td><td>数字、布尔值会还原成原类型，这点比 csv 强</td></tr>
+<tr><td>写文件</td><td><code>json.dump(obj, f, ensure_ascii=False, indent=2)</code></td><td><code>dump</code> 收文件对象，<code>dumps</code> 返回字符串</td></tr>
+</table>
+<div class="note"><b><code class="inline">dump</code> 和 <code class="inline">dumps</code> 差一个 <code class="inline">s</code>，那个 s 是 string。</b><br>同理 <code class="inline">load</code> 收文件对象、<code class="inline">loads</code> 收字符串。写反了会得到一句很奇怪的话：<code class="inline">AttributeError: 'str' object has no attribute 'read'</code>——报错里不会提醒你「是不是少了个 s」。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>编码：<code class="inline">UnicodeDecodeError</code> 到底在说什么</h2>
+<p>这个报错每个人都遇到过，但很多人只是「换个编码再试试」。今天把它彻底讲清楚——<b>字符和字节是两回事，编码就是两者之间的翻译表。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>text = "中文测试"
+raw = text.encode("gbk")
+print("原文      :", text)
+print("GBK 字节  :", raw)
+print("长度      :", len(text), "字符 /", len(raw), "字节")
+print()
+print("按 gbk 解回来:", raw.decode("gbk"))
+print("按 utf-8 硬解:")
+try:
+    raw.decode("utf-8")
+except UnicodeDecodeError as e:
+    print("  ", e)
+print()
+bad = raw.decode("utf-8", errors="replace")
+print("replace 后长度:", len(bad), "含替换符:", "\ufffd" in bad)
+print("ignore  后长度:", len(raw.decode("utf-8", errors="ignore")))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">原文      : 中文测试
+GBK 字节  : b'\xd6\xd0\xce\xc4\xb2\xe2\xca\xd4'
+长度      : 4 字符 / 8 字节
+
+按 gbk 解回来: 中文测试
+按 utf-8 硬解:
+   'utf-8' codec can't decode byte 0xd6 in position 0: invalid continuation byte
+
+replace 后长度: 7 含替换符: True
+ignore  后长度: 1</pre></div>
+<p>报错那句话拆开看：<b><code class="inline">0xd6</code> 这个字节，按 utf-8 的规则解释不通</b>。utf-8 里一个中文字符占 3 个字节，而且第一个字节必须以 <code class="inline">1110</code> 开头；<code class="inline">0xd6</code> 是 <code class="inline">11010110</code>，它表示「后面还跟 1 个字节」，可后面那个 <code class="inline">0xd0</code> 又是另一个开头——这就是 <code class="inline">invalid continuation byte</code> 的字面意思。</p>
+<table>
+<tr><th>编码</th><th>一个汉字占</th><th>什么时候会遇到</th></tr>
+<tr><td><code>utf-8</code></td><td>3 字节</td><td><b>默认全用它</b>。Linux / macOS / 网页 / git 都是</td></tr>
+<tr><td><code>gbk</code></td><td>2 字节</td><td>Windows 中文系统导出的 csv、老系统日志</td></tr>
+<tr><td><code>utf-8-sig</code></td><td>3 字节 + 开头 3 字节 BOM</td><td><b>Excel 另存的 csv 几乎都带 BOM</b></td></tr>
+</table>
+<h3>BOM：看不见但会让你判断失败的三个字节</h3>
+<div class="codebox"><button class="copy">复制</button><pre>bom = b"\xef\xbb\xbfabc"
+print("原始字节 :", bom)
+print("utf-8 解 :", repr(bom.decode("utf-8")), "长度", len(bom.decode("utf-8")))
+print("utf-8-sig:", repr(bom.decode("utf-8-sig")), "长度", len(bom.decode("utf-8-sig")))
+print()
+print("比较:", bom.decode("utf-8") == "abc", bom.decode("utf-8-sig") == "abc")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">原始字节 : b'\xef\xbb\xbfabc'
+utf-8 解 : '\ufeffabc' 长度 4
+utf-8-sig: 'abc' 长度 3
+
+比较: False True</pre></div>
+<div class="danger"><b>这就是「删掉 BOM 三个字节，为什么用 <code class="inline">utf-8</code> 读不出来」的原因。</b><br>它不是「编码错了」，而是<b>那三个字节被当成了一个真实字符 <code class="inline">\ufeff</code></b>，粘在你第一个字段的最前面。表现出来是：</div>
+<ul>
+<li><code class="inline">rows[0]["ip"]</code> 打印出来看着是 <code class="inline">"127.0.0.1"</code>，但 <code class="inline">== "127.0.0.1"</code> 是 <code class="inline">False</code></li>
+<li>csv 的第一列名变成了 <code class="inline">"\ufeffip"</code>，<code class="inline">row["ip"]</code> 直接 <code class="inline">KeyError</code></li>
+<li>用 Excel 打开完全正常，所以你根本想不到是它</li>
+</ul>
+<p><b>解法只有一句：读可能来自 Excel 的 csv，一律用 <code class="inline">encoding="utf-8-sig"</code>。</b>它对没有 BOM 的文件同样有效，是个安全的默认值。</p>
+<h3><code class="inline">errors</code> 参数三档</h3>
+<table>
+<tr><th>取值</th><th>遇到解不了的字节</th><th>该不该用</th></tr>
+<tr><td><code>"strict"</code>（默认）</td><td>抛 <code>UnicodeDecodeError</code></td><td><b>数据要准就必须用这个</b>，报错比静默丢数据好</td></tr>
+<tr><td><code>"replace"</code></td><td>换成 <code>\ufffd</code>（上方那个方框）</td><td>只做粗看、能做下去就行</td></tr>
+<tr><td><code>"ignore"</code></td><td><b>直接删掉</b></td><td>危险。4 个字符读成了 1 个，你还不知道</td></tr>
+</table>
+<p>看上面那行 <code class="inline">ignore 后长度: 1</code>——原本 4 个汉字，静默变成了 1 个字符。<b>它不报错、不警告，你的程序照样跑完，只是数据是错的。</b></p>
+<div class="warn"><b>处理编码问题的正确顺序：</b><br>① 先确定文件原本是什么编码（<code class="inline">file -I 文件名</code> 或看它从哪来）<br>② 用对编码去读，<b>不要用 <code class="inline">errors="ignore"</code> 硬扛</b><br>③ 读进来之后统一转成 <code class="inline">str</code>（Python 内部就是 Unicode），出去时再 <code class="inline">encode</code><br><b>中间这段全是 <code class="inline">str</code>，只有进出文件和网络的时候才是 <code class="inline">bytes</code>。</b>记住这条界线，编码问题会少一大半。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>实战：一份日志能回答哪些问题</h2>
+<p>昨天是「抠字段」，今天是「作答」。同样七行日志，能算出五组数字：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+from collections import Counter
+
+LOG = """127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 200 512
+10.0.0.5 - - [13/Nov/2026:02:15:35 +0800] "POST /api/login HTTP/1.1" 200 128
+10.0.0.5 - - [13/Nov/2026:02:15:36 +0800] "GET /api/user HTTP/1.1" 401 64
+192.168.1.9 - - [13/Nov/2026:02:16:01 +0800] "GET /static/app.js HTTP/1.1" 304 0
+127.0.0.1 - - [13/Nov/2026:02:16:10 +0800] "GET /index.html HTTP/1.1" 200 980
+10.0.0.5 - - [13/Nov/2026:03:01:02 +0800] "GET /api/order HTTP/1.1" 500 32
+127.0.0.1 - - [13/Nov/2026:03:18:44 +0800] "GET /missing HTTP/1.1" 404 32"""
+
+PATTERN = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3}) - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\] '
+    r'"(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+" '
+    r'(?P&lt;status&gt;\d{3}) (?P&lt;size&gt;\d+)'
+)
+
+rows = [m.groupdict() for m in PATTERN.finditer(LOG)]
+print("解析:", len(rows), "行")
+print()
+print("Top IP:")
+for ip, n in Counter(r["ip"] for r in rows).most_common(3):
+    print(f"  {ip:&lt;15} {n}")
+print()
+print("Top URL:")
+for p, n in Counter(r["path"] for r in rows).most_common(3):
+    print(f"  {p:&lt;18} {n}")
+print()
+print("状态码:")
+for s, n in sorted(Counter(r["status"] for r in rows).items()):
+    print(f"  {s}  {n}")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">解析: 7 行
+
+Top IP:
+  127.0.0.1       3
+  10.0.0.5        3
+  192.168.1.9     1
+
+Top URL:
+  /index.html        2
+  /api/login         1
+  /api/user          1
+
+状态码:
+  200  3
+  304  1
+  401  1
+  404  1
+  500  1</pre></div>
+<div class="note"><b><code class="inline">Counter</code> 是这一步的关键工具。</b><code class="inline">Counter(可迭代对象)</code> 直接给你「每个值出现几次」，<code class="inline">most_common(n)</code> 按次数从多到少给你前 n 个。<br><b>手写也只要三行，但没必要</b>——而且 <code class="inline">most_common</code> 用的是稳定排序，次数相同的按首次出现顺序排，结果可复现。</div>
+<p>现在加上汇总信息——<b>总请求数、总流量、错误率、按小时分布</b>：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+from collections import Counter
+
+LOG = """127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 200 512
+10.0.0.5 - - [13/Nov/2026:02:15:35 +0800] "POST /api/login HTTP/1.1" 200 128
+10.0.0.5 - - [13/Nov/2026:02:15:36 +0800] "GET /api/user HTTP/1.1" 401 64
+192.168.1.9 - - [13/Nov/2026:02:16:01 +0800] "GET /static/app.js HTTP/1.1" 304 0
+127.0.0.1 - - [13/Nov/2026:02:16:10 +0800] "GET /index.html HTTP/1.1" 200 980
+10.0.0.5 - - [13/Nov/2026:03:01:02 +0800] "GET /api/order HTTP/1.1" 500 32
+127.0.0.1 - - [13/Nov/2026:03:18:44 +0800] "GET /missing HTTP/1.1" 404 32"""
+
+PATTERN = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3}) - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\] '
+    r'"(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+" '
+    r'(?P&lt;status&gt;\d{3}) (?P&lt;size&gt;\d+)'
+)
+HOUR = re.compile(r":(\d{2}):\d{2}:\d{2}")
+
+rows = [m.groupdict() for m in PATTERN.finditer(LOG)]
+total = len(rows)
+bytes_total = sum(int(r["size"]) for r in rows)
+errors = [r for r in rows if r["status"].startswith(("4", "5"))]
+
+print("=" * 42)
+print(f"总请求 {total} 条 · 流量 {bytes_total} 字节")
+print(f"错误请求 {len(errors)} 条 · 错误率 {len(errors) / total:.1%}")
+print("=" * 42)
+print()
+print("按小时")
+for h in sorted({HOUR.search(r["time"]).group(1) for r in rows}):
+    n = sum(1 for r in rows if HOUR.search(r["time"]).group(1) == h)
+    print(f"  {h} 点  {'#' * n} {n}")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">==========================================
+总请求 7 条 · 流量 1748 字节
+错误请求 3 条 · 错误率 42.9%
+==========================================
+
+按小时
+  02 点  ##### 5
+  03 点  ## 2</pre></div>
+<p>三个写法值得单独说：</p>
+<table>
+<tr><th>写法</th><th>为什么这么做</th></tr>
+<tr><td><code>r["status"].startswith(("4", "5"))</code></td><td><b>用元组，不是 <code>or</code>。</b>写成 <code>startswith("4") or startswith("5")</code> 也对，但字符串会被调两次；写成 <code>startswith("4" or "5")</code> 则<b>只判 "4"</b>，因为 <code>"4" or "5"</code> 求值结果是 <code>"4"</code></td></tr>
+<tr><td><code>{HOUR.search(...).group(1) for r in rows}</code></td><td>集合推导先拿到「有哪些小时」，省得对每一行都试一次。顺序不定，所以外面套 <code>sorted()</code></td></tr>
+<tr><td><code>{len(errors) / total:.1%}</code></td><td><code>:.1%</code> 自动乘 100 并加百分号，比手写 <code>f"{x*100:.1f}%"</code> 少一处出错</td></tr>
+</table>
+<div class="danger"><b>注意 <code class="inline">total = len(rows)</code> 这个位置。</b><br>如果日志一行都没解析出来，<code class="inline">total</code> 就是 0，<code class="inline">len(errors) / total</code> 会抛 <code class="inline">ZeroDivisionError</code>。<b>真实日志里这一定会发生</b>（比如文件是空的，或者格式完全不对）。<br>防御写法：<code class="inline">rate = len(errors) / total if total else 0</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>结果怎么交出去：屏幕、csv、json 三选一</h2>
+<p>算出来的东西总要落到某个地方。三种最常见的去处，各自的适用场景很不一样：</p>
+<table>
+<tr><th>去处</th><th>写起来</th><th>谁看</th><th>注意</th></tr>
+<tr><td>打印到屏幕</td><td><code>print</code> + f-string 补空格</td><td>你自己</td><td>中英混排要考虑对齐，纯 ASCII 用 <code>:</code>&lt;n&gt;</td></tr>
+<tr><td>写 csv</td><td><code>csv.DictWriter</code></td><td><b>人</b>（Excel 能直接打开）</td><td>必须 <code>writeheader()</code>；<b>写完别忘了 <code>newline=""</code></b></td></tr>
+<tr><td>写 json</td><td><code>json.dump(obj, f, ensure_ascii=False, indent=2)</code></td><td>下一个程序</td><td>中文必须 <code>ensure_ascii=False</code>，否则全是 <code>\u</code></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>import csv
+import io
+from collections import Counter
+
+rows = [
+    {"ip": "127.0.0.1", "path": "/index.html", "status": "200", "size": "512"},
+    {"ip": "10.0.0.5", "path": "/api/login", "status": "200", "size": "128"},
+    {"ip": "10.0.0.5", "path": "/api/user", "status": "401", "size": "64"},
+]
+
+buf = io.StringIO()
+w = csv.DictWriter(buf, fieldnames=["ip", "count"])
+w.writeheader()
+for ip, n in sorted(Counter(r["ip"] for r in rows).items()):
+    w.writerow({"ip": ip, "count": n})
+print("\n".join(buf.getvalue().splitlines()))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">ip,count
+10.0.0.5,2
+127.0.0.1,1</pre></div>
+<div class="warn"><b>为什么这里要用 <code class="inline">splitlines()</code> 转一道？</b><br>因为 <code class="inline">csv</code> 写出来的行尾是 <code class="inline">\r\n</code>，<code class="inline">print</code> 出来时那个 <code class="inline">\r</code> 会让光标回到行首，看着像是每行之间多了个空行。<br><b><code class="inline">splitlines()</code> 专门处理这件事</b>——它认 <code class="inline">\n</code>、<code class="inline">\r\n</code>、<code class="inline">\r</code> 三种换行，比 <code class="inline">split("\n")</code> 稳。<b>这也是第 5 节末尾那个 <code class="inline">newline=""</code> 讨论的同一个根因</b>：csv 模块自己管换行符。</div>
+<div class="warn"><b>为什么这里用 <code class="inline">io.StringIO()</code> 而不是真写文件？</b><br>一是演示时不污染目录，二是<b>测试时更好用</b>——<code class="inline">csv.DictWriter</code> 接收任何「有 write 方法的对象」，字符串缓冲区也算。你以后写测试，就可以<b>断言输出的 csv 内容</b>，而不用去读磁盘文件。</div>
+<div class="note"><b>真写文件时，那个 <code class="inline">newline=""</code> 不是可选项。</b><br><code class="inline">open(path, "w", newline="", encoding="utf-8")</code>——不加它，Windows 上 csv 每行之间会多出一个空行。原因是 csv 模块自己写 <code class="inline">\r\n</code>，而文本模式的 <code class="inline">open</code> 又会把 <code class="inline">\n</code> 再转一次。<b>这个坑只在 Windows 上出现，所以 Mac 上写好的代码拿到 Windows 运行才发现。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>八道练习</h2>
+<p><b>第 5–8 题连起来就是 D020 那个命令行工具的雏形。</b>今天的重点是「把数据整理成型」，先别管参数和日志。</p>
+<ol class="task">
+<li><b>按流量排 IP</b>：不是次数，是<b>总字节数</b>。<code class="inline">Counter</code> 只能计数，这个要自己累加</li>
+<li><b>找出响应最大的 3 个请求</b>：按 size 降序，输出 <code class="inline">(path, size)</code></li>
+<li><b>分开数 4xx 和 5xx</b>：别合起来算，这两类问题的排查方向完全不同</li>
+<li><b>用 <code class="inline">re.S</code> 抓多行内容</b>：给一段跨行的 HTML，把每个 <code class="inline">&lt;p&gt;</code> 里的文字取出来（去掉首尾空白）</li>
+<li><b>结果写成 csv</b>：用 <code class="inline">io.StringIO</code> 写，打印出来看格式对不对</li>
+<li><b>读带 BOM 的文本</b>：手工造一段 <code class="inline">b"\xef\xbb\xbf..."</code>，对比 <code class="inline">utf-8</code> 和 <code class="inline">utf-8-sig</code> 读出来的差别</li>
+<li><b>GBK 转 UTF-8</b>：一段 GBK 字节，转成 UTF-8 字节，再各自解回字符串验证</li>
+<li><b>写 <code class="inline">report(rows)</code> 函数</b>：返回一个字典（<code class="inline">total</code> / <code class="inline">bytes</code> / <code class="inline">error_rate</code> / <code class="inline">top_ip</code>），<b>要能直接 <code class="inline">json.dumps</code></b></li>
+</ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<h3>第 1–3 题 · 三种统计</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+from collections import Counter
+
+LOG = """127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 200 512
+10.0.0.5 - - [13/Nov/2026:02:15:35 +0800] "POST /api/login HTTP/1.1" 200 128
+10.0.0.5 - - [13/Nov/2026:02:15:36 +0800] "GET /api/user HTTP/1.1" 401 64
+192.168.1.9 - - [13/Nov/2026:02:16:01 +0800] "GET /static/app.js HTTP/1.1" 304 0
+127.0.0.1 - - [13/Nov/2026:02:16:10 +0800] "GET /index.html HTTP/1.1" 200 980"""
+
+P = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3}) - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\] '
+    r'"(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+" '
+    r'(?P&lt;status&gt;\d{3}) (?P&lt;size&gt;\d+)'
+)
+rows = [m.groupdict() for m in P.finditer(LOG)]
+
+traffic = Counter()
+for r in rows:
+    traffic[r["ip"]] += int(r["size"])
+print("按流量:", sorted(traffic.items(), key=lambda kv: -kv[1]))
+
+big = sorted(rows, key=lambda r: -int(r["size"]))[:3]
+print("最大的3个:", [(r["path"], r["size"]) for r in big])
+
+c4 = sum(1 for r in rows if r["status"][0] == "4")
+c5 = sum(1 for r in rows if r["status"][0] == "5")
+print(f"4xx={c4} 5xx={c5}")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">按流量: [('127.0.0.1', 1492), ('10.0.0.5', 192), ('192.168.1.9', 0)]
+最大的3个: [('/index.html', '980'), ('/index.html', '512'), ('/api/login', '128')]
+4xx=1 5xx=0</pre></div>
+<p><b>第 1 题最容易写错的地方：</b><code class="inline">Counter(r["size"] for r in rows)</code> 统计的是「每个 size 值出现几次」，不是「每个 IP 的总字节」。<b><code class="inline">Counter</code> 只会数个数，求和必须自己 <code class="inline">+=</code>。</b>或者用 <code class="inline">defaultdict(int)</code>。</p>
+<p><b>第 1 题的排序：</b><code class="inline">key=lambda kv: -kv[1]</code> 里的负号是「降序」的意思——<code class="inline">sorted</code> 默认升序，取负就反过来了。<b>也可以用 <code class="inline">reverse=True</code>，两者等价，但取负能同时表达「按第 2 个元素排、倒序」。</b></p>
+<h3>第 4 题 · re.S 抓跨行内容</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+page = """&lt;div&gt;
+&lt;p&gt;第一段
+跨了两行&lt;/p&gt;
+&lt;p&gt;第二段&lt;/p&gt;
+&lt;/div&gt;"""
+
+got = re.findall(r"&lt;p&gt;(.*?)&lt;/p&gt;", page, re.S)
+print("原始:", got)
+print("去空白:", [s.strip() for s in got])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">原始: ['第一段\n跨了两行', '第二段']
+去空白: ['第一段\n跨了两行', '第二段']</pre></div>
+<p>去掉 <code class="inline">re.S</code> 试试——会得到 <code class="inline">['第二段']</code>，<b>第一段因为跨行被整个跳过了</b>。而 <code class="inline">strip()</code> 只去掉首尾空白，中间那个换行还在，<b>想连中间一起去掉得用 <code class="inline">" ".join(s.split())</code></b>。</p>
+<h3>第 5 题 · 写成 csv</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import csv
+import io
+from collections import Counter
+
+rows = [
+    {"ip": "127.0.0.1"}, {"ip": "10.0.0.5"},
+    {"ip": "10.0.0.5"}, {"ip": "192.168.1.9"},
+]
+
+buf = io.StringIO()
+w = csv.DictWriter(buf, fieldnames=["ip", "count"])
+w.writeheader()
+for ip, n in sorted(Counter(r["ip"] for r in rows).items()):
+    w.writerow({"ip": ip, "count": n})
+print("\n".join(buf.getvalue().splitlines()))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">ip,count
+10.0.0.5,2
+127.0.0.1,1
+192.168.1.9,1</pre></div>
+<p><b>忘了 <code class="inline">writeheader()</code> 的话，第一行数据会被当成表头</b>，用 Excel 打开时列名是 <code class="inline">10.0.0.5</code> 和 <code class="inline">2</code>。</p>
+<h3>第 6 题 · BOM</h3>
+<div class="codebox"><button class="copy">复制</button><pre>raw = b"\xef\xbb\xbfip,count\n10.0.0.5,2"
+
+a = raw.decode("utf-8")
+b = raw.decode("utf-8-sig")
+print("utf-8     :", repr(a.split("\n")[0]))
+print("utf-8-sig :", repr(b.split("\n")[0]))
+print("第一个字段相同吗:", a.split("\n")[0] == b.split("\n")[0])
+
+import csv
+import io
+print("用 utf-8 读的列名:", list(csv.DictReader(io.StringIO(a)).fieldnames))
+print("用 sig  读的列名:", list(csv.DictReader(io.StringIO(b)).fieldnames))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">utf-8     : '\ufeffip,count'
+utf-8-sig : 'ip,count'
+第一个字段相同吗: False
+用 utf-8 读的列名: ['\ufeffip', 'count']
+用 sig  读的列名: ['ip', 'count']</pre></div>
+<p><b>这就是最有欺骗性的地方：</b>列名看着是 <code class="inline">ip</code>，实际是 <code class="inline">\ufeffip</code>。<code class="inline">row["ip"]</code> 一定 <code class="inline">KeyError</code>，而 <code class="inline">print(row)</code> 出来看着完全正常。</p>
+<h3>第 7 题 · GBK 转 UTF-8</h3>
+<div class="codebox"><button class="copy">复制</button><pre>gbk_bytes = "用户名,数量".encode("gbk")
+utf8_bytes = gbk_bytes.decode("gbk").encode("utf-8")
+
+print("GBK  :", gbk_bytes, len(gbk_bytes), "字节")
+print("UTF-8:", utf8_bytes, len(utf8_bytes), "字节")
+print("解回来:", utf8_bytes.decode("utf-8"))
+print("一致:", utf8_bytes.decode("utf-8") == "用户名,数量")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">GBK  : b'\xd3\xc3\xbb\xa7\xc3\xfb,\xca\xfd\xc1\xbf' 11 字节
+UTF-8: b'\xe7\x94\xa8\xe6\x88\xb7\xe5\x90\x8d,\xe6\x95\xb0\xe9\x87\x8f' 16 字节
+解回来: 用户名,数量
+一致: True</pre></div>
+<p><b>关键在 <code class="inline">decode</code> 再 <code class="inline">encode</code> 这个顺序。</b>不能直接 <code class="inline">gbk_bytes.encode("utf-8")</code>——bytes 没有 <code class="inline">encode</code>，只有 <code class="inline">decode</code>。<b>bytes → str 叫解码，str → bytes 叫编码</b>，方向搞反是新手最常见的错。</p>
+<h3>第 8 题 · report() 函数</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import json
+from collections import Counter
+
+rows = [
+    {"ip": "127.0.0.1", "status": "200", "size": "512"},
+    {"ip": "10.0.0.5", "status": "200", "size": "128"},
+    {"ip": "10.0.0.5", "status": "401", "size": "64"},
+    {"ip": "192.168.1.9", "status": "304", "size": "0"},
+]
+
+
+def report(rows):
+    total = len(rows)
+    errors = sum(1 for r in rows if r["status"][0] in "45")
+    return {
+        "total": total,
+        "bytes": sum(int(r["size"]) for r in rows),
+        "error_rate": round(errors / total, 3) if total else 0,
+        "top_ip": Counter(r["ip"] for r in rows).most_common(3),
+    }
+
+
+r = report(rows)
+print(json.dumps(r, ensure_ascii=False, indent=2))
+print()
+print("空列表也能跑:", report([]))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">{
+  "total": 4,
+  "bytes": 704,
+  "error_rate": 0.25,
+  "top_ip": [
+    [
+      "10.0.0.5",
+      2
+    ],
+    [
+      "127.0.0.1",
+      1
+    ],
+    [
+      "192.168.1.9",
+      1
+    ]
+  ]
+}
+
+空列表也能跑: {'total': 0, 'bytes': 0, 'error_rate': 0, 'top_ip': []}</pre></div>
+<p>三个细节：<br>① <code class="inline">most_common()</code> 返回的是<b>元组列表</b>，<code class="inline">json.dumps</code> 会自动把它转成 JSON 数组里的数组——所以 <code class="inline">indent=2</code> 之后每个元组被拉成了多行。<b>觉得丑就包一层 <code class="inline">[{"ip": k, "n": v} for k, v in ...]</code></b>，结构更清楚。<br>② <code class="inline">error_rate</code> 用了 <code class="inline">round(..., 3)</code>，因为 <code class="inline">1/4</code> 是 <code class="inline">0.25</code> 没问题，但 <code class="inline">1/3</code> 会变成 <code class="inline">0.3333333333333333</code>，写进报告不好看。<br>③ <code class="inline">if total else 0</code> 就是第 4 节那个 <code class="inline">ZeroDivisionError</code> 的防御。</p>
+</details>
+</section>
+
+<section>
+  <h2><span class="n">7</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D016 笔记 · 正则实战与文本处理
+
+## re.M 与 re.S 管的是两件不同的事
+re.M : 让 ^ $ 认「每一行」的开头结尾（不加只认整段文本）
+re.S : 让 . 能吃换行（DOTALL）
+两个都要 → re.M | re.S
+用 re.S 时几乎总要配非贪婪 .*?，否则跨过所有成对标签
+
+## csv / json
+csv.DictReader → 字典列表，★值全是字符串，算数前必须 int()
+csv.DictWriter → 必须 writeheader()，否则第一行数据当表头
+真写文件：open(path, "w", newline="", encoding="utf-8")   ★newline="" 只在 Windows 有影响
+json.dumps(obj, ensure_ascii=False)  ★不加中文变 \u4e2d\u6587
+dump/load 收文件对象，dumps/loads 收字符串（s = string）
+json 会还原数字/布尔类型，csv 不会
+
+## 编码
+- 字符 ≠ 字节。bytes → str 叫 decode，str → bytes 叫 encode
+- 程序内部一律 str，只有进出文件和网络才是 bytes
+- UnicodeDecodeError = 这个字节按该编码的规则解释不通
+- 常见：utf-8（3 字节/汉字）/ gbk（2 字节）/ utf-8-sig（带 BOM）
+- BOM：Excel 另存的 csv 几乎都带，读出来第一个字段前面粘了 \ufeff
+  → 表现：看着一样，== 是 False，row["ip"] 却 KeyError
+  → 解法：读 csv 一律 encoding="utf-8-sig"（对无 BOM 也安全）
+- errors 三档：strict（默认，推荐）/ replace（替换成 \ufffd）/ ignore（★静默删掉，危险）
+  实测：4 个汉字用 ignore 只剩 1 个字符，不报错
+
+## 统计
+- Counter(可迭代) 计数；most_common(n) 取前 n，次数相同按首次出现顺序
+- Counter 只会计数，求和要自己 += 或用 defaultdict(int)
+- 降序：sorted(items, key=lambda kv: -kv[1]) 或 reverse=True
+- 字符串格式化：{x:.1%} 自动 ×100 加百分号
+- startswith(("4", "5")) 用元组；startswith("4" or "5") 只判 "4"
+
+## 健壮性
+- 除零：rate = errors / total if total else 0
+- 空输入必须能跑通，别假设总有数据
+- 测试 csv 输出用 io.StringIO()，不用真写文件
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D016 的产出是 <b>日志分析报告脚本</b>：Top IP、Top URL、状态码分布、按小时流量、错误率，结果可导 csv / json。</p>
+  <p>明天 D017：<b>网络编程</b>——socket 对比 C 的写法、HTTP 报文长什么样、用 requests 抓网页标题。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

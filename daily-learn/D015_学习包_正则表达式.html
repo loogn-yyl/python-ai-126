@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D015 学习包 · 正则表达式</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 015 · 第 3 周</div>
+  <h1>正则表达式：从日志里把东西抠出来</h1>
+  <p>第 3 周开局。今天学的是一门「描述形状」的语言——你不再告诉程序「第几段」，而是告诉它「长这样」。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>⚙️ re 模块</span>
+    <span>📦 产出：日志提取脚本</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：前两小时读懂形状，后两小时用它干活</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1–2 节，<b>边读边在 REPL 里试</b>。正则光看是记不住的</span></div><div class="tl"><b>第 2 小时</b><span>读 3–5 节：元字符、分组、贪婪。这三节是全部家底</span></div><div class="tl"><b>第 3 小时</b><span>读第 6 节，把日志提取脚本跑通，<b>再自己加两个字段</b></span></div><div class="tl"><b>第 4 小时</b><span>八道练习。第 6、8 题是明天的地基，别跳</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day15
+cd ~/python-learn/day15
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate</pre></div>
+<div class="note"><b>今天不需要装任何第三方库。</b><code class="inline">re</code> 是标准库，Python 自带。<br>但 <b>建 <code class="inline">.venv</code> 这个动作要养成习惯</b>——从 D014 开始，每天的项目都该有自己的环境，否则昨天装的包会干扰今天。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>先看看字符串方法为什么会碰壁</h2>
+<p>前两周处理文本，靠的是 <code class="inline">split()</code>、<code class="inline">in</code>、切片。这些方法对付「格式永远不变」的文本够用，一旦格式有变化就撑不住了。拿一条 nginx 日志试试：</p>
+<div class="codebox"><button class="copy">复制</button><pre>line = '127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 200 512'
+
+print("IP      :", line.split()[0])
+print("第 4 段  :", line.split()[3])
+print("第 9 段  :", line.split()[8])
+
+# 换一种日志格式，同一个下标就错位了
+line2 = '127.0.0.1 [13/Nov/2026:02:15:33] "GET /index.html" 200'
+print("第 9 段  :", line2.split()[8] if len(line2.split()) &gt; 8 else "IndexError")
+print("状态码在哪:", [x for x in line2.split() if x.isdigit()])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">IP      : 127.0.0.1
+第 4 段  : [13/Nov/2026:02:15:33
+第 9 段  : 200
+第 9 段  : IndexError
+状态码在哪: ['200']</pre></div>
+<p>三处都出问题了，每一处的原因还不一样：</p>
+<ul>
+<li><b>时间被切断了。</b><code class="inline">[13/Nov/2026:02:15:33</code> 后面还跟着 <code class="inline">+0800]</code>，因为中间有空格，<code class="inline">split()</code> 就把它劈成两半。</li>
+<li><b>下标是假的。</b><code class="inline">split()[8]</code> 能拿到 <code class="inline">200</code>，纯属这条日志刚好这么长。换一条格式稍变的，直接 <code class="inline">IndexError</code>。</li>
+<li><b><code class="inline">isdigit()</code> 也不可靠。</b>它只判断「这一段是不是纯数字」，但日志里哪一段是状态码、哪一段是响应大小，它不知道。这条日志里 <code class="inline">/index.html</code> 没有数字所以侥幸，换成 <code class="inline">/api/v2/user</code> 就会多出杂音。</li>
+</ul>
+<div class="warn"><b>问题的本质：<code class="inline">split()</code> 只认「空格」，不认「意思」。</b><br>它把字符串切成段，但不知道哪一段是 IP、哪一段是状态码。<b>正则解决的正是这件事——你描述「状态码长这样：三个数字，夹在引号和空格之间」，而不是「第 9 段」。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>四个函数就够用了</h2>
+<p><code class="inline">re</code> 模块有十几个函数，日常真正用到的就四个。<b>先记住它们的区别，比记语法重要得多。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+text = "订单 A1024 金额 299 元，订单 A2048 金额 1580 元"
+
+print("match  :", re.match(r"A\d+", text))
+print("search :", re.search(r"A\d+", text))
+print("findall:", re.findall(r"A\d+", text))
+print("sub    :", re.sub(r"A\d+", "A****", text))
+
+m = re.search(r"A(\d+)", text)
+print("group()  :", m.group())
+print("group(1) :", m.group(1))
+print("start/end:", m.start(), m.end())</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">match  : None
+search : &lt;re.Match object; span=(3, 8), match='A1024'&gt;
+findall: ['A1024', 'A2048']
+sub    : 订单 A**** 金额 299 元，订单 A**** 金额 1580 元
+group()  : A1024
+group(1) : 1024
+start/end: 3 8</pre></div>
+<table>
+<tr><th>函数</th><th>找几个</th><th>从哪里找</th><th>返回什么</th><th>典型用途</th></tr>
+<tr><td><code>match</code></td><td>1 个</td><td><b>只从位置 0</b></td><td>Match 或 None</td><td>校验整条格式（配 <code>$</code> 或改用 fullmatch）</td></tr>
+<tr><td><code>search</code></td><td>1 个</td><td>全串，第一个</td><td>Match 或 None</td><td>从一行里找出想要的那一小段</td></tr>
+<tr><td><code>findall</code></td><td>全部</td><td>全串</td><td>字符串列表（有分组就是元组列表）</td><td>一次抓出所有 IP / 所有链接</td></tr>
+<tr><td><code>sub</code></td><td>—</td><td>全串</td><td>替换后的新字符串</td><td>脱敏、清洗、格式转换</td></tr>
+</table>
+<h3>最关键的一条：match 不是「更严格的 search」</h3>
+<p>很多人以为 <code class="inline">match</code> 是「必须整条字符串完全匹配」，其实它只管<b>起点</b>，不管结尾。<b>只管开头、不管结尾</b>这个描述才是准确的：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+print("1", re.match(r"\d+", "abc123"))
+print("2", re.search(r"\d+", "abc123"))
+print("3", re.match(r"abc", "abcdef"))
+print("4", re.fullmatch(r"\d+", "123"))
+print("5", re.fullmatch(r"\d+", "123abc"))
+print("6", re.search(r"^abc", "xxabc"))
+print("7", re.search(r"abc$", "abcxx"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">1 None
+2 &lt;re.Match object; span=(3, 6), match='123'&gt;
+3 &lt;re.Match object; span=(0, 3), match='abc'&gt;
+4 &lt;re.Match object; span=(0, 3), match='123'&gt;
+5 None
+6 None
+7 None</pre></div>
+<table>
+<tr><th>行</th><th>结果</th><th>说明</th></tr>
+<tr><td>1 / 2</td><td>None / 命中</td><td><code>\d+</code> 不在开头，<code>match</code> 立刻放弃，<code>search</code> 往后扫到了</td></tr>
+<tr><td>3</td><td>命中</td><td><code>abcdef</code> 只匹配了前三个字符 <b>就成功了</b>，剩下的 <code>def</code> 它不管</td></tr>
+<tr><td>4 / 5</td><td>命中 / None</td><td>要「整条都得是数字」，只有 <code>fullmatch</code> 能做到。<b>校验用 fullmatch，不要用 match</b></td></tr>
+<tr><td>6</td><td>None</td><td><code>^</code> 锚定开头，<code>search</code> 也救不了——它不会从中间再试一次开头</td></tr>
+</table>
+<div class="danger"><b>这是最常见的错误来源：用 <code class="inline">match</code> 做格式校验。</b><br><code class="inline">re.match(r"\d{11}", "13800001111xyz")</code> 会返回 Match，看着像「手机号合法」，其实后面还跟着三个字母。<b>校验一律用 <code class="inline">fullmatch</code>，或者自己给正则加上 <code class="inline">$</code>。</b></div>
+<div class="note"><b>还有一个小习惯，现在就该养成：</b>正则字符串一律加 <code class="inline">r</code> 前缀。<br><code class="inline">r"\d+"</code> 里的反斜杠是<b>字面意思的反斜杠</b>，直接交给 <code class="inline">re</code> 去解释；不加 <code class="inline">r</code> 的话，Python 会先自己解释一遍 <code class="inline">\d</code>，而它不认识这个转义，虽然<b>碰巧</b>能跑，但只要正则里出现 <code class="inline">\b</code> <code class="inline">\n</code> <code class="inline">\t</code> 就必错。第 3 节末尾会演示。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>元字符：把「形状」翻译成符号</h2>
+<p>这一张表是正则的全部家底。<b>不用背，但要能看懂</b>——写的时候照着查，查两次就记住了。</p>
+<table>
+<tr><th>符号</th><th>含义</th><th>例子</th></tr>
+<tr><td><code>\d</code></td><td>一个数字（等价 <code>[0-9]</code>）</td><td><code>r"\d{3}"</code> → <code>200</code></td></tr>
+<tr><td><code>\D</code></td><td>一个非数字</td><td><code>r"\D+"</code> → 连续的非数字</td></tr>
+<tr><td><code>\w</code></td><td>字母、数字、下划线、<b>汉字</b></td><td><code>r"\w+"</code> → <code>abc</code> / <code>中文</code></td></tr>
+<tr><td><code>\W</code></td><td>非 <code>\w</code>（空格、标点）</td><td><code>r"\W"</code> → <code>空格</code> <code>，</code></td></tr>
+<tr><td><code>\s</code></td><td>空白：空格 / 制表符 / 换行</td><td><code>r"\s+"</code> → 压缩连续空白</td></tr>
+<tr><td><code>\S</code></td><td>非空白（<b>抓「不含空格的一串」最常用</b>）</td><td><code>r"\S+"</code> → <code>/index.html</code></td></tr>
+<tr><td><code>.</code></td><td>除换行外的任意一个字符</td><td><code>r"a.c"</code> → <code>abc</code> / <code>a1c</code></td></tr>
+<tr><td><code>^</code> <code>$</code></td><td>开头 / 结尾</td><td><code>r"^\d+$"</code> → 整条都是数字</td></tr>
+<tr><td><code>*</code></td><td>前一个字符 <b>0 次或多次</b></td><td><code>r"ab*"</code> → <code>a</code> / <code>ab</code> / <code>abbb</code></td></tr>
+<tr><td><code>+</code></td><td>前一个字符 <b>1 次或多次</b></td><td><code>r"ab+"</code> → 至少一个 <code>b</code>（<code>a</code> 不算）</td></tr>
+<tr><td><code>?</code></td><td>前一个字符 <b>0 次或 1 次</b></td><td><code>r"https?"</code> → <code>http</code> / <code>https</code></td></tr>
+<tr><td><code>{n}</code> <code>{n,m}</code></td><td>恰好 n 次 / n 到 m 次</td><td><code>r"\d{11}"</code> → 11 位数字</td></tr>
+<tr><td><code>[abc]</code></td><td>这个位置是 a、b、c 之一</td><td><code>r"[Gg]et"</code> → <code>Get</code> / <code>get</code></td></tr>
+<tr><td><code>[^abc]</code></td><td>这个位置<b>不是</b> a、b、c</td><td><code>r"[^\]]+"</code> → 直到 <code>]</code> 之前的所有内容</td></tr>
+<tr><td><code>|</code></td><td>或</td><td><code>r"GET|POST"</code></td></tr>
+<tr><td><code>()</code></td><td>分组（见第 4 节）</td><td><code>r"(\d{4})-(\d{2})"</code></td></tr>
+</table>
+<p>跑一遍看它到底抓到了什么——<b>尤其是 <code class="inline">\w</code> 对汉字的态度，这个和 C 完全不同</b>：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+print(r"\d 数字   :", re.findall(r"\d", "a1b2c3"))
+print(r"\w 单词字符:", re.findall(r"\w", "a1 中文 _-"))
+print(r"\s 空白   :", re.findall(r"\s", "a b\tc\nd"))
+print(r". 任意字符:", re.findall(r".", "abc"))
+print("[abc]     :", re.findall(r"[abc]", "a1b2c3d"))
+print("[^abc]    :", re.findall(r"[^abc]", "a1b2c3d"))
+print("[0-9]{2}  :", re.findall(r"[0-9]{2}", "a1234b"))
+print()
+print("退格符    :", repr("\bword"), "长度", len("\bword"))
+print("原始字符串:", repr(r"\bword"), "长度", len(r"\bword"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">\d 数字   : ['1', '2', '3']
+\w 单词字符: ['a', '1', '中', '文', '_']
+\s 空白   : [' ', '\t', '\n']
+. 任意字符: ['a', 'b', 'c']
+[abc]     : ['a', 'b', 'c']
+[^abc]    : ['1', '2', '3', 'd']
+[0-9]{2}  : ['12', '34']
+
+退格符    : '\x08word' 长度 5
+原始字符串: '\\bword' 长度 6</pre></div>
+<h3>最后两行是本节最重要的两行</h3>
+<p><code class="inline">"\bword"</code> 长度是 <b>5</b>，因为 <code class="inline">\b</code> 在 Python 普通字符串里是<b>退格符</b>（<code class="inline">'\x08'</code>），而 <code class="inline">r"\bword"</code> 长度是 <b>6</b>，反斜杠和 <code class="inline">b</code> 各算一个字符。</p>
+<p>两者在正则里的意思天差地别：<b><code class="inline">\b</code> 是「单词边界」</b>——匹配位置，不消耗字符。<code class="inline">r"\bword\b"</code> 的意思是「word 前后不能紧挨着字母」。但你如果写成 <code class="inline">"\bword\b"</code>，它变成了「退格 + word + 退格」，永远匹配不到任何东西。</p>
+<div class="danger"><b>不加 <code class="inline">r</code> 前缀的三个必错场景：</b><br>① <code class="inline">\b</code> 单词边界 → 变成退格符<br>② <code class="inline">\n</code> <code class="inline">\t</code> → 变成换行和制表符，正则里的 `\n` 应该交给 re 解释<br>③ Windows 路径 <code class="inline">"C:\Users\new"</code> → <code class="inline">\U</code> <code class="inline">\n</code> 都被转义了<br><b>规则很短：写正则的地方，字符串一律 <code class="inline">r"..."</code>。没有例外。</b></div>
+<div class="note"><b>顺便记住 <code class="inline">\w</code> 认汉字这件事。</b>以前 C 语言里处理中文字符要一堆判断，Python 3 的 <code class="inline">\w</code> 默认就包含 Unicode 字母，所以 <code class="inline">r"\w+"</code> 一次能抓出「中文」两个字。<b>代价是你写 <code class="inline">r"\w+"</code> 想抓英文单词时，它会把中文一起吞了。</b>真要限定 ASCII，用 <code class="inline">r"[a-zA-Z_]+"</code> 或加 <code class="inline">re.ASCII</code> 标志。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>分组：一次匹配，多处取值</h2>
+<p>不带括号的正则只能告诉你「找到了」。<b>加了括号，它才能告诉你「每一部分各是什么」</b>——这是正则从「能找」变成「能解析」的分界线。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+s = "张三 13800001111 李四 13900002222 王五 13700003333"
+
+print("简单分组:", re.findall(r"(\S+) (\d{11})", s))
+print()
+pat = re.compile(r"(?P&lt;name&gt;\S+) (?P&lt;phone&gt;\d{11})")
+for m in pat.finditer(s):
+    print(m.groupdict())
+print()
+print("非捕获组:", re.findall(r"(?:\S+) (\d{11})", s))
+print("整个匹配:", [m.group(0) for m in pat.finditer(s)])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">简单分组: [('张三', '13800001111'), ('李四', '13900002222'), ('王五', '13700003333')]
+
+{'name': '张三', 'phone': '13800001111'}
+{'name': '李四', 'phone': '13900002222'}
+{'name': '王五', 'phone': '13700003333'}
+
+非捕获组: ['13800001111', '13900002222', '13700003333']
+整个匹配: ['张三 13800001111', '李四 13900002222', '王五 13700003333']</pre></div>
+<table>
+<tr><th>写法</th><th>名字</th><th>能取值吗</th><th>什么时候用</th></tr>
+<tr><td><code>(...)</code></td><td>捕获组</td><td><code>group(1)</code>，下标从 1 开始</td><td>要取出这一部分</td></tr>
+<tr><td><code>(?P&lt;name&gt;...)</code></td><td>命名分组</td><td><code>group("name")</code> / <code>groupdict()</code></td><td><b>组数超过 2 个就用它</b></td></tr>
+<tr><td><code>(?:...)</code></td><td>非捕获组</td><td>不能</td><td>只想把量词作用在一串上，但不想要这个值</td></tr>
+</table>
+<h3>为什么要用命名分组</h3>
+<p>三个组以上，<code class="inline">group(3)</code> 这种写法就没人看得懂了。更麻烦的是<b>改需求的时候</b>：你在正则中间插了一个新的捕获组，后面所有 <code class="inline">group(2)</code> <code class="inline">group(3)</code> 全部错位，而且<b>不会报错</b>——它只是悄悄取到了另一个值。</p>
+<div class="note"><b>结论很明确：只要组数 ≥ 2，一律用命名分组。</b><br><code class="inline">groupdict()</code> 直接给你一个字典，键就是你在正则里起的名字，这跟 D011 学的 dataclass 是一路思路——<b>让数据自己说明自己是什么，而不是靠位置</b>。</div>
+<h3><code class="inline">findall</code> 和 <code class="inline">finditer</code> 的区别</h3>
+<p>看上面的输出：<code class="inline">findall</code> 在有分组时返回的是<b>元组列表</b>，你拿不到「整个匹配」和「位置」。要这些信息就得用 <code class="inline">finditer</code>，它返回 Match 对象，每个对象上有 <code class="inline">group()</code>、<code class="inline">groupdict()</code>、<code class="inline">start()</code>、<code class="inline">span()</code>。</p>
+<div class="warn"><b>还有一个反直觉的点：<code class="inline">findall</code> 只返回「最外层分组」的内容。</b><br>正则里有一个组时，<code class="inline">findall</code> 返回的是<b>这个组</b>的列表，不是整个匹配；有两个以上，返回元组列表。想看整个匹配，要么用 <code class="inline">group(0)</code> 配 <code class="inline">finditer</code>，要么把整体也包一层括号。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>贪婪与非贪婪：多出来的那一个问号</h2>
+<p>这是正则最容易被绊住的地方，但它的机制其实只有一句话：<b>量词默认贪婪，先吃到最远，再往回退。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+html = '&lt;a href="a.html"&gt;A&lt;/a&gt; &lt;a href="b.html"&gt;B&lt;/a&gt;'
+
+print("贪婪  :", re.findall(r'&lt;a href="(.*)"&gt;', html))
+print("非贪婪:", re.findall(r'&lt;a href="(.*?)"&gt;', html))
+print()
+s = "a1b2c3"
+print("贪婪  \\d+ :", re.findall(r"\d+", s))
+print("贪婪  .+  :", re.search(r".+", s).group())
+print("非贪婪 .+? :", re.search(r".+?", s).group())
+print()
+print("为什么 .+? 只到 1 :", re.search(r".+?(\d)", s).groups())</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">贪婪  : ['a.html"&gt;A&lt;/a&gt; &lt;a href="b.html']
+非贪婪: ['a.html', 'b.html']
+
+贪婪  \d+ : ['1', '2', '3']
+贪婪  .+  : a1b2c3
+非贪婪 .+? : a
+
+为什么 .+? 只到 1 : ('1',)</pre></div>
+<p>第一组结果最能说明问题。贪婪版本抓回来的是 <code class="inline">a.html"&gt;A&lt;/a&gt; &lt;a href="b.html</code>——它<b>把两个标签之间的东西全吞了</b>。因为 <code class="inline">.*</code> 会一路吃到整行末尾，然后发现后面还要求有 <code class="inline>"&gt;</code>，于是往后退，退到<b>最后一个</b> <code class="inline">"&gt;</code> 才停下。</p>
+<p>非贪婪版本加了 <code class="inline">?</code>，逻辑反过来：<b>先尽量少地吃，每吃一个就试一下后面能不能接上</b>。吃到 <code class="inline">a.html</code> 时后面正好是 <code class="inline">"&gt;</code>，立刻收工。</p>
+<table>
+<tr><th>写法</th><th>策略</th><th>用在哪</th></tr>
+<tr><td><code>.*</code> <code>.+</code> <code>\d+</code></td><td>贪婪：先吃到底，再回退</td><td>想抓「最后一段」、整行内容</td></tr>
+<tr><td><code>.*?</code> <code>.+?</code> <code>\d+?</code></td><td>非贪婪：先吃最少，逐步加</td><td><b>抓「成对符号之间」的所有内容</b>——标签、引号、括号</td></tr>
+</table>
+<div class="note"><b>怎么判断该用哪个？看右边界是否存在。</b><br>如果正则最后有明确的「结束标记」（<code class="inline">"&gt;</code>、<code class="inline">]</code>、<code class="inline">"</code>），而且这个标记在一行里可能出现多次，<b>就用非贪婪</b>。<br>如果整个模式就是「一直吃到行尾」，那贪婪反而是对的，写 <code class="inline">.*$</code> 就行。</div>
+<p>最后一行 <code class="inline">.+?(\d)</code> 的结果是 <code class="inline">('1',)</code>，值得单独看：非贪婪的 <code class="inline">.+?</code> 最少要吃 1 个字符（<code class="inline">+</code> 保证的），所以它先吃 <code class="inline">a</code>，然后检查后面能不能接上 <code class="inline">\d</code>——接得上，就是 <code class="inline">1</code>，立刻成功。<b>它不是「抓最短的数字」，而是「整体最早成功的那一次匹配」</b>。</p>
+</section>
+
+<section>
+  <h2><span class="n">6</span>实战：把一条日志拆成六个字段</h2>
+<p>现在把前面的东西拼起来。目标：从 nginx 标准日志里取出 IP、时间、方法、路径、状态码、响应大小。</p>
+<h3>第一步：先写正则，逐段对</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+LOG = '127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 200 512'
+
+PATTERN = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3})'
+    r' - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\]'
+    r' "(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+"'
+    r' (?P&lt;status&gt;\d{3})'
+    r' (?P&lt;size&gt;\d+)'
+)
+
+m = PATTERN.match(LOG)
+print(m.groupdict())
+print()
+print("IP     :", m.group("ip"))
+print("时间    :", m.group("time"))
+print("方法    :", m.group("method"))
+print("路径    :", m.group("path"))
+print("状态码  :", m.group("status"))
+print("大小    :", m.group("size"))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">{'ip': '127.0.0.1', 'time': '13/Nov/2026:02:15:33 +0800', 'method': 'GET', 'path': '/index.html', 'status': '200', 'size': '512'}
+
+IP     : 127.0.0.1
+时间    : 13/Nov/2026:02:15:33 +0800
+方法    : GET
+路径    : /index.html
+状态码  : 200
+大小    : 512</pre></div>
+<p>逐段拆开看，每一段都对应日志里的一截：</p>
+<table>
+<tr><th>片段</th><th>对应日志里的</th><th>为什么这么写</th></tr>
+<tr><td><code>\d{1,3}(?:\.\d{1,3}){3}</code></td><td><code>127.0.0.1</code></td><td>四段数字用点连。<b>用非捕获组 <code>(?:...)</code> 包住「点 + 数字」，让它重复三次</b>——如果写成 <code>(...)</code>，会多出一个没用的捕获组</td></tr>
+<tr><td><code>\[(?P&lt;time&gt;[^\]]+)\]</code></td><td><code>[13/Nov/... +0800]</code></td><td><b><code>[^\]]+</code> 而不是 <code>.+</code></b>：时间里有空格，<code>.+</code> 会一直吃到行尾；<code>[^\]]+</code> 明确表示「直到右方括号为止」</td></tr>
+<tr><td><code>(?P&lt;path&gt;\S+)</code></td><td><code>/index.html</code></td><td><b><code>\S+</code> 而不是 <code>\w+</code></b>：路径里有 <code>/</code> 和 <code>.</code>，<code>\w</code> 不认</td></tr>
+<tr><td><code>HTTP/[\d.]+</code></td><td><code>HTTP/1.1</code></td><td>版本号可能变成 <code>2</code> 或 <code>1.0</code>，用 <code>[\d.]+</code> 都吃得下</td></tr>
+<tr><td><code>(?P&lt;status&gt;\d{3})</code></td><td><code>200</code></td><td>状态码固定三位，写死比 <code>\d+</code> 更准</td></tr>
+</table>
+<div class="warn"><b>两个高频错误，都在这张表里：</b><br>① <b>该用 <code class="inline">[^\]]+</code> 的地方用了 <code class="inline">.+</code></b>——因为 <code class="inline">.+</code> 是贪婪的，会越过右方括号一路吃到行尾，然后回退到<b>最后一个</b> <code class="inline">]</code>。<br>② <b>该用 <code class="inline">\S+</code> 的地方用了 <code class="inline">\w+</code></b>——路径 <code class="inline">/api/user</code> 会被切成 <code class="inline">api</code>，前面的斜杠直接丢了，而且<b>不报错</b>。</div>
+<h3>第二步：多行 + 容错</h3>
+<p>真实日志一定有脏行。<b>解析器必须能跳过坏行继续跑，而不是一遇到脏数据就整个崩掉。</b>这是 D006 学的异常处理在这里的具体用法：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+LOG_LINES = """127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 200 512
+10.0.0.5 - - [13/Nov/2026:02:15:35 +0800] "POST /api/login HTTP/1.1" 200 128
+10.0.0.5 - - [13/Nov/2026:02:15:36 +0800] "GET /api/user HTTP/1.1" 401 64
+192.168.1.9 - - [13/Nov/2026:02:16:01 +0800] "GET /static/app.js HTTP/1.1" 304 0
+坏行这一行故意不符合格式
+127.0.0.1 - - [13/Nov/2026:02:16:10 +0800] "GET /missing HTTP/1.1" 404 32""".split("\n")
+
+PATTERN = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3}) - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\] '
+    r'"(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+" '
+    r'(?P&lt;status&gt;\d{3}) (?P&lt;size&gt;\d+)'
+)
+
+rows, bad = [], []
+for line in LOG_LINES:
+    m = PATTERN.match(line)
+    if m:
+        rows.append(m.groupdict())
+    else:
+        bad.append(line)
+
+print("成功解析:", len(rows), "行")
+print("解析失败:", len(bad), "行")
+print()
+for r in rows:
+    print(f"{r['ip']:&lt;15} {r['time'][:20]:&lt;20} {r['method']:&lt;4} {r['path']:&lt;18} {r['status']} {r['size']}")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">成功解析: 5 行
+解析失败: 1 行
+
+127.0.0.1       13/Nov/2026:02:15:33 GET  /index.html        200 512
+10.0.0.5        13/Nov/2026:02:15:35 POST /api/login         200 128
+10.0.0.5        13/Nov/2026:02:15:36 GET  /api/user          401 64
+192.168.1.9     13/Nov/2026:02:16:01 GET  /static/app.js     304 0
+127.0.0.1       13/Nov/2026:02:16:10 GET  /missing           404 32</pre></div>
+<div class="note"><b>注意 <code class="inline">bad</code> 这个列表——它才是这条脚本真正值钱的地方。</b><br>很多人写解析器只写 <code class="inline">if m:</code> 那一支，坏行被默默丢掉，你永远不知道有多少条没解析到。等哪天统计数字对不上，你连从哪查起都不知道。<b>把「解析失败的行」收集起来，是数据处理的第一条纪律。</b></div>
+<div class="ok"><b>今天这一节就是产出。</b>把这段代码存成 <code class="inline">extract.py</code>，让它读文件而不是内存里写死的字符串，就是今天要交付的东西。明天 D016 会在它上面继续加统计。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 6、8 题是明天的地基</b>，别跳。每题的参考答案都能直接跑，<b>先自己写，卡 15 分钟再看</b>。</p>
+<ol class="task">
+<li><b>抓邮箱</b>：从一段文字里找出所有邮箱地址。用 <code class="inline">findall</code>，注意 <code class="inline">.</code> 在正则里是元字符，要用 <code class="inline">\.</code> 转义</li>
+<li><b>校验手机号</b>：11 位、1 开头、第二位 3–9。<b>用 <code class="inline">fullmatch</code>，不要用 <code class="inline">match</code></b>，并测一个 10 位的反例</li>
+<li><b>提取域名</b>：给一串 URL（<code class="inline">https://</code> / <code class="inline">http://</code> / <code class="inline">ftp://</code> 都有），取出域名部分</li>
+<li><b>改日期格式</b>：把 <code class="inline">2026-11-13</code> 改成 <code class="inline">11/13/2026</code>。<b>用 <code class="inline">sub</code> + 反向引用</b>，别用 replace</li>
+<li><b>命名分组版再写一次</b>：把第 4 题改成命名分组 + <code class="inline">\g&lt;name&gt;</code> 的写法，输出成 <code class="inline">13.11.2026</code></li>
+<li><b>抓所有 h2 标题</b>：给一段 HTML，取出每个 <code class="inline">&lt;h2&gt;</code> 里的文字。<b>这题的关键是那个问号</b></li>
+<li><b>统计状态码</b>：拿第 6 节那份日志，数出每个状态码各出现几次，按次数排序输出</li>
+<li><b>带行号的报错</b>：写一个 <code class="inline">parse_file(lines)</code>，遇到解析不了的行时打印<b>行号和前 30 个字符</b>，最后返回「成功行数 / 失败行数」</li>
+</ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<h3>第 1 题 · 抓邮箱</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+text = "联系 zs@example.com 或 ls@test.org，无效的 a@b"
+print("邮箱:", re.findall(r"[\w.+-]+@[\w-]+\.[\w.]+", text))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">邮箱: ['zs@example.com', 'ls@test.org']</pre></div>
+<p><code class="inline">[\w.+-]+</code> 里那个 <code class="inline">.</code> 在<b>字符集内部</b>就是普通字符，不用转义；而 <code class="inline">@[\w-]+\.[\w.]+</code> 里的 <code class="inline">\.</code> 在字符集外面，<b>必须转义</b>，否则它会匹配任意字符，<code class="inline">a@bc</code> 也会被当成合法邮箱。</p>
+<h3>第 2 题 · 校验手机号</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+print("手机:", bool(re.fullmatch(r"1[3-9]\d{9}", "13800001111")))
+print("假手机:", bool(re.fullmatch(r"1[3-9]\d{9}", "1380000111")))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">手机: True
+假手机: False</pre></div>
+<p>试着把 <code class="inline">fullmatch</code> 换成 <code class="inline">match</code>，再拿 <code class="inline">"13800001111abc"</code> 测一次——<b>你会得到 <code class="inline">True</code></b>。这就是第 2 节那个警告的实证。</p>
+<h3>第 3 题 · 提取域名</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+urls = ["https://a.com/x", "http://b.org/y", "ftp://c.net"]
+print("域名:", [re.search(r"://([^/]+)", u).group(1) for u in urls])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">域名: ['a.com', 'b.org', 'c.net']</pre></div>
+<p>用 <code class="inline">[^/]+</code> 而不是 <code class="inline">\w+\.\w+</code>：域名里可能有连字符、可能有端口号 <code class="inline">:8080</code>，<code class="inline">[^/]+</code> 表示「<b>从 <code class="inline">://</code> 之后一直取到第一个斜杠</b>」，不猜具体形状就不会漏。</p>
+<h3>第 4 题 · 改日期格式（反向引用）</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+s = "2026-11-13 发布，2026-12-01 更新"
+print("改格式:", re.sub(r"(\d{4})-(\d{2})-(\d{2})", r"\2/\3/\1", s))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">改格式: 11/13/2026 发布，12/01/2026 更新</pre></div>
+<p>替换串里的 <code class="inline">\1</code> <code class="inline">\2</code> <code class="inline">\3</code> 叫<b>反向引用</b>，代表「第 1、2、3 个分组抓到的东西」。<b>注意替换串也加了 <code class="inline">r</code> 前缀</b>——不加的话 <code class="inline">\1</code> 会变成八进制转义字符，输出一堆看不见的控制符。</p>
+<h3>第 5 题 · 命名分组版</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+s = "2026-11-13 发布，2026-12-01 更新"
+print("命名版 :", re.sub(r"(?P&lt;y&gt;\d{4})-(?P&lt;m&gt;\d{2})-(?P&lt;d&gt;\d{2})",
+                        r"\g&lt;d&gt;.\g&lt;m&gt;.\g&lt;y&gt;", s))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">命名版 : 13.11.2026 发布，01.12.2026 更新</pre></div>
+<p>替换串里引用命名分组必须写 <code class="inline">\g&lt;name&gt;</code>，不能写 <code class="inline">\name</code>——后者会被当成「反斜杠 + 字母 n」。</p>
+<h3>第 6 题 · 抓所有 h2</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+page = "&lt;h2&gt;第一章&lt;/h2&gt;&lt;p&gt;x&lt;/p&gt;&lt;h2&gt;第二章&lt;/h2&gt;"
+print("标题:", re.findall(r"&lt;h2&gt;(.*?)&lt;/h2&gt;", page))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">标题: ['第一章', '第二章']</pre></div>
+<p>去掉 <code class="inline">.</code> 后面的 <code class="inline">?</code> 再跑一次，会得到 <code class="inline">['第一章&lt;/h2&gt;&lt;p&gt;x&lt;/p&gt;&lt;h2&gt;第二章']</code>——<b>一个元素，两个标题粘在一起</b>。这就是第 5 节那个贪婪问题的原样重现。</p>
+<h3>第 7 题 · 统计状态码</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+from collections import Counter
+
+LOG = """127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 200 512
+10.0.0.5 - - [13/Nov/2026:02:15:35 +0800] "POST /api/login HTTP/1.1" 200 128
+10.0.0.5 - - [13/Nov/2026:02:15:36 +0800] "GET /api/user HTTP/1.1" 401 64
+192.168.1.9 - - [13/Nov/2026:02:16:01 +0800] "GET /static/app.js HTTP/1.1" 304 0
+127.0.0.1 - - [13/Nov/2026:02:16:10 +0800] "GET /missing HTTP/1.1" 404 32"""
+
+codes = re.findall(r'"\s(\d{3})\s', LOG)
+print("抓到的状态码:", codes)
+print("统计:", sorted(Counter(codes).items()))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">抓到的状态码: ['200', '200', '401', '304', '404']
+统计: [('200', 2), ('304', 1), ('401', 1), ('404', 1)]</pre></div>
+<p><b>这题的正则刻意写得很脆弱</b>：<code class="inline">"\s(\d{3})\s</code> 依赖「状态码前面紧贴着引号加空格」，换一行 <code class="inline">"GET /x HTTP/1.1" 200 512</code> 能过，但 <code class="inline">"-" 400 0</code> 这种没引号的就漏了。<br><b>想清楚一件事：抓字段用第 6 节那个完整正则，别为了省事写半截模式。</b>这里只是演示「统计」这一步该怎么写。</p>
+<h3>第 8 题 · 带行号的报错</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+
+PATTERN = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3}) - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\] '
+    r'"(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+" '
+    r'(?P&lt;status&gt;\d{3}) (?P&lt;size&gt;\d+)'
+)
+
+
+def parse_file(lines):
+    ok, fail = [], 0
+    for no, line in enumerate(lines, 1):
+        m = PATTERN.match(line)
+        if m:
+            ok.append(m.groupdict())
+        else:
+            fail += 1
+            print(f"  第 {no} 行解析失败: {line[:30]}")
+    return len(ok), fail
+
+
+lines = [
+    '127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /a HTTP/1.1" 200 10',
+    '这一行是坏的',
+    '10.0.0.5 - - [13/Nov/2026:02:15:35 +0800] "GET /b HTTP/1.1" 404 0',
+]
+ok, fail = parse_file(lines)
+print(f"成功 {ok} 行，失败 {fail} 行")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">  第 2 行解析失败: 这一行是坏的
+成功 2 行，失败 1 行</pre></div>
+<p><code class="inline">enumerate(lines, 1)</code> 那个 <code class="inline">1</code> 很关键——<b>默认从 0 开始，但跟人说「第几行」时没人从 0 数</b>。这种小地方错了，你去日志文件里翻第 2 行，看到的是第 3 行，能白找半小时。</p>
+</details>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D015 笔记 · 正则表达式
+
+## 一句话
+正则不是「更复杂的字符串方法」，是「描述形状」——告诉程序长什么样，而不是第几段。
+split() 只认空格，不认意思；格式一变就错位，而且不报错。
+
+## 四个函数
+- match     : 只从位置 0 开始匹配 —— 不是「整条必须匹配」
+- search    : 全串找第一个
+- findall   : 全串找全部，有分组返回元组列表
+- sub       : 替换，替换串里可用 \1 \g&lt;name&gt;
+- fullmatch : 整条都必须匹配 —— 校验用这个，不要用 match
+
+## 元字符
+\d 数字 / \w 字母数字下划线（含汉字）/ \s 空白 / . 任意（除换行）
+* 0+ / + 1+ / ? 0或1 / {n} / {n,m} / [abc] / [^abc] / | / ( )
+^ 开头  $ 结尾
+
+## r 前缀（必须）
+r"\bword" 长度 6（反斜杠 + b + word）
+"\bword"  长度 5（退格符 + word）
+必错三场景：\b 单词边界 / \n \t / Windows 路径
+规矩：写正则的地方，字符串一律 r"...". 没有例外。
+
+## 分组
+(...)        捕获组，group(1) 从 1 开始
+(?P&lt;name&gt;...) 命名分组，groupdict() 直接拿字典 ★组数≥2 就用它
+(?:...)      非捕获组，只想让量词作用在一串上
+findall 只返回最外层分组的内容；要 group(0) 和位置就用 finditer
+
+## 贪婪 vs 非贪婪
+.*   先吃到最远再回退 —— 抓「成对符号之间」会吞掉中间的
+.*?  先吃最少再逐步加 —— 抓标签/引号/括号内的内容必须用它
+判断：右边界是否在一行里出现多次？是 → 用 ?；整行到末尾 → 贪婪
+
+## 实战正则（nginx 日志）
+(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3}) - - \[(?P&lt;time&gt;[^\]]+)\]
+"(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+" (?P&lt;status&gt;\d{3}) (?P&lt;size&gt;\d+)
+
+两个高频错：
+- 该用 [^\]]+ 的地方用了 .+    会越界到最后的 ]
+- 该用 \S+ 的地方用了 \w+      路径 /api/user 被切成 api，不报错
+
+## 解析器的纪律
+- 收集「解析失败的行」，别默默丢掉
+- enumerate(lines, 1)，行号从 1 数
+- 报错要带行号 + 前 30 字符
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D015 的产出是 <b>日志提取脚本</b>：读 nginx 日志，输出六个字段，坏行单独收集。</p>
+  <p>明天 D016：<b>正则实战 + 文本处理</b>——多行匹配、csv/json 混合、编码转换，做成一份 Top10 分析报告。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

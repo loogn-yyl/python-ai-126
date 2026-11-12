@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D020 学习包 · 综合练习：日志分析工具 v1</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 020 · 第 3 周</div>
+  <h1>综合练习：把三日所学装进一个命令行工具</h1>
+  <p>正则、并发、异步都写过了，但它们一直是「脚本」。今天给它们装上一道门——<b>命令行参数</b>，再装上一双眼睛——<b>日志</b>。产出一个别人（或三个月后的你）真能用的 <code class="inline">logtool</code>。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12+</span>
+    <span>🧰 argparse / logging</span>
+    <span>📦 产出：日志分析工具 v1</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：今天没有新语法，只有新的组合方式</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>1–2 节 argparse，<b>今天最「新」的地方</b>，务必跟敲</span></div><div class="tl"><b>第 2 小时</b><span>3–4 节 logging，重点是第 4 节三个坑</span></div><div class="tl"><b>第 3 小时</b><span>5–6 节，把前几天的零件拼成工具</span></div><div class="tl"><b>第 4 小时</b><span>7 节错误处理，然后八道练习</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day20
+cd ~/python-learn/day20
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate</pre></div>
+<div class="note"><b>全程标准库，一个包都不用装</b>：<code class="inline">argparse</code> 解析参数，<code class="inline">logging</code> 打日志，其余是前三天已经用熟的 <code class="inline">re</code>、<code class="inline">collections</code>、<code class="inline">pathlib</code>、<code class="inline">json</code>。</div>
+<div class="warn"><b>今天的目标不是「学会 argparse」，而是「让工具能被别人用」。</b>评判标准只有一条：把 <code class="inline">logtool.py</code> 发给一个没看过你代码的人，他能不能在不问你任何问题的前提下把命令敲对。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>一条命令长什么样：三种参数形态</h2>
+<p>先把目标写死。今天结束时，下面这条命令要能跑：</p>
+<div class="tree">python logtool.py access.log -n 5 --format json</div>
+<table>
+<tr><th>形态</th><th>例子</th><th>代码里怎么写</th><th>读出来是什么</th></tr>
+<tr><td><b>位置参数</b></td><td><code>access.log</code></td><td><code>add_argument("path")</code></td><td><code>args.path</code> 是字符串</td></tr>
+<tr><td><b>选项（带值）</b></td><td><code>-n 5</code></td><td><code>add_argument("-n","--top",type=int)</code></td><td><code>args.top</code> 是整数 <code>5</code></td></tr>
+<tr><td><b>开关（不带值）</b></td><td><code>-q</code></td><td><code>add_argument("-q",action="store_true")</code></td><td><code>args.quiet</code> 是布尔 <code>True</code></td></tr>
+</table>
+<p>三条约定记牢，能省掉一半查文档的时间：</p>
+<ul>
+<li><b>属性名取第一个<em>长</em>选项名。</b><code>"-n","--top"</code> 写成一起，属性就叫 <code>top</code>，不是 <code>n</code>。只写 <code>"-n"</code> 才会叫 <code>n</code>。</li>
+<li><b>位置参数的属性名就是变量名</b>，<code>"path"</code> 对应 <code>args.path</code>，名字自己定。</li>
+<li><b>短选项可以粘连</b>：<code>-n 5</code>、<code>--top 5</code>、<code>-n5</code> 三者等价。</li>
+</ul>
+<div class="codebox"><button class="copy">复制</button><pre>import argparse
+
+parser = argparse.ArgumentParser(prog="logtool", description="分析 nginx 访问日志")
+parser.add_argument("path", help="日志文件路径")
+parser.add_argument("-n", "--top", type=int, default=3, help="Top N，默认 3")
+parser.add_argument("-q", "--quiet", action="store_true", help="只输出结果，不打进度")
+parser.add_argument("--format", choices=["text", "csv", "json"], default="text")
+
+args = parser.parse_args(["-n", "5", "--format", "json", "access.log"])
+print(args)
+print("path   =", args.path)
+print("top    =", args.top)
+print("quiet  =", args.quiet)
+print("format =", args.format)
+print()
+print("只给位置参数:", parser.parse_args(["a.log"]))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Namespace(path='access.log', top=5, quiet=False, format='json')
+path   = access.log
+top    = 5
+quiet  = False
+format = json
+
+只给位置参数: Namespace(path='a.log', top=3, quiet=False, format='text')</pre></div>
+<div class="note">注意 <code class="inline">parse_args([...])</code> 这里传了一个<b>列表</b>。这是给自己调试用的：不传参时它读的是 <code class="inline">sys.argv</code>，也就是你在终端敲的整条命令。留一个 <code class="inline">argv=None</code> 的形参，测试时塞列表，正式跑时走默认值——这个形参在第 7 节会用到。</div>
+<div class="purple"><b>没写 <code class="inline">-h</code>，但 <code class="inline">-h</code> 已经有了。</b>argparse 会自动加上 <code class="inline">-h/--help</code>，按你写的 <code class="inline">help=</code> 生成长帮助，退出码 <code class="inline">0</code>。<br>它的换行位置跟终端宽度有关，<b>别把 <code class="inline">-h</code> 的输出当固定格式背</b>——同一份代码在 80 列和 120 列的终端上排出来不一样。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>argparse 替你做的三件事：校验、报错、退出码</h2>
+<p>这三件事以前是你自己在代码里 <code class="inline">if</code> 来 <code class="inline">if</code> 去写的。现在交给 argparse，你只管「声明」，它负责「守门」。</p>
+<table>
+<tr><th>你输入了什么</th><th>argparse 的反应</th><th>退出码</th></tr>
+<tr><td>缺必填参数</td><td>打 usage + <code>error: the following arguments are required: path</code></td><td><b>2</b></td></tr>
+<tr><td><code>--format xml</code>（不在 choices 里）</td><td><code>invalid choice</code>，并把可选项列出来</td><td><b>2</b></td></tr>
+<tr><td><code>-n abc</code>（<code>type=int</code> 转不动）</td><td><code>invalid int value</code></td><td><b>2</b></td></tr>
+<tr><td>两个互斥的开关同时给</td><td><code>not allowed with argument</code></td><td><b>2</b></td></tr>
+<tr><td><code>-h</code></td><td>打印帮助</td><td><b>0</b></td></tr>
+<tr><td>一切正常</td><td>返回 <code>Namespace</code></td><td>不退出，交给你</td></tr>
+</table>
+<p>看它实际怎么退：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import argparse
+import contextlib
+import io
+
+parser = argparse.ArgumentParser(prog="logtool", description="分析 nginx 访问日志")
+parser.add_argument("path", help="日志文件路径")
+parser.add_argument("-n", "--top", type=int, default=3, help="Top N，默认 3")
+parser.add_argument("--format", choices=["text", "csv", "json"], default="text")
+
+for argv in (["-n", "5"], ["--format", "xml", "a.log"], ["-n", "abc", "a.log"]):
+    err = io.StringIO()
+    try:
+        with contextlib.redirect_stderr(err):
+            parser.parse_args(argv)
+        print(f"{argv} -&gt; 正常返回")
+    except SystemExit as e:
+        print(f"{argv} -&gt; 退出码 {e.code}")
+        print("   ", err.getvalue().strip().splitlines()[-1])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">['-n', '5'] -&gt; 退出码 2
+    logtool: error: the following arguments are required: path
+['--format', 'xml', 'a.log'] -&gt; 退出码 2
+    logtool: error: argument --format: invalid choice: 'xml' (choose from 'text', 'csv', 'json')
+['-n', 'abc', 'a.log'] -&gt; 退出码 2
+    logtool: error: argument -n/--top: invalid int value: 'abc'</pre></div>
+<div class="danger"><b>报错信息是打到 <code class="inline">stderr</code> 的，不是 <code class="inline">stdout</code>。</b>所以这个例子里必须用 <code class="inline">contextlib.redirect_stderr</code> 才抓得到——<b>正常写代码时你一行都不用写</b>，用户在自己终端上会直接看见。<br>上面只是为了让你在笔记本里看清它到底说了什么。</div>
+<h3>互斥的两个开关</h3>
+<p><code>-q</code>（安静）和 <code>-v</code>（啰嗦）同时给没有意义，让人家自己报错比你在代码里猜要好：</p>
+<div class="codebox"><button class="copy">复制</button><pre>import argparse
+import contextlib
+import io
+
+parser = argparse.ArgumentParser(prog="logtool")
+parser.add_argument("path")
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-q", "--quiet", action="store_true", help="只输出结果")
+group.add_argument("-v", "--verbose", action="store_true", help="打印每一行")
+
+print("只给 -q :", parser.parse_args(["-q", "a.log"]))
+
+err = io.StringIO()
+try:
+    with contextlib.redirect_stderr(err):
+        parser.parse_args(["-q", "-v", "a.log"])
+except SystemExit as e:
+    print("两个都给: 退出码", e.code)
+    print("   ", err.getvalue().strip().splitlines()[-1])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">只给 -q : Namespace(path='a.log', quiet=True, verbose=False)
+两个都给: 退出码 2
+    logtool: error: argument -v/--verbose: not allowed with argument -q/--quiet</pre></div>
+<div class="warn"><b>生产代码里不要 <code class="inline">try/except SystemExit</code>。</b><code class="inline">parse_args()</code> 报了错就<b>应该</b>让程序死掉——它已经替你打好了人话，重新包一层只会让信息变模糊。捕获它只发生在两种场合：写测试，或者像上面这样在笔记本里演示。</div>
+<div class="note"><b>退出码的分工，今天就定下来：</b><br><b>0</b> 成功 ｜ <b>1</b> 业务失败（文件不存在、没有可解析的行）｜ <b>2</b> 用法错误（argparse 专用，别自己占）<br>shell 脚本和 CI 都靠这个数字判断成败，别一律 <code class="inline">sys.exit(1)</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>logging：五个级别，三行配置</h2>
+<table>
+<tr><th>级别</th><th>数值</th><th>什么时候用</th></tr>
+<tr><td><code>DEBUG</code></td><td>10</td><td>变量值、耗时、循环到第几轮——只在排查问题时想看</td></tr>
+<tr><td><code>INFO</code></td><td>20</td><td>「开始处理 X」「完成，共 7 行」——正常流程的里程碑</td></tr>
+<tr><td><code>WARNING</code></td><td><b>30</b></td><td>跳过 1 行坏行——<b>不致命但需要知道</b></td></tr>
+<tr><td><code>ERROR</code></td><td>40</td><td>文件不存在、全解析失败——这次任务废了</td></tr>
+<tr><td><code>CRITICAL</code></td><td>50</td><td>整个程序没法继续（日常脚本基本用不到）</td></tr>
+</table>
+<p>配置只有三件事：<b>级别、格式、往哪写</b>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import logging
+import sys
+
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(levelname)-8s | %(name)s | %(message)s",
+    stream=sys.stdout,
+)
+log = logging.getLogger("logtool")
+
+log.debug("debug 看不到")
+log.info("info 也看不到")
+log.warning("warning 看得到")
+log.error("error 看得到")
+log.critical("critical 看得到")
+print()
+print("有效级别:", log.getEffectiveLevel())</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">WARNING  | logtool | warning 看得到
+ERROR    | logtool | error 看得到
+CRITICAL | logtool | critical 看得到
+
+有效级别: 30</pre></div>
+<div class="note"><b><code class="inline">level</code> 是一条水位线</b>：低于它的日志连字符串都不会拼，直接在源头被丢掉。所以 <code class="inline">log.debug(f"...{很贵的计算}...")</code> 只写 <code class="inline">DEBUG</code> 是不会拖慢正式运行的——但写成 <code class="inline">log.debug("..." + 很贵的计算())</code> 就会，因为参数先算完才进函数。</div>
+<h3>format 里最常用的四个占位符</h3>
+<table>
+<tr><th>占位符</th><th>出来是什么</th><th>备注</th></tr>
+<tr><td><code>%(levelname)s</code></td><td><code>WARNING</code></td><td><code>-8s</code> = 左对齐补到 8 格，<b>日志才会成列</b></td></tr>
+<tr><td><code>%(name)s</code></td><td><code>logtool</code></td><td>哪个 logger 打的，拆模块后特别有用</td></tr>
+<tr><td><code>%(message)s</code></td><td>你写的那句话</td><td>唯一必写的</td></tr>
+<tr><td><code>%(asctime)s</code></td><td><code>2026-11-13 02:49:46</code></td><td>排查线上问题才加，<b>学习笔记里别加</b>，否则输出每次都不同</td></tr>
+</table>
+<div class="warn"><code class="inline">%(asctime)s</code> 和 <code class="inline">%(lineno)d</code> 会让输出不可复现。<b>写学习笔记、贴示例输出时删掉这两项</b>，不然你没法判断「这次输出和上次是不是一样」。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>logging 的三个坑，每个我都踩过</h2>
+<h3>坑一：basicConfig 只生效一次</h3>
+<p>第二次调用不会报错、不会警告，<b>什么都不会发生</b>。这就是「我明明设了 DEBUG，怎么还是看不见」的原因。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import logging
+import sys
+
+logging.basicConfig(level=logging.INFO,
+                    format="%(levelname)-8s | %(message)s",
+                    stream=sys.stdout)
+logging.getLogger("logtool").info("第一次配置：INFO 级别生效")
+
+# 第二次调用：所有参数都被忽略
+logging.basicConfig(level=logging.DEBUG,
+                    format="&gt;&gt;&gt; %(message)s",
+                    stream=sys.stdout)
+log = logging.getLogger("logtool")
+log.info("第二次 basicConfig 被忽略，格式还是第一次的")
+log.debug("级别也没变成 DEBUG，这行不显示")
+print()
+print("根 logger 上的 handler 数量:", len(logging.getLogger().handlers))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">INFO     | 第一次配置：INFO 级别生效
+INFO     | 第二次 basicConfig 被忽略，格式还是第一次的
+
+根 logger 上的 handler 数量: 1</pre></div>
+<div class="warn"><b>所以配置要放在程序最早的地方，且只放一次。</b>被 <code class="inline">import</code> 的模块里<b>绝对不要</b>调 <code class="inline">basicConfig</code>——谁先 import 谁说了算，行为取决于 import 顺序，这种 bug 极难查。<br>模块里只写 <code class="inline">log = logging.getLogger(__name__)</code>，配置交给入口文件。</div>
+<h3>坑二：不配置时，默认水位线是 WARNING</h3>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>import logging
+
+log = logging.getLogger("logtool")
+log.info("这行不会出现")
+log.warning("只有这行会出来")
+print("上面没有 INFO，就是默认级别 WARNING 在拦")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">只有这行会出来
+上面没有 INFO，就是默认级别 WARNING 在拦</pre></div>
+<p>此时连格式都没有——一个没配过的兜底 handler 直接把消息丢到 <code class="inline">stderr</code>。所以「我加了 <code class="inline">log.info</code> 却看不到」的第一反应应该是：<b>我调 <code class="inline">basicConfig</code> 了吗？</b></p>
+<h3>坑三：<code class="inline">getLogger("logtool")</code> 与 <code class="inline">getLogger(__name__)</code></h3>
+<div class="codebox"><button class="copy">复制</button><pre>import logging
+import sys
+
+logging.basicConfig(level=logging.INFO,
+                    format="%(name)-14s | %(levelname)-8s | %(message)s",
+                    stream=sys.stdout)
+root = logging.getLogger()
+app = logging.getLogger("logtool")
+sub = logging.getLogger("logtool.report")
+
+print("root 的名字:", repr(root.name))
+print("app  的名字:", app.name, "| 父级:", app.parent.name)
+print("sub  的名字:", sub.name, "| 父级:", sub.parent.name)
+print()
+app.info("主模块的消息")
+sub.info("子模块的消息，冒泡上去了")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">root 的名字: 'root'
+app  的名字: logtool | 父级: root
+sub  的名字: logtool.report | 父级: logtool
+
+logtool        | INFO     | 主模块的消息
+logtool.report | INFO     | 子模块的消息，冒泡上去了</pre></div>
+<div class="note"><b>logger 是一棵树，名字用点分层。</b><code class="inline">logtool.report</code> 的父级是 <code class="inline">logtool</code>，消息会往上冒泡到根——所以<b>子 logger 不需要单独配置</b>，只要根配好了，它自己就有了格式和出口。<br>这就是明天把 <code class="inline">logtool.py</code> 拆成四个文件时，<b>每个文件写 <code class="inline">getLogger(__name__)</code> 就自动带上了文件名</b>的原因。</div>
+<h3>为什么不用 print</h3>
+<table>
+<tr><th></th><th>print</th><th>logging</th></tr>
+<tr><td>想关掉</td><td>删代码，或者到处加 <code>if not quiet</code></td><td>改一个 <code>level</code></td></tr>
+<tr><td>分级</td><td>做不到</td><td>五个级别，一眼看出轻重</td></tr>
+<tr><td>去哪</td><td>只能 stdout</td><td>同时终端 + 文件 + 网络，各带各的格式</td></tr>
+<tr><td>谁打的</td><td>靠你自己写前缀</td><td><code>%(name)s</code> 自动填</td></tr>
+</table>
+<div class="ok"><b>一句话分界：给人看的结果用 <code class="inline">print</code>，给排错看的过程用 <code class="inline">log</code>。</b>报告正文是结果，走 <code class="inline">print</code>；「开始处理」「跳过 1 行」是过程，走 <code class="inline">log</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>拼装：从日志文本到一份报告</h2>
+<p>前几天的零件一个都不用改，只要按下面的顺序串起来。<b>关键是中间那步——先把结果算成一个 dict，最后才决定怎么打印。</b></p>
+<div class="tree">argv ──parse_args──▶ args        （谁来跑、跑什么、跑多细）
+args ──load──────▶ rows, bad    （正则解析，坏行单独记）
+rows ──build─────▶ d: dict      ★ 与打印方式无关的「事实」
+d    ──render_*──▶ 字符串 ──print──▶ stdout</div>
+<div class="codebox"><button class="copy">复制</button><pre>import re
+from collections import Counter
+
+LINE = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3})'
+    r' - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\]'
+    r' "(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+"'
+    r' (?P&lt;status&gt;\d{3})'
+    r' (?P&lt;size&gt;\d+)'
+)
+
+RAW = """10.0.0.7 - - [12/Nov/2026:09:01:11 +0800] "GET /api/user HTTP/1.1" 200 512
+10.0.0.7 - - [12/Nov/2026:09:01:12 +0800] "GET /api/user HTTP/1.1" 200 512
+10.0.0.9 - - [12/Nov/2026:09:02:03 +0800] "POST /api/login HTTP/1.1" 401 231
+10.0.0.7 - - [12/Nov/2026:09:02:44 +0800] "GET /static/app.js HTTP/1.1" 200 88213
+10.0.0.9 - - [12/Nov/2026:09:03:10 +0800] "GET /api/user HTTP/1.1" 500 0
+这行是坏的，没有方括号和引号
+10.0.0.11 - - [12/Nov/2026:14:04:00 +0800] "GET /api/order HTTP/1.1" 200 1024
+10.0.0.11 - - [12/Nov/2026:14:05:30 +0800] "GET /api/detail HTTP/1.1" 404 87"""
+
+
+def parse_line(line):
+    m = LINE.match(line)
+    if not m:
+        return None
+    d = m.groupdict()
+    d["status"] = int(d["status"])
+    d["size"] = int(d["size"])
+    return d
+
+
+def load(text):
+    rows, bad = [], []
+    for i, line in enumerate(text.splitlines(), 1):
+        if not line.strip():
+            continue
+        rec = parse_line(line)
+        rows.append(rec) if rec else bad.append(i)
+    return rows, bad
+
+
+def top_n(counter, n):
+    # 次数降序，次数相同按名字升序 —— 少了第二关键字，顺序就不固定
+    return sorted(counter.items(), key=lambda kv: (-kv[1], kv[0]))[:n]
+
+
+def report(rows, bad, n=3):
+    ips = Counter(r["ip"] for r in rows)
+    paths = Counter(r["path"] for r in rows)
+    codes = Counter(r["status"] for r in rows)
+    errors = sum(c for s, c in codes.items() if s &gt;= 400)
+    out = [f"文件共 {len(rows) + len(bad)} 行，解析成功 {len(rows)} 行，坏行 {len(bad)} 行"]
+    if bad:
+        out.append(f"坏行行号：{bad}")
+    out.append("")
+    out.append(f"Top {n} IP")
+    for ip, c in top_n(ips, n):
+        out.append(f"  {ip:&lt;12}{c:&gt;4}  {c / len(rows):&gt;6.1%}")
+    out.append(f"Top {n} URL")
+    for p, c in top_n(paths, n):
+        out.append(f"  {p:&lt;18}{c:&gt;4}")
+    out.append("状态码")
+    for s, c in sorted(codes.items()):
+        out.append(f"  {s}  {c:&gt;4}")
+    out.append(f"错误率 {errors / len(rows):.1%}（{errors}/{len(rows)}）")
+    return "\n".join(out)
+
+
+rows, bad = load(RAW)
+print(report(rows, bad))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">文件共 8 行，解析成功 7 行，坏行 1 行
+坏行行号：[6]
+
+Top 3 IP
+  10.0.0.7       3   42.9%
+  10.0.0.11      2   28.6%
+  10.0.0.9       2   28.6%
+Top 3 URL
+  /api/user            3
+  /api/detail          1
+  /api/login           1
+状态码
+  200     4
+  401     1
+  404     1
+  500     1
+错误率 42.9%（3/7）</pre></div>
+<div class="warn"><b>看第 2 行和第 3 行：<code class="inline">10.0.0.11</code> 排在 <code class="inline">10.0.0.9</code> 前面。</b>两次都是 2 次请求，凭什么它在前？因为第二排序键是字符串，<code class="inline">"10.0.0.11" &lt; "10.0.0.9"</code>（逐字符比，<code class="inline">1</code> 比 <code class="inline">9</code> 小）。<br>字符串比较下 <code class="inline">"10.0.0.11"</code> 反而「更小」，这跟直觉相反但完全一致——<b>只要规则固定，这个顺序就是可复现的</b>。想按 IP 真实大小排，得用第 8 节第 5 题的办法。</div>
+<div class="note"><b>为什么一定要有第二排序键？</b>没有它，<code class="inline">sorted</code> 对相等元素的先后不做任何承诺，这次跑出 A 在前、下次可能 B 在前。你贴进笔记的输出、写进测试的断言，全都会随机失败。<b>任何「Top N」都必须有确定的 tie-break 规则。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>三种输出：同一份结果，三种穿法</h2>
+<p>因为第 5 节把结果算成了 dict，换个打印方式只是换一个函数，中间逻辑一行都不用动。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import json
+
+# 假设解析已完成，rows 里每条记录长这样
+rows = [
+    {"ip": "10.0.0.7", "path": "/api/user", "status": 200},
+    {"ip": "10.0.0.7", "path": "/api/user", "status": 200},
+    {"ip": "10.0.0.9", "path": "/api/login", "status": 401},
+]
+codes = {}
+for r in rows:
+    key = str(r["status"])
+    codes[key] = codes.get(key, 0) + 1
+
+data = {"total": len(rows), "codes": codes, "备注": "含中文"}
+print(json.dumps(data, ensure_ascii=False, indent=2))
+print()
+print(json.dumps(data, ensure_ascii=True))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">{
+  "total": 3,
+  "codes": {
+    "200": 2,
+    "401": 1
+  },
+  "备注": "含中文"
+}
+
+{"total": 3, "codes": {"200": 2, "401": 1}, "\u5907\u6ce8": "\u542b\u4e2d\u6587"}</pre></div>
+<table>
+<tr><th>格式</th><th>给谁看</th><th>要点</th></tr>
+<tr><td><b>text</b></td><td>人，直接在终端读</td><td>对齐、带单位、数字后面别堆小数点</td></tr>
+<tr><td><b>csv</b></td><td>Excel / 表格软件</td><td><b>用 <code>csv</code> 模块写</b>，别手拼字符串</td></tr>
+<tr><td><b>json</b></td><td>别的程序、接口、存档</td><td><code>ensure_ascii=False</code> 才保得住中文；<code>indent=2</code> 只是给人看</td></tr>
+</table>
+<div class="danger"><b>手拼 CSV 有三个必炸点：</b>①值里有逗号（URL 的查询串 <code class="inline">?a=1,b=2</code>）；②值里有换行（抓下来的页面标题）；③值里有双引号。<code class="inline">csv.writer</code> 会自动加引号并转义，手拼就得自己实现这一整套。<b>结论：能 <code class="inline">import csv</code> 就别手拼。</b></div>
+<h3>结果走 stdout，日志走 stderr</h3>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>import logging
+import sys
+
+logging.basicConfig(level=logging.INFO,
+                    format="%(levelname)-8s | %(message)s",
+                    stream=sys.stderr)      # 日志 → stderr
+log = logging.getLogger("logtool")
+
+log.info("进度：开始处理")
+print("报告正文：总请求 7 条")
+log.info("进度：结束")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">$ python split.py 2&gt;/dev/null
+报告正文：总请求 7 条
+
+$ python split.py 1&gt;/dev/null
+INFO     | 进度：开始处理
+INFO     | 进度：结束</pre></div>
+<div class="ok"><b>这就是为什么日志要走 <code class="inline">stderr</code>。</b>两路分开之后，<code class="inline">python logtool.py access.log &gt; report.txt</code> 得到的文件里<b>只有干净的正文</b>，进度信息还在屏幕上滚——不用再写 <code class="inline">--quiet</code> 去关它，重定向本身就是开关。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>错误处理：三种死法，三种交代</h2>
+<p>工具给人用，就得替人想到「他可能会做错什么」。这一节只有三件事：<b>检查、报错、给出退出码</b>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import contextlib
+import io
+import re
+import sys
+from pathlib import Path
+
+LINE = re.compile(
+    r'(?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3})'
+    r' - - '
+    r'\[(?P&lt;time&gt;[^\]]+)\]'
+    r' "(?P&lt;method&gt;[A-Z]+) (?P&lt;path&gt;\S+) HTTP/[\d.]+"'
+    r' (?P&lt;status&gt;\d{3})'
+    r' (?P&lt;size&gt;\d+)'
+)
+
+GOOD = '10.0.0.7 - - [12/Nov/2026:09:01:11 +0800] "GET /api/user HTTP/1.1" 200 512\n'
+
+
+def load(text):
+    rows = []
+    for line in text.splitlines():
+        m = LINE.match(line)
+        if m:
+            rows.append(m.groupdict())
+    return rows
+
+
+def run(path):
+    p = Path(path)
+    if not p.exists():
+        print(f"错误：找不到文件 {path}", file=sys.stderr)
+        return 1
+    rows = load(p.read_text(encoding="utf-8"))
+    if not rows:
+        print(f"错误：{path} 里一行都没解析出来", file=sys.stderr)
+        return 1
+    print(f"成功：{path} 解析出 {len(rows)} 行")
+    return 0
+
+
+Path("ok.log").write_text(GOOD, encoding="utf-8")
+Path("bad.log").write_text("全是坏行\n再来一行坏的\n", encoding="utf-8")
+
+for name in ("ok.log", "bad.log", "missing.log"):
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = run(name)
+    print(f"  {name:&lt;12} 退出码 {code}   {err.getvalue().strip()}")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">成功：ok.log 解析出 1 行
+  ok.log       退出码 0   
+  bad.log      退出码 1   错误：bad.log 里一行都没解析出来
+  missing.log  退出码 1   错误：找不到文件 missing.log</pre></div>
+<div class="note"><b><code class="inline">run()</code> 返回退出码，<code class="inline">main()</code> 负责把它交出去。</b>这样写的两个好处：①每个分支的返回值都能被测试直接断言，不用起子进程；②「工具做了什么」和「进程怎么退出」彻底分开。</div>
+<div class="codebox"><button class="copy">复制</button><pre>import argparse
+import logging
+import sys
+
+def parse_args(argv=None):
+    p = argparse.ArgumentParser(prog="logtool", description="分析 nginx 访问日志")
+    p.add_argument("path", help="日志文件路径")
+    p.add_argument("-n", "--top", type=int, default=3, help="Top N，默认 3")
+    p.add_argument("-q", "--quiet", action="store_true", help="不打进度日志")
+    p.add_argument("--format", choices=["text", "csv", "json"], default="text")
+    return p.parse_args(argv)      # ★ argv=None 走 sys.argv
+
+
+def setup_log(quiet):
+    logging.basicConfig(
+        level=logging.WARNING if quiet else logging.INFO,
+        format="%(levelname)-8s | %(message)s",
+        stream=sys.stderr,         # ★ 日志走 stderr，结果走 stdout
+    )
+    return logging.getLogger("logtool")
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    log = setup_log(args.quiet)
+    log.info("开始处理 %s", args.path)
+    code = run(args)               # 第 7 节上面那个函数
+    log.info("结束，退出码 %d", code)
+    return code
+
+
+if __name__ == "__main__":
+    sys.exit(main())</pre></div>
+<div class="ok"><b>最后三行是整份脚本的门面。</b><code class="inline">if __name__ == "__main__":</code> 保证被 import 时不会自动跑（测试要 import 它）；<code class="inline">sys.exit(main())</code> 把返回值变成进程退出码——<b>不写这一句，<code class="inline">return 1</code> 就只是个被丢弃的值，进程照样退 0</b>，shell 那边看见的永远是「成功」。</div>
+<div class="tree">day20/
+├── logtool.py        ← 今天的目标：单文件能跑
+├── access.log        ← 自己造的样例数据
+└── .venv/
+
+python logtool.py access.log                 # 默认 Top 3，text
+python logtool.py access.log -n 5            # Top 5
+python logtool.py access.log --format json   # 给程序吃
+python logtool.py access.log -q              # 不打进度
+python logtool.py                            # 报错，退出码 2
+python logtool.py nope.log                   # 报错，退出码 1</div>
+<div class="warn"><b>别急着拆成包。</b>单文件能跑通（上面六条命令全对）再拆——今天就把 <code class="inline">logtool.py</code> 写成一个文件，<b>拆包是明天的事</b>。先能跑，再好看。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>练习：在能跑的工具上继续加东西</h2>
+<p>八道题全部基于第 7 节的 <code class="inline">logtool.py</code>。<b>样例数据就用第 5 节那 8 行</b>（7 行能解析、1 行坏行），所以每道题的预期数字都能自己核对。</p>
+<ol class="task">
+<li>加一个 <code class="inline">--min-status N</code>：只统计状态码 ≥ N 的请求。跑 <code class="inline">--min-status 400</code> 应该只剩 3 条。<b>想清楚过滤该放在 <code class="inline">build()</code> 之前还是之后</b>。</li>
+<li>加 <code class="inline">-o/--output FILE</code>：把报告写进文件，不传就照旧打到屏幕。做完顺手验证 <code class="inline">python logtool.py access.log -o r.txt</code> 之后屏幕上还剩什么。</li>
+<li>把 <code class="inline">-q</code> 换成三档：默认 INFO，<code class="inline">-v</code> 变 DEBUG，<code class="inline">-q</code> 变 WARNING。用 <code class="inline">action="count"</code> 让 <code class="inline">-vv</code> 也能用。</li>
+<li>让 <code class="inline">-q</code> 和 <code class="inline">-v</code> 互斥。验证同时给时退出码是 2，并检查你写的帮助信息里有没有出现 <code class="inline">[-q | -v]</code>。</li>
+<li>修第 5 节那个「<code class="inline">10.0.0.11</code> 排在 <code class="inline">10.0.0.9</code> 前面」的问题，改成按 IP 真实数值排序。<b>注意 <code class="inline">top_n</code> 同时被 IP 和 URL 用着，改之前先想会不会把 URL 那边弄炸。</b></li>
+<li>加日志文件：终端和 <code class="inline">logtool.log</code> 同时输出。要求两边格式一致，且 <code class="inline">-q</code> 时文件里也不该有 INFO。</li>
+<li>把 <code class="inline">errors="replace"</code> 改成默认的 <code class="inline">strict</code>，然后造一个 GBK 编码的日志文件去读它。看到 <code class="inline">UnicodeDecodeError</code> 之后，写一个能自动试编码的函数把这个问题真正解决掉。</li>
+<li>加 <code class="inline">--by-hour</code>：按小时分组统计请求数。样例日志应该输出 <code class="inline">09</code> 点 5 条、<code class="inline">14</code> 点 2 条。<b>时间字段长这样：<code class="inline">12/Nov/2026:09:01:11 +0800</code>，想清楚取哪一段。</b></li>
+</ol>
+
+<details><summary>参考答案 1 · --min-status</summary>
+<div class="codebox"><button class="copy">复制</button><pre>def parse_args(argv=None):
+    ...
+    p.add_argument("--min-status", type=int, default=0, metavar="N",
+                   help="只看状态码大于等于 N 的请求")
+    return p.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    log = setup_log(args.quiet)
+    rows, bad = load(args.path)
+
+    # ★ 放在 build 之前：错误率的分母才会跟着变
+    if args.min_status:
+        rows = [r for r in rows if r["status"] &gt;= args.min_status]
+        log.info("过滤后剩 %d 行", len(rows))
+
+    d = build(rows, bad, args.top)</pre></div>
+<p><b>放 <code class="inline">build()</code> 之后的后果：</b>Top IP 少了，但「错误率 42.9%（3/7）」的 7 还是全部的 7，报告自相矛盾。<b>过滤是「换一份数据」，不是「换一种打印」</b>，所以必须在算事实之前。</p>
+<p><b>另一个坑：</b>过滤后 <code class="inline">rows</code> 可能变成空列表，<code class="inline">errors / len(rows)</code> 会 <code class="inline">ZeroDivisionError</code>。第 7 节的 <code class="inline">build()</code> 里写了 <code class="inline">if rows else 0.0</code> 就是为了挡这个。</p>
+</details>
+
+<details><summary>参考答案 2 · -o/--output</summary>
+<div class="codebox"><button class="copy">复制</button><pre>p.add_argument("-o", "--output", default=None, help="写到文件，默认打到屏幕")
+
+# 先把三种格式都变成字符串，再统一决定往哪送
+if args.format == "json":
+    text = json.dumps(d, ensure_ascii=False, indent=2)
+elif args.format == "csv":
+    text = render_csv(d)
+else:
+    text = render_text(d)
+
+if args.output:
+    Path(args.output).write_text(text + "\n", encoding="utf-8")
+    log.info("已写入 %s", args.output)
+else:
+    print(text)</pre></div>
+<p><b>为什么要先收成字符串？</b>原来的写法是三个分支各自 <code class="inline">print</code>，加 <code class="inline">-o</code> 就得在三个分支里各写一遍「写文件还是打印」。收成一个 <code class="inline">text</code> 之后，只在一个地方决定去向——<b>「怎么算」「怎么拼」「往哪送」是三件不同的事，别混在一个分支里。</b></p>
+<p>验证：<code class="inline">python logtool.py access.log -o r.txt</code> 之后，屏幕上只剩 <code class="inline">INFO | 已写入 r.txt</code>（以及坏行的 WARNING）——报告正文全在文件里。这正是日志走 <code class="inline">stderr</code> 换来的好处。</p>
+</details>
+
+<details><summary>参考答案 3 · -v 变成 count</summary>
+<div class="codebox"><button class="copy">复制</button><pre>p.add_argument("-v", "--verbose", action="count", default=0,
+               help="加一次看 DEBUG，加两次以上同效")
+
+def setup_log(quiet, verbose):
+    level = logging.INFO
+    if verbose &gt;= 1:
+        level = logging.DEBUG
+    if quiet:
+        level = logging.WARNING
+    logging.basicConfig(level=level, format=..., stream=sys.stderr)
+    return logging.getLogger("logtool")</pre></div>
+<p>几个验证点：<code class="inline">-v</code> 与 <code class="inline">-vv</code> 与 <code class="inline">-v -v</code> 三种写法 <code class="inline">args.verbose</code> 分别是 1、2、2；不传时是 <code class="inline">0</code>（靠 <code class="inline">default=0</code> 撑着，<b>不写 <code class="inline">default</code> 时 <code class="inline">count</code> 的默认值是 <code class="inline">None</code></b>，<code class="inline">None &gt;= 1</code> 会抛 <code class="inline">TypeError</code>）。</p>
+<p><b>顺序也有讲究：</b>两个 <code class="inline">if</code> 谁在后面谁生效。上面把 <code class="inline">quiet</code> 放最后，意味着「同时给 <code class="inline">-q -v</code> 时以安静为准」——但第 4 题会直接让这种组合报错，所以这只是兜底。</p>
+</details>
+
+<details><summary>参考答案 4 · 互斥</summary>
+<div class="codebox"><button class="copy">复制</button><pre>group = p.add_mutually_exclusive_group()
+group.add_argument("-q", "--quiet", action="store_true", help="只输出结果")
+group.add_argument("-v", "--verbose", action="count", default=0, help="打印调试日志")</pre></div>
+<p>两个要点：</p>
+<ul>
+<li><b>用法行会变成 <code class="inline">[-q | -v]</code></b>，那个竖线是 argparse 自己加的，等于在 <code class="inline">-h</code> 里就告诉用户「这两个不能一起给」——比运行时才报错友好。</li>
+<li><code class="inline">default=0</code> 仍然要写在 <code class="inline">verbose</code> 上。<b>互斥只限制「用户能不能同时给」，不影响默认值。</b></li>
+</ul>
+<p>验证：<code class="inline">python logtool.py access.log -q -v</code> → 打 <code class="inline">not allowed with argument</code>，退出码 2，报告一个字都不会输出。</p>
+</details>
+
+<details><summary>参考答案 5 · IP 按数值排序</summary>
+<div class="codebox"><button class="copy">复制</button><pre>from ipaddress import ip_address
+
+def top_n(counter, n, key=lambda k: k):
+    return sorted(counter.items(), key=lambda kv: (-kv[1], key(kv[0])))[:n]
+
+# 调用处：IP 传 ip_address，URL 走默认的字符串排序
+ips   = top_n(Counter(r["ip"] for r in rows), n, key=ip_address)
+paths = top_n(Counter(r["path"] for r in rows), n)</pre></div>
+<p><b>这里最容易犯的错是直接改 <code class="inline">top_n</code> 内部：</b></p>
+<div class="codebox"><button class="copy">复制</button><pre># ✗ 这样改会把 URL 那边弄炸
+def top_n(counter, n):
+    return sorted(counter.items(), key=lambda kv: (-kv[1], ip_address(kv[0])))[:n]
+# ValueError: '/api/user' does not appear to be an IPv4 or IPv6 address</pre></div>
+<p>一个函数被两种数据共用时，<b>别把「某一种数据的规则」写死在函数里</b>，用参数（或者 <code class="inline">key=</code>）从外面传进去。改完再跑一次，Top 3 IP 应变成 <code class="inline">10.0.0.7</code>(3)、<code class="inline">10.0.0.9</code>(2)、<code class="inline">10.0.0.11</code>(2)——<b>9 跑到 11 前面了</b>，这才符合直觉。</p>
+</details>
+
+<details><summary>参考答案 6 · 终端 + 文件双输出</summary>
+<div class="codebox"><button class="copy">复制</button><pre>def setup_log(quiet):
+    level = logging.WARNING if quiet else logging.INFO
+    fmt = logging.Formatter("%(levelname)-8s | %(message)s")
+
+    fh = logging.FileHandler("logtool.log", encoding="utf-8")
+    fh.setFormatter(fmt)
+    sh = logging.StreamHandler(sys.stderr)
+    sh.setFormatter(fmt)
+
+    # ★ 一旦传了 handlers，format / stream 这两个参数就被忽略
+    logging.basicConfig(level=level, handlers=[fh, sh])
+    return logging.getLogger("logtool")</pre></div>
+<p><b>三个必须知道的点：</b></p>
+<ul>
+<li>传了 <code class="inline">handlers=[...]</code> 之后，<code class="inline">format=</code> 和 <code class="inline">stream=</code> 会被<b>静默忽略</b>——格式得自己 <code class="inline">setFormatter</code> 到每个 handler 上。这也是「配了格式却不生效」的常见原因。</li>
+<li><code class="inline">FileHandler</code> 必须写 <code class="inline">encoding="utf-8"</code>，否则在中文 Windows 上按 GBK 写，换台机器打开就是乱码。</li>
+<li><code class="inline">level</code> 设在 <b>logger</b> 上（这里是 <code class="inline">basicConfig</code> 的 <code class="inline">level</code>），是<b>总闸</b>；handler 上还可以再各设一个 <code class="inline">setLevel</code>，是<b>分闸</b>。想「终端只留 WARNING、文件全留」就靠分闸，别把一个 <code class="inline">level</code> 用到底。</li>
+</ul>
+<p>验证 <code class="inline">-q</code>：<code class="inline">python logtool.py access.log -q</code> 之后 <code class="inline">logtool.log</code> 里应该只有 WARNING 那一行——因为 INFO 在总闸就被拦掉了，两个 handler 谁都收不到。</p>
+</details>
+
+<details><summary>参考答案 7 · 编码兜底</summary>
+<div class="codebox"><button class="copy">复制</button><pre>from pathlib import Path
+
+Path("gbk.log").write_bytes("状态码 200".encode("gbk"))
+Path("gbk.log").read_text(encoding="utf-8")
+# UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd7 ...</pre></div>
+<p>修法：<b>按可能性从高到低逐个试，第一个能解开的就用它。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>def read_text(path):
+    data = Path(path).read_bytes()
+    for enc in ("utf-8-sig", "utf-8", "gbk"):
+        try:
+            return data.decode(enc)
+        except UnicodeDecodeError:
+            continue
+    raise ValueError(f"{path} 编码认不出来，请手动指定")
+
+
+# 顺带解决 D016 那个 BOM 问题：utf-8-sig 会把 BOM 吃掉，
+# 所以用它的返回值的首行不会是 "\ufeffip,count"
+def read_csv_text(path):
+    return read_text(path).splitlines()[0]</pre></div>
+<p><b>为什么不直接用 <code class="inline">errors="ignore"</code>？</b>因为它会<b>静默删掉</b>解不开的字节——4 个汉字可能只剩 1 个字符，日志里 IP 还在、URL 变半个，报表看着挺正常，实际全错。<b>宁可报错，也别静默出错。</b></p>
+<p>注意先 <code class="inline">read_bytes()</code> 再 <code class="inline">decode()</code>：<code class="inline">read_text()</code> 会在读的瞬间就按给定编码解码，解不开直接抛，没法在里面换编码重试。</p>
+</details>
+
+<details><summary>参考答案 8 · --by-hour</summary>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>p.add_argument("--by-hour", action="store_true", help="按小时分组统计")
+
+# main() 里，拿到 d 之后
+if args.by_hour:
+    hours = Counter(r["time"].split(":")[1] for r in rows)
+    print("按小时")
+    for h, c in sorted(hours.items()):
+        print(f"  {h} 点  {c:&gt;3}")</pre></div>
+<p>预期输出：</p>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">按小时
+  09 点    5
+  14 点    2</pre></div>
+<p><b>为什么是 <code class="inline">split(":")[1]</code>？</b>时间字段是 <code class="inline">12/Nov/2026:09:01:11 +0800</code>，用冒号切开得到 <code class="inline">["12/Nov/2026", "09", "01", "11 +0800"]</code>，下标 1 正好是小时。<b>别用固定下标去切空格</b>（D015 第 1 节踩过：格式一变就错位），按结构切。</p>
+<p>想更严谨可以把它做成 datetime：<code class="inline">datetime.strptime(t, "%d/%b/%Y:%H:%M:%S %z").hour</code>——<code class="inline">%b</code> 认 <code class="inline">Nov</code> 这种英文月份缩写，<code class="inline">%z</code> 认 <code class="inline">+0800</code>。好处是能顺手做「按星期几」「按时段」的统计，代价是遇到不认识的时间格式会抛异常，要 <code class="inline">try</code> 住。</p>
+</details>
+</section>
+
+<section>
+  <h2><span class="n">9</span>笔记要点：抄这一页就够</h2>
+<div class="codebox"><button class="copy">复制</button><pre>## argparse 三种形态
+位置参数  add_argument("path")                     args.path
+选项带值  add_argument("-n","--top",type=int)      args.top   ★名字取长选项
+开关      add_argument("-q",action="store_true")   args.quiet
+选择      add_argument("--format",choices=[...])
+计数      add_argument("-v",action="count",default=0)   ★default 不写是 None
+
+## argparse 替你做的三件事
+校验（缺参 / 类型 / choices / 互斥）→ 报错到 stderr → 退出码 2
+-h 自动生成 → 退出码 0
+★ 退出码分工：0 成功 / 1 业务失败 / 2 用法错误（2 是 argparse 专用）
+★ 生产代码别 except SystemExit；argv=None 的形参是留给测试的
+
+## logging 五个级别
+DEBUG 10  INFO 20  WARNING 30  ERROR 40  CRITICAL 50
+★ level 是水位线，低于它的连字符串都不拼
+
+## logging 三行配置
+basicConfig(level=..., format="%(levelname)-8s | %(message)s", stream=sys.stderr)
+★ -8s 左对齐补 8 格，日志才成列
+★ 别加 %(asctime)s：输出就不可复现了
+
+## 三个坑
+1 basicConfig 只生效一次，第二次静默忽略 → 只在入口调一次
+  被 import 的模块里只写 getLogger(__name__)
+2 不配置时默认 WARNING，info 全丢，格式也没有
+3 logger 是树：logtool.report 的父级是 logtool，消息向上冒泡
+  → 根配好了，子 logger 自动有格式
+
+## 为什么不用 print
+给排错看的过程 → log；给人看的结果 → print
+日志走 stderr，结果走 stdout
+→ python x.py > report.txt 得到的只有干净正文
+
+## 拼装顺序（今天最重要的一页）
+parse_args → load(rows, bad) → build(dict) → render_* → print
+★ 先算成 dict，最后才决定怎么打印：换格式不用动中间逻辑
+★ 过滤在 build 之前：换的是数据，不是打印方式
+★ Top N 必须有第二排序键，否则顺序随机
+★ "10.0.0.11" < "10.0.0.9"（字符串比较），要真实大小得用 ip_address
+★ 共用的函数别写死某一种数据的规则，用 key= 从外面传
+
+## 出口一行
+if __name__ == "__main__":
+    sys.exit(main())
+★ 不写 sys.exit()，return 1 就只是被丢掉的值，进程照样退 0
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D020 的产出是 <b>日志分析工具 v1</b>：单文件、命令行可调、text/csv/json 三种输出、退出码分明。</p>
+  <p>明天 D021：<b>阶段复盘</b>——三周的知识地图、一次自测，以及把这些天写的东西整理成一份能拿出去的目录。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

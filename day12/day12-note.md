@@ -33,7 +33,7 @@
 ## itertools
 | 函数 | 意义 |
 | --- | --- |
-| count(start, step) / islice(it, n) | 无限序列 + 截断(必须配 islice) |
+| count(start, step) + islice(it, n) | 无限序列 + 截断(必须配 islice) |
 | chain(a, b) | 拼接多个序列 |
 | cycle(it) | 无限循环 |
 | groupby(it) | 相邻分组！要全局分组先 sorted |

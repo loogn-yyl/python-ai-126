@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D019 学习包 · 并发编程</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 019 · 第 3 周</div>
+  <h1>并发编程：线程池、进程池，和什么时候别用它们</h1>
+  <p>昨天用异步把「等」重叠起来了。今天看另外两条路，以及一条重要的反向结论：<b>并发不是越多越好，有时候会更慢</b>。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐍 Python 3.12.16</span>
+    <span>🧵 threading / futures</span>
+    <span>📦 产出：批量下载器</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：先花一小时把「该用哪个」想清楚</h2>
+<div class="timeline"><div class="tl"><b>第 1 小时</b><span>读 1 节那张表。<b>只看这一张表也够今天用了</b></span></div><div class="tl"><b>第 2 小时</b><span>读 2–3 节：threading 和 futures，跟着敲</span></div><div class="tl"><b>第 3 小时</b><span>读 4–5 节：实测 + 竞态，<b>竞态那段要亲手跑</b></span></div><div class="tl"><b>第 4 小时</b><span>读第 6 节做下载器，然后八道练习</span></div></div>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-learn/day19
+cd ~/python-learn/day19
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate</pre></div>
+<div class="note"><b>今天全部用标准库</b>：<code class="inline">threading</code>、<code class="inline">concurrent.futures</code>、<code class="inline">multiprocessing</code>（被 futures 包着用）。<br>所有例子都用 <code class="inline">time.sleep</code> 模拟等待，<b>不联网，结果可复现</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>四条路，一张表选完</h2>
+<table>
+<tr><th>方式</th><th>怎么开</th><th>适合</th><th>代价</th></tr>
+<tr><td><b>asyncio</b></td><td><code>async/await</code></td><td><b>IO 密集、任务特别多</b>（上千个连接）</td><td>整条链路都得改成异步，同步库用不了</td></tr>
+<tr><td><b>ThreadPoolExecutor</b></td><td><code>pool.map(f, xs)</code></td><td><b>IO 密集、已有同步代码</b></td><td>并发度受线程池大小限制；共享状态要加锁</td></tr>
+<tr><td><b>ProcessPoolExecutor</b></td><td><code>pool.map(f, xs)</code></td><td><b>CPU 密集</b></td><td>进程启动贵；参数和返回值必须可 pickle</td></tr>
+<tr><td>不用</td><td>普通循环</td><td><b>任务很少（≤3 个）或每个都很快</b></td><td>没有</td></tr>
+</table>
+<div class="danger"><b>最后一行最容易被忽略。</b><br>三个任务、每个 10 毫秒，写成线程池反而更慢——<b>创建线程的开销比你省下的时间还多</b>。今天第 4 节会用实测数据证明这一点。<br><b>并发是优化手段，不是代码风格。没测过变快，就别加。</b></div>
+<div class="note"><b>为什么异步只适合「任务特别多」？</b><br>因为它在一个线程里管理所有任务，每个任务的额外开销只有几十字节。<b>一万个并发请求，asyncio 扛得住，线程池会直接把内存吃光</b>——每个线程默认要占几 MB 栈空间。<br>反过来，<b>只有几十个任务时，用线程池写起来快得多</b>，不值得为它改造整条链路。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>threading：最朴素的写法，和它的三个麻烦</h2>
+<p>先看最原始的多线程，<b>目的是让你知道 <code class="inline">futures</code> 替你省了什么</b>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import threading
+import time
+
+results = []
+
+
+def fetch(i):
+    time.sleep(0.05 * i)
+    results.append(f"任务{i}完成")
+
+
+threads = [threading.Thread(target=fetch, args=(i,)) for i in range(1, 4)]
+
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()          # 等所有线程结束
+
+print("结果:", results)
+print("线程还活着吗:", any(t.is_alive() for t in threads))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">结果: ['任务1完成', '任务2完成', '任务3完成']
+线程还活着吗: False</pre></div>
+<p>三个麻烦，每一个 <code class="inline">futures</code> 都解决了：</p>
+<table>
+<tr><th>麻烦</th><th>threading 的做法</th><th>futures 的做法</th></tr>
+<tr><td><b>拿返回值</b></td><td>没有返回值。得自己往一个共享 list 里塞，或者用 <code>queue.Queue</code></td><td><code>pool.map()</code> 直接给你一个列表</td></tr>
+<tr><td><b>等结束</b></td><td>必须 <code>start()</code> 一轮、<code>join()</code> 一轮，两轮循环</td><td><code>with</code> 块结束时自动等</td></tr>
+<tr><td><b>抓异常</b></td><td><b>异常在子线程里抛出，主线程完全不知道</b>，只在终端打一行 traceback</td><td><code>f.result()</code> 会把异常重新抛到调用方</td></tr>
+</table>
+<div class="danger"><b>第三条最坑。</b>子线程里报错，主线程会<b>若无其事地继续跑</b>，你看到的结果就是「少了几条，但不报错」。<br>这是多线程排查难度高的根本原因——<b>错误和它的后果发生在不同的地方</b>。</div>
+<div class="warn"><b><code class="inline">join()</code> 那一轮循环不能省。</b><br>少了它，主线程可能在子线程还没跑完时就 <code class="inline">print(results)</code>，你得到空列表或半个列表。<b>而且这个错时有时无</b>——机器快的时候看着对，换台机器就错。<br>更隐蔽的是：<b>主线程退出时，非守护线程会被强制终止</b>（<code class="inline">daemon=False</code> 时 Python 会等待，但行为依版本而异）。老老实实 <code class="inline">join()</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>concurrent.futures：一个接口，两种池</h2>
+<p>这是实际项目里该用的东西。<b>把 <code class="inline">Thread</code> 换成 <code class="inline">Process</code>，其他代码一个字都不用改</b>——这是它最大的价值。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from concurrent.futures import ThreadPoolExecutor
+
+URLS = [f"https://site{i}.com" for i in range(1, 6)]
+DELAY = 0.1
+
+
+def fetch(url):
+    time.sleep(DELAY)          # 模拟网络等待
+    return f"{url} 的标题"
+
+
+t0 = time.perf_counter()
+serial = [fetch(u) for u in URLS]
+print(f"串行   : {time.perf_counter() - t0:.1f} 秒")
+
+t0 = time.perf_counter()
+with ThreadPoolExecutor(max_workers=5) as pool:
+    parallel = list(pool.map(fetch, URLS))
+print(f"线程池 : {time.perf_counter() - t0:.1f} 秒")
+
+print("结果一致:", serial == parallel)
+print("第一条  :", parallel[0])</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">串行   : 0.5 秒
+线程池 : 0.1 秒
+结果一致: True
+第一条  : https://site1.com 的标题</pre></div>
+<p><b>五行改动，快五倍，结果一字不差。</b>这就是 <code class="inline">futures</code> 该有的样子。</p>
+<h3><code class="inline">map</code> 和 <code class="inline">submit</code> 的区别</h3>
+<table>
+<tr><th></th><th><code>pool.map(f, xs)</code></th><th><code>pool.submit(f, x)</code></th></tr>
+<tr><td>返回</td><td>结果迭代器，<b>按输入顺序</b></td><td>一个 Future 对象</td></tr>
+<tr><td>拿结果</td><td>直接 <code>list()</code></td><td><code>f.result()</code>（阻塞等某个）</td></tr>
+<tr><td>拿顺序</td><td><b>永远是输入顺序</b></td><td>用 <code>as_completed()</code> 按完成顺序</td></tr>
+<tr><td>异常</td><td>遍历到那一条时才抛</td><td><code>f.result()</code> 时抛</td></tr>
+<tr><td>额外参数</td><td>只能传一个可迭代对象</td><td>可以传任意多个参数</td></tr>
+</table>
+<div class="note"><b>怎么选？</b><br>「一批数据，同一个函数」→ <code class="inline">map</code>，一行搞定。<br>「要边完成边处理」或「参数不止一个」→ <code class="inline">submit</code> + <code class="inline">as_completed</code>。<br><b><code class="inline">map</code> 看起来更简单，但它有个隐患：结果迭代器是惰性的，你不消费它，任务也会跑，但异常可能被吞掉。</b>所以要么 <code class="inline">list(pool.map(...))</code> 一次收完，要么用 <code class="inline">submit</code>。</div>
+<div class="warn"><b><code class="inline">with</code> 语句结束时，池会等所有任务完成。</b><br>这意味着 <code class="inline">with</code> 块里的代码会「卡住」直到全部跑完。<b>这是好事</b>（保证不会提前退出），但如果你在 <code class="inline">with</code> 里写了个死循环任务，程序就永远退不出去。<b><code class="inline">executor.shutdown(wait=False)</code> 可以不等，但一般没必要。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>实测：什么时候并发反而更慢</h2>
+<p>这一段是本课最重要的内容。<b>同样是并发，IO 密集和 CPU 密集的结果完全相反。</b></p>
+<h3>IO 密集：线程池有效</h3>
+<p>上面那个例子已经证明了——0.5 秒变 0.1 秒。<b>因为等待的时候线程会让出 GIL，五个线程真的同时在等。</b></p>
+<h3>CPU 密集：线程池几乎无效，进程池也不一定</h3>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+
+
+def cpu_work(n):
+    total = 0
+    for i in range(n):
+        total += i * i
+    return total
+
+
+N = 4_000_000
+TASKS = [N, N]
+
+if __name__ == "__main__":
+    t0 = time.perf_counter()
+    r1 = [cpu_work(n) for n in TASKS]
+    print(f"单线程   : {time.perf_counter() - t0:.2f} 秒")
+
+    t0 = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        r2 = list(pool.map(cpu_work, TASKS))
+    print(f"线程池 2 : {time.perf_counter() - t0:.2f} 秒")
+
+    t0 = time.perf_counter()
+    with ProcessPoolExecutor(max_workers=2) as pool:
+        r3 = list(pool.map(cpu_work, TASKS))
+    print(f"进程池 2 : {time.perf_counter() - t0:.2f} 秒")
+
+    print("结果一致:", r1 == r2 == r3)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">单线程   : 0.80 秒
+线程池 2 : 0.70 秒
+进程池 2 : 1.27 秒
+结果一致: True</pre></div>
+<div class="danger"><b>看清楚这个结果：线程池只快了 0.1 秒，进程池反而慢了 0.47 秒。</b><br><b>为什么进程池更慢？</b>因为 Windows 和 macOS 的 Python 用 <code class="inline">spawn</code> 方式启动子进程——<b>每个子进程都要重新启动一个 Python 解释器、重新 import 模块</b>，这个开销在 0.3~0.5 秒量级。你的任务只有 0.4 秒，<b>省下的时间全被启动成本吃掉了，还倒贴。</b></div>
+<table>
+<tr><th>方式</th><th>为什么这个结果</th></tr>
+<tr><td>线程池没变快</td><td><b>GIL</b>。两个线程抢一把锁，同一时刻只有一个在算，还多了切换开销</td></tr>
+<tr><td>进程池更慢</td><td><b>启动成本 &gt; 收益</b>。每个子进程都要重新初始化解释器</td></tr>
+</table>
+<div class="ok"><b>那什么时候进程池真的有用？判断标准只有一条：单个任务要跑得够久。</b><br>经验上，<b>单个任务超过 0.5 秒</b>，进程池开始划算；<b>超过 2 秒</b>，加速比接近核数。<br>所以你该做的是：<b>先测，再决定</b>。把 <code class="inline">N</code> 从 4_000_000 改成 40_000_000 再跑一次，你会看到进程池明显胜出——<b>但那就说明「任务太碎」才是瓶颈，不是并发不够。</b></div>
+<div class="note"><b>顺带说清 <code class="inline">if __name__ == "__main__":</code> 为什么必须有。</b><br>子进程启动时会重新 import 你的模块。如果没有这个守卫，<b>模块顶层的代码会被再执行一遍</b>，包括「创建进程池」这一行——于是子进程又去创建子进程，无限递归，Python 会直接报 <code class="inline">RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase</code>。<br><b>用线程池不需要它，用进程池必须有。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>GIL 保护不了你的变量</h2>
+<p>很多人有个误解：「有 GIL，所以多线程是安全的」。<b>完全不对。</b></p>
+<p>GIL 保证的是<b>「同一时刻只有一个线程在执行字节码」</b>，但它<b>不保证「一段代码会连续执行完」</b>——线程可以在两条字节码之间被切换掉。</p>
+<p>而 <code class="inline">counter += 1</code> 在底层是三步：<b>读、加、写</b>。中间被切走，就会丢更新。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import threading
+import time
+
+N = 2_000
+counter_nolock = 0
+lock = threading.Lock()
+counter_lock = 0
+
+
+def add_nolock():
+    global counter_nolock
+    for _ in range(N):
+        v = counter_nolock
+        time.sleep(0)              # 把「读」和「写」之间的窗口放大
+        counter_nolock = v + 1
+
+
+def add_lock():
+    global counter_lock
+    for _ in range(N):
+        with lock:
+            v = counter_lock
+            time.sleep(0)
+            counter_lock = v + 1
+
+
+ts = [threading.Thread(target=add_nolock) for _ in range(4)]
+for t in ts:
+    t.start()
+for t in ts:
+    t.join()
+
+ts = [threading.Thread(target=add_lock) for _ in range(4)]
+for t in ts:
+    t.start()
+for t in ts:
+    t.join()
+
+print("期望值:", 4 * N)
+print("无锁结果正确:", counter_nolock == 4 * N)
+print("有锁结果正确:", counter_lock == 4 * N)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">期望值: 8000
+无锁结果正确: False
+有锁结果正确: True</pre></div>
+<div class="note"><b><code class="inline">time.sleep(0)</code> 那两行是故意加的。</b><br>真实场景里，这个窗口只有几微秒，<b>大多数时候你运气好，跑一万次都不出错</b>。但只要机器慢一点、任务多一点、换个 Python 版本，<b>它就会在某天凌晨三点爆一次</b>。<br>加 <code class="inline">sleep(0)</code> 是为了把窗口放大到「一定能复现」，<b>让你亲眼看到问题存在</b>，不是问题只在加了 sleep 时才存在。</div>
+<h3>正确写法有四种，按推荐程度排</h3>
+<table>
+<tr><th>写法</th><th>什么时候用</th></tr>
+<tr><td><b>根本别共享</b></td><td><b>首选</b>。每个任务自己算自己的，结果放返回值和 <code class="inline">map</code> 里</td></tr>
+<tr><td><code>queue.Queue</code></td><td>生产者-消费者模型，队列内部已经加锁</td></tr>
+<tr><td><code>threading.Lock</code></td><td>不得已才用。锁的范围越小越好</td></tr>
+<tr><td><code>dataclasses.replace</code> / 不可变对象</td><td>函数式写法，从根上避免修改共享状态</td></tr>
+</table>
+<div class="danger"><b>加了锁不等于没问题。</b><br>锁的经典错误是<b>死锁</b>：线程 A 拿了锁 1 等锁 2，线程 B 拿了锁 2 等锁 1，两边都不放，程序永久卡住。<b>避免方法：所有地方都按同一个顺序拿锁，或者干脆只用一把锁。</b><br>更隐蔽的是<b>锁粒度过大</b>——把整个函数包起来，等于把并发变回串行，还不如不用线程。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>实战：多线程批量下载器</h2>
+<p>今天的产出。比起「能下载」，更重要的是<b>它怎么处理失败</b>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+URLS = [f"https://site{i}.com/file{i}.zip" for i in range(1, 6)]
+
+
+def download(item):
+    i, url = item
+    time.sleep(0.05 * i)                 # 越靠后越慢，让完成顺序可预期
+    if "site3" in url:
+        raise ConnectionError("连不上 site3")
+    return f"{url} -&gt; {100 * i} 字节"
+
+
+def batch(urls, workers=3):
+    ok, fail = [], []
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(download, it): it[1] for it in enumerate(urls, 1)}
+        for f in as_completed(futures):
+            url = futures[f]
+            try:
+                ok.append(f.result())
+                print(f"完成 {url}")
+            except Exception as e:
+                fail.append(url)
+                print(f"失败 {url} ({type(e).__name__})")
+    return ok, fail
+
+
+ok, fail = batch(URLS)
+print()
+print(f"成功 {len(ok)} 个，失败 {len(fail)} 个")
+print("失败清单:", fail)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">完成 https://site1.com/file1.zip
+完成 https://site2.com/file2.zip
+失败 https://site3.com/file3.zip (ConnectionError)
+完成 https://site4.com/file4.zip
+完成 https://site5.com/file5.zip
+
+成功 4 个，失败 1 个
+失败清单: ['https://site3.com/file3.zip']</pre></div>
+<p>三个设计决策，每一个都可以单独考你：</p>
+<table>
+<tr><th>写法</th><th>为什么</th></tr>
+<tr><td><code>{submit(...): url for ...}</code></td><td><b>字典把 Future 映射回 URL</b>。<code>as_completed</code> 只给你 Future，不告诉你它是谁</td></tr>
+<tr><td><code>try/except</code> 在循环里</td><td><b>必须在这里</b>。放到 <code>with</code> 外面，第一个失败就会中断整批</td></tr>
+<tr><td><code>fail.append(url)</code></td><td>失败清单是产出的一部分。<b>只报「成功 4 个」这种话，等于没说</b></td></tr>
+</table>
+<div class="warn"><b><code class="inline">as_completed(futures)</code> 传的是字典，遍历出来的却是 Future。</b><br>传字典时它遍历的是<b>键</b>（也就是 Future），所以 <code class="inline">futures[f]</code> 能拿回 URL。<b>这是 Python 里一个很常用的小技巧</b>：用字典同时维护「对象 → 元信息」的映射。<br><b>注意别写成 <code class="inline">futures.items()</code></b>——那样 <code class="inline">as_completed</code> 会拿到元组，直接报错。</div>
+<div class="ok"><b>这个结构能直接改成 D017 的抓标题脚本。</b><br>把 <code class="inline">download</code> 换成 <code class="inline">fetch_title</code>，把 <code class="inline">sleep</code> 换成 <code class="inline">requests.get</code>，就是并发版抓取器。<b>明天 D020 会在这个基础上加命令行参数和日志。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>八道练习</h2>
+<p><b>第 7、8 题直接进 D020。</b>做的时候注意：<b>每道题都要问一句「这比串行快了吗」</b>——不快就说明你用错了。</p>
+<ol class="task">
+<li><b>threading 基线</b>：三个线程各 <code class="inline">sleep(0.1)</code>，用 <code class="inline">start()</code> + <code class="inline">join()</code> 两轮循环，验证总耗时约 0.1 秒</li>
+<li><b>改用线程池</b>：把上题换成 <code class="inline">ThreadPoolExecutor</code>，<b>数一下代码少了多少行</b></li>
+<li><b>证明子线程的异常会被吞掉</b>：在子线程里 <code class="inline">raise ValueError</code>，主线程 <code class="inline">print("我还活着")</code>，看会发生什么</li>
+<li><b>用 <code class="inline">submit</code> 抓异常</b>：同样的错误，用 <code class="inline">f.result()</code> 把它抛回主线程</li>
+<li><b>测出线程池的甜点</b>：5 个任务，分别用 <code class="inline">max_workers</code> = 1 / 2 / 5 / 10，各跑一次记耗时，<b>解释为什么 10 不比 5 快</b></li>
+<li><b>无锁计数器</b>：复现第 5 节那个丢更新，然后<b>用 <code class="inline">queue.Queue</code> 重写一版</b>，不用锁也能对</li>
+<li><b>给下载器加进度</b>：每完成一个打印 <code class="inline">已完成 3/5</code>，<b>注意这个计数也要考虑线程安全</b></li>
+<li><b>限流版下载器</b>：<code class="inline">max_workers=2</code> 处理 6 个任务，打印每个任务的开始和结束，<b>从输出里数出同时在跑几个</b></li>
+</ol>
+<details>
+<summary>参考答案（先自己写，卡 15 分钟再看）</summary>
+<h3>第 1–2 题 · threading vs 线程池</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from concurrent.futures import ThreadPoolExecutor
+
+DELAY = 0.1
+
+# 版本一：threading，11 行
+import threading
+
+t0 = time.perf_counter()
+ts = [threading.Thread(target=time.sleep, args=(DELAY,)) for _ in range(3)]
+for t in ts:
+    t.start()
+for t in ts:
+    t.join()
+print(f"threading : {time.perf_counter() - t0:.1f} 秒")
+
+# 版本二：线程池，3 行
+t0 = time.perf_counter()
+with ThreadPoolExecutor(max_workers=3) as pool:
+    list(pool.map(time.sleep, [DELAY] * 3))
+print(f"线程池    : {time.perf_counter() - t0:.1f} 秒")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">threading : 0.1 秒
+线程池    : 0.1 秒</pre></div>
+<p><b>速度一样，代码少一半有余。</b>而且线程池版还多了两样 threading 版没有的东西：<b>返回值</b>和<b>异常传播</b>。</p>
+<h3>第 3 题 · 被吞掉的异常</h3>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>import threading
+
+
+def boom():
+    raise ValueError("子线程炸了")
+
+
+t = threading.Thread(target=boom)
+t.start()
+t.join()
+
+print("主线程: 我还活着，而且不知道上面出过事")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">Exception in thread Thread-1 (boom):
+Traceback (most recent call last):
+  File "&lt;省略&gt;", line 5, in boom
+    raise ValueError("子线程炸了")
+ValueError: 子线程炸了
+主线程: 我还活着，而且不知道上面出过事</pre></div>
+<p><b>注意顺序：</b>traceback 先打出来（子线程自己打的），然后主线程若无其事地继续。<b>你的程序「看起来跑完了」，但其中一条数据是缺的。</b><br>输入里的 <code class="inline">File "&lt;省略&gt;"</code> 是路径，你机器上会显示真实文件名，<b>那部分不用抄</b>。</p>
+<h3>第 4 题 · 让异常抛回来</h3>
+<div class="codebox"><button class="copy">复制</button><pre>from concurrent.futures import ThreadPoolExecutor
+
+
+def boom():
+    raise ValueError("子线程炸了")
+
+
+with ThreadPoolExecutor(max_workers=1) as pool:
+    f = pool.submit(boom)
+    try:
+        f.result()
+    except ValueError as e:
+        print("主线程抓到了:", type(e).__name__, e)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">主线程抓到了: ValueError 子线程炸了</pre></div>
+<p><b>这就是 <code class="inline">futures</code> 最值钱的地方之一。</b>异常被存在 Future 对象里，你调 <code class="inline">result()</code> 时才重新抛出——<b>而且抛出点就在你调用的那一行</b>，调用栈是完整的。</p>
+<h3>第 5 题 · 线程池的甜点</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from concurrent.futures import ThreadPoolExecutor
+
+DELAY = 0.1
+TASKS = [DELAY] * 5
+
+for w in (1, 2, 5, 10):
+    t0 = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=w) as pool:
+        list(pool.map(time.sleep, TASKS))
+    print(f"max_workers={w:&lt;2} : {time.perf_counter() - t0:.1f} 秒")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">max_workers=1  : 0.5 秒
+max_workers=2  : 0.3 秒
+max_workers=5  : 0.1 秒
+max_workers=10 : 0.1 秒</pre></div>
+<p><b><code class="inline">max_workers=1</code> 就是串行</b>（0.5 秒），这是最好的对照组。<br><b>10 不比 5 快，因为只有 5 个任务</b>——多出来的 5 个线程从头到尾没事干，纯属浪费。<b>线程数超过任务数没有意义。</b></p>
+<h3>第 6 题 · 用队列替代锁</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import queue
+import threading
+
+N = 2_000
+q = queue.Queue()
+done = []
+
+
+def worker():
+    subtotal = 0
+    while True:
+        item = q.get()
+        if item is None:
+            q.task_done()
+            break
+        subtotal += item
+        q.task_done()
+    done.append(subtotal)
+
+
+threads = [threading.Thread(target=worker) for _ in range(4)]
+for t in threads:
+    t.start()
+
+for _ in range(N * 4):
+    q.put(1)
+for _ in range(4):
+    q.put(None)          # 每个线程一个毒丸
+
+q.join()
+for t in threads:
+    t.join()
+
+print("总计数:", sum(done))
+print("正确:", sum(done) == N * 4)</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">总计数: 8000
+正确: True</pre></div>
+<p><b>核心思路是「不共享」</b>：每个线程维护自己的 <code class="inline">subtotal</code>，最后再汇总。<b>没有共享变量，就不需要锁</b>——这是并发编程里最干净的写法。<br><b>「毒丸」<code class="inline">None</code></b> 是让阻塞在 <code class="inline">q.get()</code> 上的线程退出的标准手法。<b>不发毒丸，<code class="inline">q.join()</code> 会永远等下去。</b></p>
+<h3>第 7 题 · 带进度的下载器</h3>
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+URLS = [f"file{i}.zip" for i in range(1, 6)]
+
+
+def download(item):
+    i, url = item
+    time.sleep(0.02 * i)
+    return f"{url} 下载完成"
+
+
+total = len(URLS)
+with ThreadPoolExecutor(max_workers=3) as pool:
+    futures = {pool.submit(download, it): it[1] for it in enumerate(URLS, 1)}
+    for n, f in enumerate(as_completed(futures), 1):
+        print(f"已完成 {n}/{total}  {f.result()}")</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">已完成 1/5  file1.zip 下载完成
+已完成 2/5  file2.zip 下载完成
+已完成 3/5  file3.zip 下载完成
+已完成 4/5  file4.zip 下载完成
+已完成 5/5  file5.zip 下载完成</pre></div>
+<p><b>这里的进度计数是安全的，因为 <code class="inline">enumerate</code> 跑在主线程的循环里</b>——只有一个线程在动它。<b>如果把计数写进 <code class="inline">download()</code> 里，就要考虑加锁了。</b></p>
+<h3>第 8 题 · 限流</h3>
+<!--skip-->
+<div class="codebox"><button class="copy">复制</button><pre>import time
+from concurrent.futures import ThreadPoolExecutor
+
+TASKS = list(range(1, 7))
+
+
+def job(i):
+    print(f"  开始 {i}")
+    time.sleep(0.1)
+    print(f"  结束 {i}")
+
+
+with ThreadPoolExecutor(max_workers=2) as pool:
+    list(pool.map(job, TASKS))</pre></div>
+<div class="codebox light"><button class="copy">复制</button><pre class="out">  开始 1
+  开始 2
+  结束 1
+  结束 2
+  开始 3
+  开始 4
+  结束 3
+  结束 4
+  开始 5
+  开始 6
+  结束 5
+  结束 6</pre></div>
+<p><b>数一下「开始」和「结束」的排布：永远是两个开始、两个结束。</b>这就是 <code class="inline">max_workers=2</code> 在起作用——第三个任务得等前两个里有空的。<br><b>这个输出格式是最好的自检工具</b>：如果你看到六个「开始」连着出现，说明限流没生效。</p>
+<div class="warn"><b>你机器上的顺序会有细微差别。</b><br>比如「开始 3」和「结束 2」谁先谁后是不确定的——<b>任务 1 先结束就立刻接手任务 3，可能赶在任务 2 打印之前</b>。<b>要看的不是具体顺序，是「同时有几个在跑」。</b></div>
+</details>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今日笔记要点</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D019 笔记 · 并发编程
+
+## 四条路
+asyncio               IO 密集、任务特别多（上千）   整条链路要改
+ThreadPoolExecutor    IO 密集、已有同步代码          并发度受池大小限制
+ProcessPoolExecutor   CPU 密集                        启动贵、参数要能 pickle
+不用                   任务 ≤3 个或每个都很快          没有
+
+## 判断标准
+IO 密集（等）  → 线程池 / asyncio，真的会快
+CPU 密集（算） → 多进程，且单任务要 > 0.5 秒才划算
+任务很碎       → 并发开销 > 收益，比串行还慢 ★
+
+## threading 的三个麻烦（futures 都解决了）
+1 拿返回值：得自己塞共享 list
+2 等结束  ：start 一轮 + join 一轮
+3 异常    ：★子线程抛异常，主线程完全不知道，程序照样跑完
+            少了几条数据，但界面上一切正常
+
+## futures
+pool.map(f, xs)      结果迭代器，★永远按输入顺序
+pool.submit(f, x)    Future，f.result() 拿值/抛异常
+as_completed(fs)     按完成顺序
+{f: meta for ...}    ★字典把 Future 映射回 URL（as_completed 只给 Future）
+★ 用 ProcessPool 必须 if __name__ == "__main__":，否则无限递归
+
+## 实测结论（本机，4M 次循环 × 2）
+单线程   0.80 秒
+线程池 2 0.70 秒   ← GIL，几乎没提升
+进程池 2 1.27 秒   ← ★反而更慢！spawn 启动成本 > 收益
+→ 进程池单任务 > 0.5 秒才划算，> 2 秒接近核数
+→ 先测再决定，别凭感觉加并发
+
+## 竞态
+counter += 1 是 读-加-写 三步，中间会被切
+★GIL 只保证「同一时刻一个线程执行字节码」，不保证「一段代码连续执行完」
+无锁 → 丢更新；有锁 → 正确
+正确写法优先级：不共享 > queue.Queue > Lock > 不可变对象
+死锁：A 拿锁1等锁2，B 拿锁2等锁1 → 统一加锁顺序
+
+## 纪律
+- 并发是优化手段，不是代码风格；没测过变快就别加
+- 失败要收集清单，只报「成功 4 个」等于没说
+- 自检：assert 串行结果 == 并发结果
+
+## 踩过的坑
+- （写你真实遇到的）</pre></div>
+</section>
+
+<footer>
+  <p>📌 D019 的产出是 <b>多线程批量下载器</b>：限流、收集失败清单、能改成并发抓标题。</p>
+  <p>明天 D020：<b>综合练习</b>——把这些能力拼成一个能命令行调用的日志分析工具，加上 argparse 和 logging。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>
