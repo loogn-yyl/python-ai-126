@@ -1,20 +1,29 @@
-__pycache__/
-*.pyc
+# ===== 系统与编辑器 =====
 .DS_Store
-.vscode/
-.idea/
-*.png
 Icon?
 Icon
-day06/log.txt
-contacts.json
+.vscode/
+.idea/
+
+# ===== Python 缓存 =====
+__pycache__/
+*.py[cod]
+
+# ===== 虚拟环境 =====
 .venv/
+venv/
 
-# 运行时产物
-*.log
-demo*.json
-
-# 工具缓存
+# ===== 测试与类型检查缓存 =====
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+
+# ===== 运行时产物 =====
+*.log
+log.txt
+demo*.json
+contacts.json
+
+# ===== 截图等二进制 =====
+*.png

@@ -57,7 +57,7 @@ def test_旧格式字符串能读回来(tmp_path):
     import json
 
     p = tmp_path / "old.json"
-    p.write_text(json.dumps({"张三": "13800001111"}, ensure_ascii==False), encoding="utf-8")
+    p.write_text(json.dumps({"张三": "13800001111"}, ensure_ascii=False), encoding="utf-8")
     old = AddressBook(path=str(p))
     assert old.items["张三"].phone == "13800001111"
     assert old.items["张三"].tags == []
@@ -96,8 +96,8 @@ def test_遍历查询(book):
     assert [c.name for c in book] == ["张三", "李四"]
 
 def test_按标签找人(book):
-    book.add(Contact("张三", "13800001111", ["同事"]))
-    book.add(Contact("李四", "13900002222", ["同事", "技术部"]))
+    book.add(Contact("张三", "13800001111", "", ["同事"]))
+    book.add(Contact("李四", "13900002222", "", ["同事", "技术部"]))
     book.add(Contact("王五", "13700003333"))
     assert [c.name for c in book.search_by_tag("同事")] == ["张三", "李四"]
     assert [c.name for c in book.search_by_tag("客户")] == []
