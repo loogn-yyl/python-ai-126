@@ -247,6 +247,11 @@ print("原始字符串:", repr(r"\bword"), "长度", len(r"\bword"))</pre></div>
 <p><code class="inline">"\bword"</code> 长度是 <b>5</b>，因为 <code class="inline">\b</code> 在 Python 普通字符串里是<b>退格符</b>（<code class="inline">'\x08'</code>），而 <code class="inline">r"\bword"</code> 长度是 <b>6</b>，反斜杠和 <code class="inline">b</code> 各算一个字符。</p>
 <p>两者在正则里的意思天差地别：<b><code class="inline">\b</code> 是「单词边界」</b>——匹配位置，不消耗字符。<code class="inline">r"\bword\b"</code> 的意思是「word 前后不能紧挨着字母」。但你如果写成 <code class="inline">"\bword\b"</code>，它变成了「退格 + word + 退格」，永远匹配不到任何东西。</p>
 <div class="danger"><b>不加 <code class="inline">r</code> 前缀的三个必错场景：</b><br>① <code class="inline">\b</code> 单词边界 → 变成退格符<br>② <code class="inline">\n</code> <code class="inline">\t</code> → 变成换行和制表符，正则里的 `\n` 应该交给 re 解释<br>③ Windows 路径 <code class="inline">"C:\Users\new"</code> → <code class="inline">\U</code> <code class="inline">\n</code> 都被转义了<br><b>规则很短：写正则的地方，字符串一律 <code class="inline">r"..."</code>。没有例外。</b></div>
+<div class="warn"><b>第二个静默的坑：量词的花括号里只能有数字和逗号，一个空格都不能有。</b><br>
+<code class="inline">r"\d{1, 3}"</code> <b>不会报错，也不会警告</b>——Python 发现 <code class="inline">{1, 3}</code> 不是合法量词，就把这六个字符<b>当成普通字面量</b>处理。于是这条正则的意思从「1 到 3 个数字」变成了「<b>一个数字，后面紧跟 <code class="inline">{1, 3}</code> 这六个字符</b>」。日志里不可能出现这种东西，所以它永远返回 <code class="inline">None</code>。<br>
+实测对比：<code class="inline">re.findall(r"\d{1, 3}", "123")</code> → <code class="inline">[]</code>，<code class="inline">re.findall(r"\d{1,3}", "123")</code> → <code class="inline">['123']</code>。<br>
+<b>这类错误的可怕之处是它不报错。</b>你的代码能编译、能运行、能打印，就是什么都匹配不到，然后你开始怀疑数据、怀疑编码、怀疑隐藏字符——全都不对。<br>
+<b>排查口诀：凡是「正则写对了但匹配结果是 <code class="inline">None</code>」，先数一遍所有 <code class="inline">{}</code> 里的字符，只允许 <code class="inline">0-9</code> 和 <code class="inline">,</code>。</b></div>
 <div class="note"><b>顺便记住 <code class="inline">\w</code> 认汉字这件事。</b>以前 C 语言里处理中文字符要一堆判断，Python 3 的 <code class="inline">\w</code> 默认就包含 Unicode 字母，所以 <code class="inline">r"\w+"</code> 一次能抓出「中文」两个字。<b>代价是你写 <code class="inline">r"\w+"</code> 想抓英文单词时，它会把中文一起吞了。</b>真要限定 ASCII，用 <code class="inline">r"[a-zA-Z_]+"</code> 或加 <code class="inline">re.ASCII</code> 标志。</div>
 </section>
 

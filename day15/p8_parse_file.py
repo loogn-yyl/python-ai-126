@@ -2,7 +2,7 @@
 import re
 
 PATTERN = re.compile(
-    r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3}) - -'
+    r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3}) - - '
     r'\[(?P<time>[^\]]+)\] '
     r'"(?P<method>[A-Z]+) (?P<path>\S+) HTTP/[\d.]+" '
     r'(?P<status>\d{3}) (?P<size>\d+)'

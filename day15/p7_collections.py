@@ -11,4 +11,4 @@ LOG = """127.0.0.1 - - [13/Nov/2026:02:15:33 +0800] "GET /index.html HTTP/1.1" 2
 
 codes = re.findall(r'"\s(\d{3})\s', LOG)
 print("抓到的状态码:", codes)
-print("统计:", sorted(Counter(codes).items()))
+print("统计:", sorted(Counter(codes).most_common()))
