@@ -1,18 +1,18 @@
 # D016 笔记 · 正则实战与文本处理
 
 ## re.M 与 re.S 管的是两件不同的事
-re.M : 让 ^ $ 认「每一行」的开头结尾（不加只认整段文本）
-re.S : 让 . 能吃换行（DOTALL）
-两个都要 → re.M | re.S
-用 re.S 时几乎总要配非贪婪 .*?，否则跨过所有成对标签
+- re.M : 让 ^ $ 认「每一行」的开头结尾（不加只认整段文本）
+- re.S : 让 . 能吃换行（DOTALL）
+- 两个都要 → re.M | re.S
+- 用 re.S 时几乎总要配非贪婪 .*?，否则跨过所有成对标签
 
 ## csv / json
-csv.DictReader → 字典列表，★值全是字符串，算数前必须 int()
-csv.DictWriter → 必须 writeheader()，否则第一行数据当表头
-真写文件：open(path, "w", newline="", encoding="utf-8")   ★newline="" 只在 Windows 有影响
-json.dumps(obj, ensure_ascii=False)  ★不加中文变 \u4e2d\u6587
-dump/load 收文件对象，dumps/loads 收字符串（s = string）
-json 会还原数字/布尔类型，csv 不会
+- csv.DictReader → 字典列表，★值全是字符串，算数前必须 int()
+- csv.DictWriter → 必须 writeheader()，否则第一行数据当表头
+- 真写文件：open(path, "w", newline="", encoding="utf-8")   ★newline="" 只在 Windows 有影响
+- json.dumps(obj, ensure_ascii=False)  ★不加中文变 \u4e2d\u6587
+- dump/load 收文件对象，dumps/loads 收字符串（s = string）
+- json 会还原数字/布尔类型，csv 不会
 
 ## 编码
 - 字符 ≠ 字节。bytes → str 叫 decode，str → bytes 叫 encode
@@ -38,4 +38,5 @@ json 会还原数字/布尔类型，csv 不会
 - 测试 csv 输出用 io.StringIO()，不用真写文件
 
 ## 踩过的坑
-- （写你真实遇到的）
+- print("re.M + $:", re.findall(r"^\d+$", text, re.M)) 要求整行都是数字
+- csv.DictReader 后面必须是文件, 或者可以用 io.StringIO(CSV_TEXT) 代替
