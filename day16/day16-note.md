@@ -8,7 +8,7 @@
 
 ## csv / json
 - csv.DictReader → 字典列表，★值全是字符串，算数前必须 int()
-- csv.DictWriter → 必须 writeheader()，否则第一行数据当表头
+- csv.DictWriter → 必须 writeheader()，否则不输出表头
 - 真写文件：open(path, "w", newline="", encoding="utf-8")   ★newline="" 只在 Windows 有影响
 - json.dumps(obj, ensure_ascii=False)  ★不加中文变 \u4e2d\u6587
 - dump/load 收文件对象，dumps/loads 收字符串（s = string）

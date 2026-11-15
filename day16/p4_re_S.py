@@ -2,11 +2,16 @@
 import re
 
 page = """<div>
-<p>第一段
-跨了两行</p>
-<p>第二段</p>
+<p>
+  第一段
+  跨了两行
+</p>
+<p>
+  第二段
+</p>
 </div>"""
 
 got = re.findall(r"<p>(.*?)</p>", page, re.S)
-print("原始:", got)
+print("原始      :", got)
 print("去掉首尾空白:", [s.strip() for s in got])
+print("压平后     :", ["  ".join(s.split()) for s in got])

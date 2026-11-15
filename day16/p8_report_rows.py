@@ -16,7 +16,8 @@ def report(rows):
         "total": total,
         "bytes": sum(int(r["size"]) for r in rows),
         "error_rate": round(errors / total, 3) if total else 0,
-        "top_ip": Counter(r["ip"] for r in rows).most_common(3),
+        "top_ip": [{"ip": ip, "count": n} 
+                   for ip, n in Counter(r["ip"] for r in rows).most_common(3)],
     }
 
 r = report(rows)

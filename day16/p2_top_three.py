@@ -17,5 +17,7 @@ PATTERN = re.compile(
 
 rows = [m.groupdict() for m in PATTERN.finditer(LOG)]
 
-top = sorted(rows, key=lambda r: -int(r["size"]))[:3]
+for r in rows:
+    r["size"] = int(r["size"])
+top = sorted(rows, key=lambda r: -r["size"])[:3]
 print("最大的 3 个:", [(r["path"], r["size"]) for r in top])
