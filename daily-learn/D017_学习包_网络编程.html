@@ -240,8 +240,9 @@ raw = b"".join(chunks)
 text = raw.decode("utf-8", errors="replace")
 print("收到", len(raw), "字节")
 print("首行:", text.split("\r\n")[0])</pre></div>
-<div class="codebox light"><button class="copy">复制</button><pre class="out">收到 1256 字节
+<div class="codebox light"><button class="copy">复制</button><pre class="out">收到 928 字节
 首行: HTTP/1.1 200 OK</pre></div>
+<p><b>「收到 N 字节」这个数每次都不一样</b>——example.com 会按线路和 CDN 返回不同大小的页面（我最早测是 1256，现在是 928）。<b>只要首行是 <code class="inline">HTTP/1.1 200 OK</code>、字节数是几百量级，就算对</b>；如果只收到几十字节，那才是真的没读全，说明循环没写对。</p>
 <p><b>这段代码里有六个地方会出错，每一个都是真实项目里踩过的：</b></p>
 <table>
 <tr><th>写法</th><th>不加会怎样</th></tr>
@@ -269,8 +270,9 @@ print("长度  :", len(r.text), "字符")
 print("首 60 :", r.text[:60].replace("\n", " "))</pre></div>
 <div class="codebox light"><button class="copy">复制</button><pre class="out">状态码: 200
 编码  : utf-8
-长度  : 1256 字符
-首 60 : &lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;    &lt;title&gt;Example Domain&lt;/title&gt;    &lt;style&gt;</pre></div>
+长度  : 577 字符
+首 60 : &lt;!doctype html&gt;&lt;html lang=en&gt;&lt;head&gt;&lt;meta charset=utf-8&gt;&lt;link</pre></div>
+<p><b>长度和「首 60」都会变</b>，原因同上：同一台服务器对不同地区、不同 <code class="inline">User-Agent</code> 返回的页面不一样。<b>这三行里真正稳定的是第一行 <code class="inline">状态码: 200</code></b>——拿它对照结果，别拿字符数。</p>
 <p>刚才那六个坑，它全处理了：超时、编码、连接复用、分块接收、自动解压、<code class="inline">Host</code> 头自动填。<b>这就是「库」的价值——不是帮你省几行，是帮你避开你不知道自己不知道的坑。</b></p>
 <table>
 <tr><th>属性 / 方法</th><th>给你什么</th><th>注意</th></tr>
@@ -337,8 +339,17 @@ def fetch(url):
 
 
 print("四种异常各对应一类失败，抓的时候要分开")
-print("顺序也有讲究：Timeout 和 ConnectionError 都是 ConnectionError 的子类关系要理清")</pre></div>
-<div class="note"><b>为什么不能只写 <code class="inline">except Exception</code>？</b><br>因为「超时」和「状态码 500」的处理方式完全不同：<b>超时可以重试，500 重试也没用</b>（服务器本身有问题）。只抓一个 <code class="inline">Exception</code>，你就分不出该不该重试。<br><b>异常分类的价值不在「接住」，而在「分开处理」。</b></div>
+print("顺序也有讲究：ConnectTimeout 既是 Timeout 又是 ConnectionError 的子类")</pre></div>
+<div class="warn">
+    <b><code class="inline">except</code> 的顺序不是随便排的，因为有一个异常同时属于两类。</b><br>
+    实测 requests 的继承关系：<code class="inline">ConnectTimeout</code> 的 MRO 是 <code class="inline">[ConnectionError, Timeout, RequestException]</code>——<b>它既是 <code class="inline">ConnectionError</code> 也是 <code class="inline">Timeout</code></b>（连接阶段就超时了，两种身份都成立）。而 <code class="inline">Timeout</code> 本身<b>不是</b> <code class="inline">ConnectionError</code> 的子类，<code class="inline">ReadTimeout</code> 也不是。
+    <pre class="out">ConnectTimeout 是 ConnectionError 的子类: True
+ConnectTimeout 是 Timeout 的子类       : True
+ReadTimeout    是 ConnectionError 的子类: False</pre>
+    所以把 <code class="inline">except ConnectionError</code> 写在 <code class="inline">except Timeout</code> 前面，连接超时会被当成「连不上」处理——<b>该重试的没重试，直接放弃了</b>。上面那段代码把 <code class="inline">Timeout</code> 放前面，是对的。<br>
+    <b>记法：越具体的异常越往前写。</b><code class="inline">RequestException</code> 永远排最后兜底。
+  </div>
+  <div class="note"><b>为什么不能只写 <code class="inline">except Exception</code>？</b><br>因为「超时」和「状态码 500」的处理方式完全不同：<b>超时可以重试，500 重试也没用</b>（服务器本身有问题）。只抓一个 <code class="inline">Exception</code>，你就分不出该不该重试。<br><b>异常分类的价值不在「接住」，而在「分开处理」。</b></div>
 </section>
 
 <section>
@@ -594,10 +605,10 @@ elapsed = time.perf_counter() - start
 
 print("抓到", len(results), "个页面")
 print(f"总耗时 {elapsed:.2f} 秒")
-print(f"平均每个 {elapsed / len(urls) * 1000:.0f} ms")</pre></div>
+print(f"平均每个 {elapsed / len(urls):.1f} 秒")</pre></div>
 <div class="codebox light"><button class="copy">复制</button><pre class="out">抓到 5 个页面
 总耗时 0.50 秒
-平均每个 100 ms</pre></div>
+平均每个 0.1 秒</pre></div>
 <div class="warn"><b>计时数字每次跑都会有微小差异</b>（0.49~0.52 都有可能）。<b>你在自己机器上跑出 <code class="inline">0.51 秒</code> 是对的，不是出错。</b><br>所以写进笔记时<b>只记结论</b>（「5 个请求 ≈ 5 × 单次延迟」），别记具体数字。</div>
 <h3>第 8 题 · 分类统计</h3>
 <div class="codebox"><button class="copy">复制</button><pre>import time

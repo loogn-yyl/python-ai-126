@@ -4,12 +4,12 @@
 | C | Python | 作用 |
 | --- | --- | --- |
 | socket(AF_INET, SOCK_STREAM, 0) | socket.socket(socket.AF_INET, socket.SOCK_STREAM) | 创建一个 IPv4 的 TCP 套接字 |
-｜connect(fd, &addr, len) | s.connect((host, port)) | 发起三次握手 |
+| connect(fd, &addr, len) | s.connect((host, port)) | 发起三次握手 |
 | send(fd, buf, n, 0) | s.sendall(b"...") | 发数据 |
 | recv(fd, buf, n, 0) | s.recv(4096) | 收数据 |
 | close(fd) | s.close() | 关闭(或 with 自动关) |
-- 不用传长度、不用 malloc 缓冲、不用 htons
-- settimeout 必设（C 里是 setsockopt(SO_RCVTIMEO)）
+- Python 不用传长度、不用 malloc 缓冲、不用 htons  
+  settimeout 必设（C 里是 setsockopt(SO_RCVTIMEO)）
 
 ## HTTP 报文
 - 请求 = 请求行 + 头 + 空行 + 正文  
@@ -53,7 +53,8 @@
 - Timeout / HTTPError / ConnectionError / TooManyRedirects
 - 最后用 RequestException 兜底 → 函数永远不抛异常
 - 超时可重试，500 重试没用 → 必须分类
-- 顺序也有讲究：Timeout 和 ConnectionError 都是 ConnectionError 的子类关系要理清
+- ConnectTimeout 既是 Timeout 又是 ConnectionError 的子类, 所以 except 顺序不能反  
+  先写 except ConnectError 的话, 连接超时会被判成「连不上」, 本该重试的直接放弃
 
 ## 抓标题
 - r"<title[^>]*>(.*?)</title>" + re.S | re.I
@@ -69,7 +70,6 @@
 - AF_INET 就是数字 2，SOCK_STREAM 就是数字 1  
   这些常量在 C 里也是 #define 出来的整数，Python 只是把它们做成了模块属性  
   所以 print(s.family) 输出 2 
-- partition("\r\n\r\n") 原始文本切成「头部 / 分隔符 / 正文」三段, 比 split 好用
 
 ## 遇到乱码，第一件事是盯住这两行
 - print(r.encoding)          -> 如果是 ISO-8859-1 或 None，基本就是它  
@@ -81,4 +81,4 @@
   1. r.encoding       —— headers 里写的，可能是错的  
   2. r.apparent_encoding —— 从正文猜的，比较慢但通常更准  
   3. 都不对 —— 那就自己试 gbk / utf-8-sig
-- print("改 r.encoding 之后必须重新读 r.text，值不会自动刷新")
+- print("改了 r.encoding 之后必须重新读 r.text，已经存进变量的字符串不会跟着变")

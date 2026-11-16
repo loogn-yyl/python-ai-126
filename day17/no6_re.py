@@ -2,7 +2,7 @@
 import re
 
 html = """<html><head><title>Python 官方教程</title></head>
-<body><hi>欢迎</hi></body></html>"""
+<body><h1>欢迎</h1></body></html>"""
 
 m = re.search(r"<title>(.*?)</title>", html, re.S | re.I)
 print("标题:", m.group(1).strip() if m else None)
