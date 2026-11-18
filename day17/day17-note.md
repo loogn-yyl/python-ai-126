@@ -54,7 +54,7 @@
 - 最后用 RequestException 兜底 → 函数永远不抛异常
 - 超时可重试，500 重试没用 → 必须分类
 - ConnectTimeout 既是 Timeout 又是 ConnectionError 的子类, 所以 except 顺序不能反  
-  先写 except ConnectError 的话, 连接超时会被判成「连不上」, 本该重试的直接放弃
+  先写 except ConnectionError 的话, 连接超时会被判成「连不上」, 本该重试的直接放弃
 
 ## 抓标题
 - r"<title[^>]*>(.*?)</title>" + re.S | re.I
@@ -81,4 +81,4 @@
   1. r.encoding       —— headers 里写的，可能是错的  
   2. r.apparent_encoding —— 从正文猜的，比较慢但通常更准  
   3. 都不对 —— 那就自己试 gbk / utf-8-sig
-- print("改了 r.encoding 之后必须重新读 r.text，已经存进变量的字符串不会跟着变")
+- 改了 r.encoding 之后必须重新读 r.text，已经存进变量的字符串不会跟着变
