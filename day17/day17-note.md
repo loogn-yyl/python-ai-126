@@ -21,7 +21,7 @@
   HTTP/1.1 200 OK  
   Content-Type: ...; charset=utf-8  
   (空行)
-- partition("\r\n\r\n") 切头部和正文（比 split 好：只切第一个）
+- partition("\r\n\r\n") 切头部和正文（比 split 好：partition 只切第一个）
 
 ## 手写 socket 的六个坑（requests 全替你处理）
 | 坑 | 后果 |

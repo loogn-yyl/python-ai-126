@@ -1,7 +1,7 @@
 # no.3
 import socket
 
-host, port = "example.com", 80
+host, port = "www.baidu.com", 80
 req = f"GET / HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n"
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

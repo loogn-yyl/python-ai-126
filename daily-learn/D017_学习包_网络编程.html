@@ -218,10 +218,11 @@ print("正文  :", body)</pre></div>
 <section>
   <h2><span class="n">3</span>亲手发一次，你就知道 requests 替你做了什么</h2>
 <p>这段要联网，<b>你按自己情况跑</b>。跑不通也没关系，看懂它在做什么就行。</p>
+<div class="warn"><b>这一段的目标站点用 <code class="inline">www.baidu.com</code>。</b><br>example.com 是 IANA 的教学域名，服务器在国外，<b>部分国内网络连它的 80 端口会直接超时</b>——报错是 <code class="inline">TimeoutError: timed out</code>，看着像代码写错了，其实跟代码没关系。国内站点秒连，报文结构一模一样，练的东西一点不少。<b>换目标只改第一行。</b></div>
 <!--skip-->
 <div class="codebox"><button class="copy">复制</button><pre>import socket
 
-host, port = "example.com", 80
+host, port = "www.baidu.com", 80
 req = f"GET / HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n"
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -240,9 +241,9 @@ raw = b"".join(chunks)
 text = raw.decode("utf-8", errors="replace")
 print("收到", len(raw), "字节")
 print("首行:", text.split("\r\n")[0])</pre></div>
-<div class="codebox light"><button class="copy">复制</button><pre class="out">收到 928 字节
+<div class="codebox light"><button class="copy">复制</button><pre class="out">收到 18160 字节
 首行: HTTP/1.1 200 OK</pre></div>
-<p><b>「收到 N 字节」这个数每次都不一样</b>——example.com 会按线路和 CDN 返回不同大小的页面（我最早测是 1256，现在是 928）。<b>只要首行是 <code class="inline">HTTP/1.1 200 OK</code>、字节数是几百量级，就算对</b>；如果只收到几十字节，那才是真的没读全，说明循环没写对。</p>
+<p><b>「收到 N 字节」这个数每次都不一样</b>——baidu 首页塞了几十个脚本和图标，一万多字节很正常；它改一次版，数字就跟着变。<b>只要首行是 <code class="inline">HTTP/1.1 200 OK</code>、字节数在几千以上，就算对</b>；如果只收到几十字节，那才是真的没读全，说明 <code class="inline">while</code> 循环没写对。</p>
 <p><b>这段代码里有六个地方会出错，每一个都是真实项目里踩过的：</b></p>
 <table>
 <tr><th>写法</th><th>不加会怎样</th></tr>

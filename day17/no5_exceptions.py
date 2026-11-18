@@ -20,4 +20,4 @@ def fetch(url):
     return None
 
 print("四种异常各对应一类失败, 抓的时候要分开")
-print("顺序也有讲究: Timeout 和 ConnectionError 都是 ConnectionError 的子类关系要理清")
+print("顺序也有讲究: ConnectTimeout 既是 Timeout 又是 ConnectionError 的子类")
