@@ -43,4 +43,4 @@ asyncio.run(main())
 # no.4-3
 import os
 
-print(f"ThreadPoolExcutor 的默认上限:", min(32, os.cpu_count() + 4))
+print(f"ThreadPoolExecutor 的默认上限:", min(32, os.cpu_count() + 4))
