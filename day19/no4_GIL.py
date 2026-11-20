@@ -34,6 +34,8 @@ for t in ts:
 for t in ts:
     t.join() 
 
-print("期望值:", 4 * N)
+print("期望值      :", 4 * N)
+print("无锁结果    :", counter_nolock)
 print("无锁结果正确:", counter_nolock == 4 * N)
+print("有锁结果    :", counter_lock)
 print("有锁结果正确:", counter_lock == 4 * N)

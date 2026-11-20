@@ -504,7 +504,18 @@ print("总计数:", sum(done))
 print("正确:", sum(done) == N * 4)</pre></div>
 <div class="codebox light"><button class="copy">复制</button><pre class="out">总计数: 8000
 正确: True</pre></div>
-<p><b>核心思路是「不共享」</b>：每个线程维护自己的 <code class="inline">subtotal</code>，最后再汇总。<b>没有共享变量，就不需要锁</b>——这是并发编程里最干净的写法。<br><b>「毒丸」<code class="inline">None</code></b> 是让阻塞在 <code class="inline">q.get()</code> 上的线程退出的标准手法。<b>不发毒丸，<code class="inline">q.join()</code> 会永远等下去。</b></p>
+<p><b>核心思路是「不共享」</b>：每个线程维护自己的 <code class="inline">subtotal</code>，最后再汇总。<b>没有共享变量，就不需要锁</b>——这是并发编程里最干净的写法。<br><b>「毒丸」<code class="inline">None</code></b> 是让阻塞在 <code class="inline">q.get()</code> 上的线程退出的标准手法。<b>毒丸少发一个，就有一个线程永远卡在 <code class="inline">q.get()</code> 上，卡住的是后面的 <code class="inline">t.join()</code>（不是 <code class="inline">q.join()</code>）。</b></p>
+<div class="warn"><b>这里容易记反，实测区分一下：</b><br>
+<b>① 不发毒丸 → <code class="inline">q.join()</code> 照样能返回</b>，因为它只统计「未 <code class="inline">task_done</code> 的任务数」，100 个任务都 done 了它就放行。<b>卡住的是 <code class="inline">t.join()</code></b>——线程还在 <code class="inline">q.get()</code> 上阻塞着，永远不结束。<br>
+<b>② 毒丸数量必须正好等于线程数</b>（4 个线程就要 4 个 <code class="inline">None</code>）。少一个多一个都会卡，只是卡的位置正好相反：
+<table style="margin-top:8px">
+<tr><th>毒丸数</th><th><code>q.join()</code></th><th><code>t.join()</code></th><th>为什么</th></tr>
+<tr><td>正好 4 个</td><td>返回</td><td>返回</td><td>四条线程各拿一个收工，队列清零</td></tr>
+<tr><td>0 个</td><td><b>返回</b></td><td><b>卡死</b></td><td>活干完了，但没人通知线程收工</td></tr>
+<tr><td>2 个</td><td><b>返回</b></td><td><b>卡死</b></td><td>两条走了，另两条还堵在 <code>q.get()</code> 上</td></tr>
+<tr><td>6 个</td><td><b>卡死</b></td><td>返回</td><td>四条都走了，剩两个毒丸没人取、也没人 <code>task_done</code></td></tr>
+</table>
+<b>③ 还有个反直觉的实测现象：任务不会平均分配。</b>8000 个任务 4 个线程，我跑了四次，三次是「一个线程干了 8000、另外三个 0」，一次是 6897 / 1103 / 0 / 0。<b>队列只保证「每个任务被拿且只被拿一次」，不保证「大家平分」</b>——所以汇总必须用 <code class="inline">sum(done)</code>，别指望每个线程的数字差不多。</div>
 <h3>第 7 题 · 带进度的下载器</h3>
 <div class="codebox"><button class="copy">复制</button><pre>import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
