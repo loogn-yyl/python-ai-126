@@ -3,7 +3,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 DELAY = 0.1
-TASKS = [DELAY * 5]
+TASKS = [DELAY] * 5
 
 for w in [1, 2, 5, 10]:
     t0 = time.perf_counter()

@@ -3,7 +3,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 DELAY = 0.1
-TASKS = list(range(1, 6))
+TASKS = list(range(1, 7))
 
 def download(t):
     print(f"{t} 下载开始")
