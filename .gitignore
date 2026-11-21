@@ -21,7 +21,7 @@ htmlcov/
 
 # ===== 运行时产物 =====
 *.log
-log.txt
+*.txt
 demo*.json
 contacts.json
 
