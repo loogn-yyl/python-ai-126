@@ -153,6 +153,7 @@ def run(args):
         log.info("过滤后剩 %d 行", len(rows))
         if not rows:
             print(f"提示: {args.path} 里没有状态码 >= {args.min_status} 的请求", file=sys.stderr)
+            return 1
 
     d = build(rows, bad, args.top, file_lines, by_hour=args.by_hour)
     if args.format == "json":
