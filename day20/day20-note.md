@@ -48,6 +48,6 @@ if __name__ == "__main__":
 ★ 不写 sys.exit()，return 1 就只是被丢掉的值，进程照样退 0
 
 ## 踩过的坑
-- 使用 group = p.add_mutually_exclusive_group() + grooup.add_argument(...) 保证 -q 和 -v 互斥
+- 使用 group = p.add_mutually_exclusive_group() + group.add_argument(...) 保证 -q 和 -v 互斥
 - logging.basicConfig 传了 handlers=[...] 之后，format= 和 stream= 会被静默忽略——格式得自己 setFormatter 到每个 handler 上
 - 一个函数被两种数据共用时，别把「某一种数据的规则」写死在函数里，用参数（或者 key=）从外面传进去。改完再跑一次
