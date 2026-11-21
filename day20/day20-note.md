@@ -43,8 +43,8 @@ parse_args → load(rows, bad) → build(dict) → render_* → print
 ★ 共用的函数别写死某一种数据的规则，用 key= 从外面传  
 
 ## 出口一行
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__ == "__main__":  
+    sys.exit(main())  
 ★ 不写 sys.exit()，return 1 就只是被丢掉的值，进程照样退 0
 
 ## 踩过的坑
