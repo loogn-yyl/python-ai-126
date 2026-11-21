@@ -1,9 +1,11 @@
 ## argparse 三种形态
-位置参数  add_argument("path")                     args.path
-选项带值  add_argument("-n","--top",type=int)      args.top   ★名字取长选项
-开关      add_argument("-q",action="store_true")   args.quiet
-选择      add_argument("--format",choices=[...])
-计数      add_argument("-v",action="count",default=0)   ★default 不写是 None
+| 形态 | 表达式 | 参数 |
+| --- | --- | --- |
+| 位置参数 | add_argument("path") | args.path |
+| 选项带值 | add_argument("-n","--top",type=int) | args.top   ★名字取长选项 |
+| 开关 | add_argument("-q",action="store_true") | args.quiet |
+| 选择 | add_argument("--format",choices=[...]) | args.format |
+| 计数 | add_argument("-v",action="count",default=0) | ★default 不写是 None |
 
 ## argparse 替你做的三件事
 校验（缺参 / 类型 / choices / 互斥）→ 报错到 stderr → 退出码 2  
@@ -46,4 +48,6 @@ if __name__ == "__main__":
 ★ 不写 sys.exit()，return 1 就只是被丢掉的值，进程照样退 0
 
 ## 踩过的坑
-- （写你真实遇到的）
+- 使用 group = p.add_mutually_exclusive_group() + grooup.add_argument(...) 保证 -q 和 -v 互斥
+- logging.basicConfig 传了 handlers=[...] 之后，format= 和 stream= 会被静默忽略——格式得自己 setFormatter 到每个 handler 上
+- 一个函数被两种数据共用时，别把「某一种数据的规则」写死在函数里，用参数（或者 key=）从外面传进去。改完再跑一次

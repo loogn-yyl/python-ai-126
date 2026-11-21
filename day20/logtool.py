@@ -10,9 +10,6 @@ from pathlib import Path
 from collections import Counter
 from ipaddress import ip_address
 
-Path("gbk.log").write_bytes("状态码 200".encode("gbk"))
-Path("gbk.log").read_text(encoding="utf-8")
-
 LINE = re.compile(
     r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3})'
     r' - - '
@@ -44,13 +41,14 @@ def top_n(counter, n, key=lambda k: k):
     # 次数降序, 次数相同按名字升序
     return sorted(counter.items(), key=lambda kv: (-kv[1], key(kv[0])))[:n]
 
-def build(rows, bad, n):
+def build(rows, bad, n, file_lines, by_hour=False):
     """把「事实」算成一个 dict, 与怎么打印无关"""
     codes = Counter(r["status"] for r in rows)
     total = len(rows)
     errors = sum(c for s, c in codes.items() if s >= 400)
+    hours = Counter(r["time"].split(":")[1] for r in rows) if by_hour else Counter()
     return {
-        "total_lines": total + len(bad),
+        "file_lines": file_lines,
         "parsed": total,
         "bad_lines": bad,
         "top_ips": top_n(Counter(r["ip"] for r in rows), n, key=ip_address),
@@ -58,10 +56,11 @@ def build(rows, bad, n):
         "codes": dict(sorted(codes.items())),
         "errors": errors,
         "error_rate": errors / total if total else 0.0,
+        "by_hours": dict(sorted(hours.items()))
     }
 
 def render_text(d, n):
-    out = [f"文件共 {d['total_lines']} 行, 解析成功 {d['parsed']} 行, 坏行 {len(d['bad_lines'])} 行"]
+    out = [f"文件共 {d['file_lines']} 行, 解析成功 {d['parsed']} 行, 坏行 {len(d['bad_lines'])} 行"]
     if d["bad_lines"]:
         out.append(f"坏行行号: {d['bad_lines']}")
     out.append("")
@@ -74,6 +73,10 @@ def render_text(d, n):
     out.append("状态码")
     for s, c in d["codes"].items():
         out.append(f"  {s}  {c:>4}")
+    if d["by_hours"]:
+        out.append("按小时")
+        for h, c in d["by_hours"].items():
+            out.append(f"  {h} 点{c:>4}")
     out.append(f"错误率  {d['error_rate']:.1%}({d['errors']}/{d['parsed']})")
     return "\n".join(out)
 
@@ -87,6 +90,8 @@ def render_csv(d):
         w.writerow(["path", p, c])
     for s, c in d["codes"].items():
         w.writerow(["status", s, c])
+    for h, c in d["by_hours"].items():
+        w.writerow(["hour", h, c])
     return buf.getvalue().rstrip("\r\n")
 
 def read_text(path):
@@ -97,9 +102,6 @@ def read_text(path):
         except UnicodeDecodeError:
             continue
     raise ValueError(f"{path} 编码认不出来, 请手动指定")
-
-def read_csv_text(path):
-    return read_text(path).splitlines()[0]
 
 def parse_args(argv=None):
     p = argparse.ArgumentParser(prog="logtool", description="分析 nginx 访问日志")
@@ -137,22 +139,22 @@ def run(args):
     if not p.exists():
         print(f"错误: 找不到文件 {args.path}", file=sys.stderr)
         return 1
-    rows, bad = load(p.read_text(encoding="utf-8"))
+    raw = read_text(args.path)
+    log.debug("读到 %d 字符", len(raw))
+    rows, bad = load(raw)
     if not rows:
         print(f"错误: {args.path} 里一行都没解析出来", file=sys.stderr)
         return 1
+    file_lines = len(rows) + len(bad)
     log.info("解析成功 %d 行, 坏行 %d 行", len(rows), len(bad))
 
     if args.min_status:
         rows = [r for r in rows if r["status"] >= args.min_status]
         log.info("过滤后剩 %d 行", len(rows))
+        if not rows:
+            print(f"提示: {args.path} 里没有状态码 >= {args.min_status} 的请求", file=sys.stderr)
 
-    d = build(rows, bad, args.top)
-    if args.by_hour:
-        hours = Counter(r["time"].split(":")[1] for r in rows)
-        print("按小时")
-        for h, c in sorted(hours.items()):
-            print(f"  {h} 点   {c:>3}")
+    d = build(rows, bad, args.top, file_lines, by_hour=args.by_hours)
     if args.format == "json":
         text = json.dumps(d, ensure_ascii=False, indent=2)
     elif args.format == "csv":
