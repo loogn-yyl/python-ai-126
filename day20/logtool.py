@@ -56,7 +56,7 @@ def build(rows, bad, n, file_lines, by_hour=False):
         "codes": dict(sorted(codes.items())),
         "errors": errors,
         "error_rate": errors / total if total else 0.0,
-        "by_hours": dict(sorted(hours.items()))
+        "by_hour": dict(sorted(hours.items()))
     }
 
 def render_text(d, n):
@@ -73,9 +73,9 @@ def render_text(d, n):
     out.append("状态码")
     for s, c in d["codes"].items():
         out.append(f"  {s}  {c:>4}")
-    if d["by_hours"]:
+    if d["by_hour"]:
         out.append("按小时")
-        for h, c in d["by_hours"].items():
+        for h, c in d["by_hour"].items():
             out.append(f"  {h} 点{c:>4}")
     out.append(f"错误率  {d['error_rate']:.1%}({d['errors']}/{d['parsed']})")
     return "\n".join(out)
@@ -90,7 +90,7 @@ def render_csv(d):
         w.writerow(["path", p, c])
     for s, c in d["codes"].items():
         w.writerow(["status", s, c])
-    for h, c in d["by_hours"].items():
+    for h, c in d["by_hour"].items():
         w.writerow(["hour", h, c])
     return buf.getvalue().rstrip("\r\n")
 
@@ -154,7 +154,7 @@ def run(args):
         if not rows:
             print(f"提示: {args.path} 里没有状态码 >= {args.min_status} 的请求", file=sys.stderr)
 
-    d = build(rows, bad, args.top, file_lines, by_hour=args.by_hours)
+    d = build(rows, bad, args.top, file_lines, by_hour=args.by_hour)
     if args.format == "json":
         text = json.dumps(d, ensure_ascii=False, indent=2)
     elif args.format == "csv":
