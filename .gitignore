@@ -24,6 +24,8 @@ htmlcov/
 *.txt
 demo*.json
 contacts.json
+# 作品集里的样例日志是固定素材, 要进仓库(必须写在 *.log 后才生效)
+!portfolio/**/sample_access.log
 
 # ===== 截图等二进制 =====
 *.png
