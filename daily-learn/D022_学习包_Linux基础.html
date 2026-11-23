@@ -639,7 +639,7 @@ du -sh */ | sort -h | tail -n 3</pre></div>
 <div class="codebox"><button class="copy">复制</button><pre class="out">4.0K	docs/
 8.0K	logs/
 8.0K	src/</pre></div>
-<p><b>三个目录都在，都只有几 K——因为每个里面只放了一两个文件，而 <code class="inline">du</code> 按 4K 块向上取整</b>，<code class="inline">readme.txt</code> 只有 9 个字节也报 4.0K（数字随文件系统变，见第 3 节那段说明）；<code class="inline">logs</code> 和 <code class="inline">src</code> 同为 8.0K 时先后顺序不固定。<b><code class="inline">du -sh */</code> 只统计一级子目录、不展开</b>；<code class="inline">sort -h</code> 按「人类可读大小」排（<code class="inline">1K &lt; 2M &lt; 3G</code>，普通 <code class="inline">sort</code> 会把 <code class="inline">10K</code> 排在 <code class="inline">2M</code> 后面）。<b>如果 <code class="inline">sort -h</code> 在你的系统上报错，说明 BSD sort 版本老，改用 <code class="inline">du -sk */ | sort -n | tail -n 3</code>（<code class="inline">-k</code> 单位统一为 KB，<code class="inline">-n</code> 按数字排）。</b></p>
+<p><b>三个目录都在，都只有几 K——因为每个里面只放了一两个文件，而 <code class="inline">du</code> 按 4K 块向上取整</b>，<code class="inline">readme.txt</code> 只有 9 个字节也报 4.0K（数字随文件系统变，见第 3 节那段说明）；<code class="inline">logs</code> 和 <code class="inline">src</code> 同为 8.0K 时先后顺序不固定。<b>更重要的是：你跑出来的数字很可能不是这三个。</b>按顺序做到这里，<code class="inline">logs</code> 里已经有 <code class="inline">access.log</code>、<code class="inline">old.log</code>，再做完第 5 题多一个 <code class="inline">errors.log</code>，三个文件 × 4K = <b>12K</b>。<b>这不是你做错了，是 <code class="inline">du</code> 在量「你现在这个目录」</b>——它不记历史，只看当下。想验证就看一眼 <code class="inline">ls logs</code>，文件数和 12K 对不对得上。<b><code class="inline">du -sh */</code> 只统计一级子目录、不展开</b>；<code class="inline">sort -h</code> 按「人类可读大小」排（<code class="inline">1K &lt; 2M &lt; 3G</code>，普通 <code class="inline">sort</code> 会把 <code class="inline">10K</code> 排在 <code class="inline">2M</code> 后面）。<b>如果 <code class="inline">sort -h</code> 在你的系统上报错，说明 BSD sort 版本老，改用 <code class="inline">du -sk */ | sort -n | tail -n 3</code>（<code class="inline">-k</code> 单位统一为 KB，<code class="inline">-n</code> 按数字排）。</b></p>
 </details>
 
 <h3>第 8 题 · 一条命令：找出所有 .log 文件里含 "500" 的文件名（不输出内容）</h3>
@@ -648,7 +648,7 @@ du -sh */ | sort -h | tail -n 3</pre></div>
 grep -rl "500" --include="*.log" .</pre></div>
 <div class="codebox"><button class="copy">复制</button><pre class="out">./logs/access.log
 ./logs/old.log</pre></div>
-<p><code class="inline">-l</code>（小写 L）只输出文件名。<b>出现两个是因为「第二组」里用 <code class="inline">cp</code> + <code class="inline">mv</code> 复制过一份 <code class="inline">old.log</code></b>——它内容一样，自然也命中。<b>这正好是那句老话的现场版：练习目录里留下的副本，会到处污染你的统计结果。</b><br>用法上很实用：<b>先 <code class="inline">-l</code> 定位是哪几个文件，再对单个文件 <code class="inline">grep -n</code> 看具体行</b>，比一上来就递归全文搜索好读得多。</p>
+<p><code class="inline">-l</code>（小写 L）只输出文件名。<b>出现两个是因为「第二组」里用 <code class="inline">cp</code> + <code class="inline">mv</code> 复制过一份 <code class="inline">old.log</code></b>——它内容一样，自然也命中。<b>这正好是那句老话的现场版：练习目录里留下的副本，会到处污染你的统计结果。</b><b>如果你还做过第 5 题，这里会输出三个</b>——<code class="inline">errors.log</code> 就是那份 500 单拎出来的文件，里面当然也有 "500"，于是它自己也命中了。<b>一份数据被复制成几份放在同一个目录里，任何「有几个文件含 X」的问题都会给出偏大的答案。</b>这也是为什么真正的日志系统会轮转、归档，而不是在同一个目录里复制粘贴。<br>用法上很实用：<b>先 <code class="inline">-l</code> 定位是哪几个文件，再对单个文件 <code class="inline">grep -n</code> 看具体行</b>，比一上来就递归全文搜索好读得多。</p>
 </details>
 <div class="ok"><b>八题里如果有三道以上卡住，说明缺的不是命令，是「把命令串起来」的感觉。</b>那就把第 4 题那条四级管道默写三遍：<code class="inline">awk 取列 | sort | uniq -c | sort -rn</code>。这一条通吃所有「统计出现次数」的需求——访问最多的 IP、最频繁的错误码、最常见的 URL，全是一个形状。</div>
 </section>
