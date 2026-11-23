@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D025 学习包 · Git 基础</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 025 · Git 基础</div>
+  <h1>Git：你早就在用 <code style="color:#fff">gl</code> 了，今天搞清它动了什么</h1>
+  <p>前后三周你 push 了二十多次，但每次都是 <code style="color:#fff">gl</code> 一敲就完事。<b>今天要把中间那几步拆开看</b>——不然遇到冲突、误提交、想回退时，会完全没有方向。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🗂 三区与快照</span>
+    <span>🌿 分支与冲突</span>
+    <span>📦 产出：含冲突的演练仓库</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配</h2>
+<div class="timeline">
+<div class="tl"><b>40 分钟</b><span>第 1 节：三区模型，这一步想通了后面全通</span></div>
+<div class="tl"><b>50 分钟</b><span>第 2、3 节：init / add / commit / diff / log</span></div>
+<div class="tl"><b>40 分钟</b><span>第 4 节：.gitignore 与 <code>git rm --cached</code></span></div>
+<div class="tl"><b>60 分钟</b><span>第 5、6 节：分支、合并、手工解冲突</span></div>
+<div class="tl"><b>40 分钟</b><span>第 7、8 节：回退与 reflog</span></div>
+<div class="tl"><b>50 分钟</b><span>第 9、10 节：练习 + 笔记</span></div>
+</div>
+<div class="note"><b>今天的产出是一个「故意制造过冲突」的本地仓库</b>，放在 <code class="inline">~/git-lab/</code>。<b>不要动 <code class="inline">~/python-learn</code></b>——那是你的正式仓库，练手去别处练。<b>练「回退」这种操作时，在正式仓库里练一次就够后悔的。</b></div>
+<div class="purple"><b>你已有的优势：</b>你的 <code class="inline">gl()</code> 里那句 <code class="inline">git pull --rebase</code>，其实已经是今天第 8 节的内容了。<b>今天之后你会知道为什么它是 rebase 而不是 pull，以及它把提交接到哪儿去了。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>心智模型：三个区，一串快照</h2>
+<p><b>Git 只做一件事：在你要的时候，把整个目录拍一张照片存起来。</b>提交不是「记录改了什么」，是「存下此刻所有文件的完整样子」。<b>理解这一点，后面所有命令都是在管理「照片放哪、拿哪张」。</b></p>
+<div class="tree">  工作区                  暂存区                  本地仓库
+  Working Tree       →     Index / Stage     →     Repository
+ （你眼前的文件）        （准备提交的清单）      （一张张提交快照）
+        │                       │                      │
+        │      git add          │     git commit       │
+        └───────────────────────┴──────────────────────┘
+                                │
+                                │      git push
+                                ▼
+                            远程仓库（GitHub）</div>
+<table>
+<tr><th>区</th><th>是什么</th><th>怎么往里放东西</th></tr>
+<tr><td><b>工作区</b></td><td>你能用编辑器打开的那些文件</td><td>直接改，随便改</td></tr>
+<tr><td><b>暂存区</b></td><td>一份「这次要提交什么」的清单</td><td><code>git add 文件</code></td></tr>
+<tr><td><b>本地仓库</b></td><td><code>.git</code> 目录里的一串提交</td><td><code>git commit</code></td></tr>
+</table>
+<div class="ok"><b>为什么要「暂存」这么一道？</b>因为你经常同时改了好几件事：修 bug、加功能、改错别字。<b>暂存区让你挑着提交</b>——先 <code class="inline">git add</code> 那个 bug 的文件、提交一次，再 add 功能的文件、再提交一次。<b>提交历史一条一件事，将来查问题时才查得动。</b><br><b>这就是「<code class="inline">gl</code> 一把梭」的代价</b>：<code class="inline">git add -A</code> 把所有改动塞进一个提交，历史里就只剩「学习记录 11-22」这种一句话。</div>
+<h3>提交是快照，不是差异</h3>
+<p>这一点决定了 <code class="inline">git diff</code> 要跟谁比。<b>每个提交都指向一棵完整的文件树</b>，所以任意两个提交之间都能比，不比邻居也能比。</p>
+<div class="tree">提交 A ── 提交 B ── 提交 C ── 提交 D
+（完整树）  （完整树）  （完整树）  （完整树）
+                              ▲
+                             HEAD（你现在在哪）</div>
+<div class="note"><b><code class="inline">HEAD</code> 是「你现在站在哪个提交上」的指针。</b><code class="inline">HEAD~1</code> 是上一个，<code class="inline">HEAD~3</code> 是往前三个。<b>它跟着分支走</b>——你在 <code class="inline">main</code> 分支上提交，<code class="inline">main</code> 和 <code class="inline">HEAD</code> 一起往前挪。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>从零建一个仓库：五条命令走完一轮</h2>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/git-lab/demo &amp;&amp; cd ~/git-lab/demo
+git init
+
+# 第一次用 git 时设一下身份（全局只需一次）
+git config --global user.name "你的名字"
+git config --global user.email "你的邮箱"
+
+echo "line1" &gt; app.py
+echo "readme" &gt; README.md
+git status</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+	README.md
+	app.py
+
+nothing added to commit but untracked files present (use "git add" to track)</pre></div>
+<h3><code>git status --short</code>：两列状态码，天天看</h3>
+<div class="codebox"><button class="copy">复制</button><pre>git status --short
+git add app.py
+git status --short
+git commit -m "初始化项目"
+git status --short
+git log --oneline</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">?? README.md
+?? app.py
+A  app.py
+?? README.md
+1c1ad7a 初始化项目</pre></div>
+<table>
+<tr><th>码</th><th>意思</th><th>在哪一列</th></tr>
+<tr><td><code>??</code></td><td>未跟踪，git 完全不管它</td><td>两列都是 ?</td></tr>
+<tr><td><code>A</code></td><td>新增，已暂存</td><td>左列（暂存区）</td></tr>
+<tr><td><code>M</code></td><td>修改</td><td><b>左列 = 已暂存；右列 = 只在工作区改过</b></td></tr>
+<tr><td><code>D</code></td><td>删除</td><td>同上</td></tr>
+<tr><td><code>UU</code></td><td><b>冲突未解决</b></td><td>两列都是 U</td></tr>
+</table>
+<div class="warn"><b>两列的含义是「左暂存、右工作区」</b>，这是 <code class="inline">--short</code> 最需要先记住的一件事。<code class="inline">M  app.py</code> 表示「暂存区有改动」，<code class="inline"> M app.py</code>（M 在右边）表示「只在工作区改过、还没 add」。<b>看到 <code class="inline"> M</code> 就知道还差一个 <code class="inline">git add</code>；看到 <code class="inline">M </code> 就知道还差一个 <code class="inline">git commit</code>。</b></div>
+<div class="danger"><b><code class="inline">README.md</code> 一直是 <code class="inline">??</code>，说明它从来没被提交过。</b>这是初学者最容易忽略的事——<b>你以为的「项目已经进 Git 了」，其实只进了一半</b>。<code class="inline">git status</code> 每次都要看，不是走过场。</div>
+<h3>提交信息怎么写</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 好的提交信息：一行说完这件事，必要时空一行写细节
+git commit -m "日志工具支持 csv 输出"
+
+# 需要写细节时用两个 -m
+git commit -m "修复 GBK 日志解码失败" -m "read_text 之前写了没接上，现在按 utf-8 → gbk 顺序尝试"
+
+# 改错了上一条（还没 push 时）
+git commit --amend -m "新的信息"</pre></div>
+<div class="note"><b>判断标准：一年后的你看这条信息，能不能知道「当时为什么要改」。</b>「update」「修改」「fix bug」都是无效信息——<b>它们和「学习记录 11-22」是同一个问题：只记录了动作，没记录内容。</b><br><b>你的 <code class="inline">gl</code> 默认信息是「学习记录 MM-DD」</b>，日常提交够用；<b>但作品集的提交建议手写</b>，因为那是要给别人看的。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>diff 的三个视角：到底在跟谁比</h2>
+<p>因为有三个区，所以「看差异」有三种比法。<b>分不清的时候，画面图：比较的是左右相邻的两个格子。</b></p>
+<div class="tree">工作区  ←─ git diff ─→  暂存区  ←─ git diff --cached ─→  仓库(HEAD)</div>
+<div class="codebox"><button class="copy">复制</button><pre># 改一下文件
+echo "line2" &gt;&gt; app.py
+
+git status --short          #  M app.py  ← M 在右边，说明只在工作区
+git diff                    # 工作区 vs 暂存区
+
+git add app.py
+git diff                    # 空了！因为工作区和暂存区已经一样
+git diff --cached           # 暂存区 vs HEAD（这次要提交的内容）</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out"> M app.py
+
+diff --git a/app.py b/app.py
+index a29bdeb..c0d0fb4 100644
+--- a/app.py
++++ b/app.py
+@@ -1 +1,2 @@
+ line1
++line2</pre></div>
+<div class="warn"><b><code class="inline">git add</code> 之后 <code class="inline">git diff</code> 变空，是新手的第一个「我的改动没了？！」惊吓时刻。</b>改动没丢，只是<b>从「工作区 vs 暂存区」的差异里消失了</b>——两边现在一样了。用 <code class="inline">git diff --cached</code> 看它。</div>
+<table>
+<tr><th>命令</th><th>比较</th><th>什么时候用</th></tr>
+<tr><td><code>git diff</code></td><td>工作区 ↔ 暂存区</td><td>「我改了但还没 add 的东西」</td></tr>
+<tr><td><code>git diff --cached</code></td><td>暂存区 ↔ 最新提交</td><td><b>commit 之前必看</b>：确认这次到底要提交什么</td></tr>
+<tr><td><code>git diff HEAD</code></td><td>工作区 ↔ 最新提交</td><td>「从现在到上次提交，一共变了什么」</td></tr>
+<tr><td><code>git diff A B</code></td><td>任意两个提交/分支</td><td>「这两个版本差在哪」</td></tr>
+</table>
+<div class="note"><b>提交前跑一次 <code class="inline">git diff --cached</code>，是一个能省掉很多麻烦的习惯。</b>它能当场发现：<b>误加进来的调试代码、忘了删的 <code class="inline">print</code>、不该提交的密钥、编辑器生成的临时文件。</b>这些一旦提交再清理，就要多一次提交或者改写历史。</div>
+<h3>看历史：log 的四种看法</h3>
+<div class="codebox"><button class="copy">复制</button><pre>git log                     # 完整信息，翻页看
+git log --oneline           # 一行一条
+git log --oneline -5        # 最近 5 条
+git log --oneline --graph   # 带分支图
+git log --stat              # 每条改了哪些文件、多少行
+git log -p app.py           # 某个文件的历史改动
+git log --author="loogn" --since="7 days ago"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">b47175a 合并 feature：保留日志与缓存两项
+a423299 main: 加日志
+95c148b feature: 加缓存
+49cb2a5 初始化项目</pre></div>
+<div class="note"><b><code class="inline">git log --oneline --graph</code> 是唯一能看清分支形状的方式</b>，第 5 节合并完一定要跑一次。<b>提交号那 7 位是哈希的前 7 位</b>，唯一标识一个提交，<b>可以当参数用</b>：<code class="inline">git diff a423299 b47175a</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>.gitignore：为什么加了规则，文件还在</h2>
+<p><b>.gitignore 只对「未跟踪的文件」生效。</b>已经被提交过的文件，加进规则也不会被忽略——<b>这是你的仓库 11-22 真实撞上的问题</b>（<code class="inline">day06/log.txt</code> 第二次被提交进来）。</p>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/git-lab/demo
+echo "x" &gt; log.txt
+git add -A &amp;&amp; git commit -m "误提交 log.txt"
+
+printf '*.log\n' &gt; .gitignore
+git status --short
+git check-ignore -v log.txt</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">?? .gitignore
+（check-ignore 没有任何输出 —— 因为 log.txt 已被跟踪）</pre></div>
+<div class="warn"><b>规则写了、文件还在、<code class="inline">git status</code> 里也不消失。</b>因为忽略规则只回答一个问题：「<b>这个从没被跟踪过的文件，要不要提醒我？</b>」——已经跟踪的，规则管不着。<b>规则生效后新加的文件才会被挡住</b>，这也解释了为什么「加了 .gitignore 之后还是有垃圾进来」：那些垃圾是在规则之前或规则没覆盖到的路径下产生的。</div>
+<div class="codebox"><button class="copy">复制</button><pre># 正确做法：从索引里移除，但本地文件保留
+git rm --cached log.txt
+git status --short
+ls log.txt</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">D  log.txt
+?? .gitignore
+log.txt</pre></div>
+<div class="ok"><b>看第三行：文件还在。</b><code class="inline">D</code> 在左列表示「索引里删掉它」，这是要提交的改动；<b>工作区的文件完全没动。</b><br><b><code class="inline">git rm --cached</code> 和 <code class="inline">git rm</code> 的区别就是这一条：<code class="inline">--cached</code> 只动索引，不加才是连文件一起删。</b>加错的那次，文件就真没了（除非在回收站/trash 里）。</div>
+<h3>写 .gitignore 的四条规则</h3>
+<table>
+<tr><th>写法</th><th>含义</th><th>例子</th></tr>
+<tr><td><code>*.log</code></td><td><b>任何目录下</b>的 .log 文件</td><td>日志、缓存</td></tr>
+<tr><td><code>/*.txt</code></td><td><b>只有根目录</b>的 .txt</td><td>根目录的临时文件</td></tr>
+<tr><td><code>build/</code></td><td>任何叫 build 的目录及其内容</td><td>编译产物</td></tr>
+<tr><td><code>!重要.log</code></td><td><b>取反</b>：放行</td><td>必须<b>写在被忽略规则之后</b></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre># 验证某条规则到底有没有生效（对未跟踪文件）
+echo "z" &gt; new.log
+git check-ignore -v new.log</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">.gitignore:1:*.log	new.log</pre></div>
+<div class="note"><b><code class="inline">git check-ignore -v</code> 输出三段：哪一行规则、规则内容、命中的文件。</b>排查「为什么这个文件被忽略了 / 为什么没被忽略」用它最快——<b>比逐条读 .gitignore 猜要快十倍，而且能告诉你别的 .gitignore 有没有插一脚</b>（子目录里的 .gitignore 也会生效，还有全局的 <code class="inline">~/.gitignore</code>）。</div>
+<div class="danger"><b>不要用 <code class="inline">git add -f</code> 强行把被忽略的文件加进来</b>，尤其是在你已经写对了规则的情况下。<b>那等于在规则上开一个洞，而且后来的人看不出为什么这个文件特殊。</b>真要放行，就在 .gitignore 里显式写一条 <code class="inline">!路径</code>，并在旁边写一行注释说明为什么。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>分支：开一条线，做完再合回来</h2>
+<p><b>分支在 Git 里便宜得离谱</b>——它只是一个指向某个提交的指针，40 个字节。<b>所以「开个分支试试」永远比「在主分支上硬改」划算。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>git branch                  # 看有哪些分支（* 是当前的）
+git switch -c feature       # 新建并切过去（老版本 git 用 checkout -b）
+git branch
+git switch main             # 切回来</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">* main
+  feature</pre></div>
+<div class="note"><b><code class="inline">git switch</code> 是 git 2.23 之后的新命令，把 <code class="inline">checkout</code> 的两个职责拆开了</b>：<code class="inline">switch</code> 管切分支、<code class="inline">restore</code> 管还原文件。<b>老教程里的 <code class="inline">git checkout -b</code> 现在还能用，但新命令更不容易误操作。</b></div>
+<h3>合并的两种情况</h3>
+<div class="tree">情况一：快进（fast-forward）
+main:    A ── B
+                ╲
+feature:         C ── D
+合并后 main 直接指到 D，不产生新提交。
+
+情况二：三方合并（产生一个合并提交）
+main:    A ── B ────── M
+                ╲      ╱
+feature:         C ── D</div>
+<div class="codebox"><button class="copy">复制</button><pre>git switch main
+git merge feature
+git log --oneline --graph</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">*   b47175a 合并 feature：保留日志与缓存两项
+|\
+| * 95c148b feature: 加缓存
+* | a423299 main: 加日志
+|/
+* 49cb2a5 初始化项目</pre></div>
+<div class="note"><b>看图的方式：<code class="inline">*</code> 是提交、竖线是同一条分支、斜线是分叉/汇合。</b>上面这张图的读法是：从 <code class="inline">49cb2a5</code> 分叉出两条，各自走了一个提交，然后在 <code class="inline">b47175a</code> 汇合。<b>合并提交有两个父提交</b>，这就是它和普通提交的唯一区别。</div>
+<div class="warn"><b>为什么这次必须产生合并提交、不能快进？</b>因为两边都往前走了。<b>快进只在「目标分支没有新提交」时才能发生</b>——那种情况下 Git 连新提交都不用建，直接把指针挪过去。<b><code class="inline">git merge --no-ff</code> 可以强制产生合并提交</b>，好处是历史里能看出「这里曾经有一个功能分支」。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>冲突：不是错误，是 Git 在问你「留哪个」</h2>
+<p><b>冲突的唯一原因是：同一个文件的同一片区域，两条分支改了不同的内容。</b>Git 不敢替你决定，于是把两边都写进文件，等你选。</p>
+<div class="codebox"><button class="copy">复制</button><pre># 制造冲突：两条分支改同一行
+git switch -c feature2
+printf '项目说明\n版本：v1\n新增：缓存功能\n' &gt; README.md
+git add -A &amp;&amp; git commit -m "feature: 加缓存"
+
+git switch main
+printf '项目说明\n版本：v2\n新增：日志功能\n' &gt; README.md
+git add -A &amp;&amp; git commit -m "main: 加日志"
+
+git merge feature2</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">Auto-merging README.md
+CONFLICT (content): Merge conflict in README.md
+Automatic merge failed; fix conflicts and then commit the result.</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>git status --short
+cat README.md</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">UU README.md
+
+项目说明
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+版本：v2
+新增：日志功能
+=======
+版本：v1
+新增：缓存功能
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature2</pre></div>
+<div class="danger"><b>这三行标记必须整个删掉，不能只删一半。</b><br><code class="inline">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> 到 <code class="inline">=======</code> 之间 = <b>你当前分支（main）的内容</b><br><code class="inline">=======</code> 到 <code class="inline">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature2</code> 之间 = <b>要合进来的那条分支的内容</b><br><b>常见错误是只留自己要的那段，把标记漏在文件里</b>——然后这个文件就跑不起来了，而且报错指向的行号会偏移，很难查。</div>
+<h3>解冲突的四个动作</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 1. 手工编辑，改成你想要的样子（两个都要，或者只留一个，或者重写）
+printf '项目说明\n版本：v2\n新增：日志功能\n新增：缓存功能\n' &gt; README.md
+
+# 2. 标记为已解决
+git add README.md
+
+# 3. 看一眼没漏（此时 status 里不该再有 UU）
+git status --short
+
+# 4. 完成合并提交
+git commit -m "合并 feature2：保留日志与缓存两项"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">M  README.md
+[b47175a] 合并 feature2：保留日志与缓存两项</pre></div>
+<div class="ok"><b>关键理解：解冲突的「编辑」是普通编辑，不是 git 命令。</b>Git 只负责把两边内容摆在你面前、并把状态标成 <code class="inline">UU</code>；<b>你改完文件、<code class="inline">git add</code> 一下，就是告诉它「这个文件我处理过了」。</b><code class="inline">git add</code> 在这里的作用不是「加入版本库」，是「标记冲突已解决」——<b>这就是为什么解完冲突必须 add，否则 <code class="inline">git commit</code> 会拒绝。</b></div>
+<div class="codebox"><button class="copy">复制</button><pre># 想放弃这次合并，回到合并前的样子
+git merge --abort
+
+# 想看看冲突的两边各自是什么（不切分支）
+git diff --name-only --diff-filter=U     # 哪些文件冲突
+git show :1:README.md                    # 共同祖先的版本
+git show :2:README.md                    # 当前分支的版本
+git show :3:README.md                    # 对方的版本</pre></div>
+<div class="note"><b><code class="inline">git merge --abort</code> 是解冲突时的安全绳。</b>改乱了、拿不准，直接 abort 回到干净状态，想清楚了再来一遍。<b>它还顺手清掉工作区的冲突标记，不会有残留。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>回退：三种 reset 与一个更该用的 revert</h2>
+<p><b>这是 Git 里最容易造成实际损失的一组命令。</b>先把三个层次摆清楚：<b>移动分支指针</b>、<b>重置暂存区</b>、<b>还原工作区</b>。</p>
+<table>
+<tr><th>命令</th><th>分支指针</th><th>暂存区</th><th>工作区文件</th><th>用在哪</th></tr>
+<tr><td><code>reset --soft HEAD~1</code></td><td>后退</td><td><b>不动</b></td><td><b>不动</b></td><td>提交信息写错、想重新提交</td></tr>
+<tr><td><code>reset --mixed HEAD~1</code>（默认）</td><td>后退</td><td>重置</td><td><b>不动</b></td><td>提交太早，想重新挑文件</td></tr>
+<tr><td><code>reset --hard HEAD~1</code></td><td>后退</td><td>重置</td><td><b>全部丢弃</b></td><td>真的不要这些改动了</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre># 实测三种的差别（在一个一次性提交上试）
+git reset --soft HEAD~1
+git status --short        # M  README.md   ← 改动还在暂存区
+
+git reset --mixed HEAD
+git status --short        #  M README.md   ← 改动退回工作区
+
+git reset --hard HEAD
+git status --short        # （空）         ← 改动没了</pre></div>
+<div class="danger"><b><code class="inline">--hard</code> 会真的删掉工作区里没提交的改动，没有确认框。</b>三个字的代价可能是半天的工作。<b>规则：敲 <code class="inline">--hard</code> 之前，先 <code class="inline">git status</code> 看一眼，再用 <code class="inline">git stash</code> 存一下。</b><br><code class="inline">git stash</code> 是「把当前改动临时收进抽屉」：<code class="inline">git stash</code> 收起、<code class="inline">git stash pop</code> 拿出来。<b>不确定要不要丢的东西，一律先 stash，它比 reset --hard 便宜太多了。</b></div>
+<h3>已经 push 出去了，怎么撤</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 撤销某个提交，但保留历史（生成一个「反向提交」）
+git revert a423299
+git log --oneline -3</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">9c1b2f0 Revert "main: 加日志"
+a423299 main: 加日志
+49cb2a5 初始化项目</pre></div>
+<div class="note"><b><code class="inline">reset</code> 改写历史，<code class="inline">revert</code> 追加历史。</b>两者选哪个只看一件事：<b>这个提交 push 过没有、别人有没有基于它工作。</b><br><b>push 过 → 用 revert</b>。因为 reset 之后你本地历史跟远端不一致，要 push 就得 <code class="inline">--force</code>，而强推会把别人的提交冲掉。<b>个人仓库只有你一个人用，强推问题不大；但只要有过协作，强推就是事故。</b></div>
+<h3>还原单个文件：restore 比 reset 安全</h3>
+<div class="codebox"><button class="copy">复制</button><pre>git restore app.py                 # 工作区的改动丢掉，回到暂存区版本
+git restore --staged app.py        # 从暂存区撤出，改动留在工作区
+git restore --source=HEAD~2 app.py # 回到两个提交前的版本</pre></div>
+<div class="note"><b><code class="inline">git restore 文件</code> 只影响那一个文件，不影响分支指针，是「改坏了想重来」的首选。</b>顺手记一下：<code class="inline">git restore --staged</code> 等价于老写法 <code class="inline">git reset HEAD 文件</code>——<b>作用就是「取消 add」，不动文件内容。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>reflog：删错了也能找回来</h2>
+<p><b>Git 几乎不真的删东西。</b>提交只要存在过，就会在 <code class="inline">reflog</code>（引用日志）里留一条记录，默认保留 90 天。<b><code class="inline">reset --hard</code> 之后觉得删错了，就靠它。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre>git reflog --oneline | head -n 6</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">b47175a HEAD@{0}: commit (merge): 合并 feature：保留日志与缓存两项
+a423299 HEAD@{1}: commit: main: 加日志
+49cb2a5 HEAD@{2}: checkout: moving from feature to main
+95c148b HEAD@{3}: commit: feature: 加缓存
+49cb2a5 HEAD@{4}: checkout: moving from main to feature
+49cb2a5 HEAD@{5}: commit (initial): 初始化项目</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre># 救回来：找到那个提交号，开一个分支指过去
+git switch -c rescue b47175a
+
+# 或者直接把当前分支拉回去
+git reset --hard b47175a</pre></div>
+<div class="ok"><b><code class="inline">reflog</code> 是 Git 的撤销键。</b>它记录的是「HEAD 每次移动」，所以 merge、reset、rebase、switch 全都在里面。<b>误删分支、硬回退过头、rebase 搞乱——都能从 reflog 里捞回来。</b><br><b>但有个前提：你得知道自己要找什么。</b>所以养成一个习惯：<b>做危险操作前，<code class="inline">git log --oneline -3</code> 记一下当前提交号</b>，出事了直接指回去。</div>
+<div class="warn"><b>reflog 是本地记录，push 不上去，也不跟着仓库走。</b>换台机器、重新 clone 就没有了。<b>所以它救不了「昨天在另一台电脑上删掉的东西」。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>练习八道</h2>
+<p>全部在 <code class="inline">~/git-lab/demo</code> 里做，<b>别在 <code class="inline">~/python-learn</code> 里练</b>。</p>
+
+<h3>第 1 题 · 建仓库、提交两个文件、把第三个文件留在未跟踪状态</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/git-lab/ex1 &amp;&amp; cd ~/git-lab/ex1
+git init
+echo a &gt; one.txt; echo b &gt; two.txt; echo c &gt; three.txt
+git add one.txt two.txt
+git commit -m "加入 one 和 two"
+git status --short</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">?? three.txt</pre></div>
+<p><b><code class="inline">??</code> 就是「git 看着它，但不管它」。</b>这种文件不会被提交、不会被 push、也不会在 diff 里出现——<b>所以「我明明写了新文件，为什么远端没有」的答案永远是这一行。</b></p>
+</details>
+
+<h3>第 2 题 · 只提交一个文件里的一部分改动</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>echo "第二行" &gt;&gt; one.txt
+git add -p one.txt
+# 交互里按 y 接受这个片段、n 跳过、q 退出
+git diff --cached      # 确认暂存了什么
+git commit -m "one.txt 加第二行"</pre></div>
+<p><b><code class="inline">git add -p</code>（patch 模式）是「一个文件里改了三件事、只想提交其中一件」的唯一办法。</b>它会一段一段问你，<b>按 <code class="inline">?</code> 能看到全部按键</b>。<br><b>这个技能在真实项目里非常值钱</b>——修 bug 时顺手改了格式、加了日志，用 -p 就能只提交修 bug 那部分。</p>
+</details>
+
+<h3>第 3 题 · 让日志文件不被跟踪，且不影响已提交的那个</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>printf '*.log\n' &gt;&gt; .gitignore
+git rm --cached log.txt
+git add .gitignore
+git commit -m "不再跟踪 log.txt，加 .gitignore"
+git status --short
+ls log.txt</pre></div>
+<p><b>顺序很重要：先改 .gitignore、再 <code class="inline">git rm --cached</code>、最后一次提交。</b>只做 <code class="inline">git rm --cached</code> 而不加规则，下次 <code class="inline">git add -A</code> 它又回来了。<br><b>验证要看两处</b>：<code class="inline">git status</code> 里不再出现它，<code class="inline">ls</code> 里文件还在。</p>
+</details>
+
+<h3>第 4 题 · 建分支、改文件、合回主分支（能快进的那种）</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>git switch -c feat-1
+echo "新功能" &gt;&gt; two.txt
+git add two.txt &amp;&amp; git commit -m "feat: two 加新功能"
+git switch main
+git merge feat-1
+git log --oneline --graph</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">* 提交号 feat: two 加新功能
+* 提交号 不再跟踪 log.txt，加 .gitignore
+...</pre></div>
+<p><b>这次是快进</b>：main 在分支创建后没有新提交，所以合并不产生新提交，指针直接挪过去。<b>判断方法就是看图——没有分叉就没有合并提交。</b></p>
+</details>
+
+<h3>第 5 题 · 制造一个冲突，然后放弃这次合并</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>git switch -c feat-2
+echo "feat-2 的版本" &gt; one.txt
+git add -A &amp;&amp; git commit -m "feat-2 改 one"
+
+git switch main
+echo "main 的版本" &gt; one.txt
+git add -A &amp;&amp; git commit -m "main 改 one"
+
+git merge feat-2
+# 看到 CONFLICT 之后
+git merge --abort
+cat one.txt</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">main 的版本</pre></div>
+<p><b><code class="inline">--abort</code> 之后 <code class="inline">one.txt</code> 回到了 main 的版本，冲突标记也清干净了。</b>这比手工删标记可靠——<b>手工删最容易漏掉 <code class="inline">=======</code> 那一行。</b></p>
+</details>
+
+<h3>第 6 题 · 提交信息写错了，还没 push，怎么改</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>git commit --amend -m "写对的信息"
+git log --oneline -1</pre></div>
+<p><b><code class="inline">--amend</code> 是「用一个新的提交替换上一个」</b>，不是修改——<b>提交号会变。</b>所以只在<b>还没 push</b> 的时候用；push 过之后 amend 会造成本地和远端历史不一致，要同步就得强推。<br><b>顺便：<code class="inline">--amend</code> 不带 <code class="inline">-m</code> 时会打开编辑器，让你改信息。</b></p>
+</details>
+
+<h3>第 7 题 · 硬回退之后发现删错了，救回来</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>git log --oneline -1        # 记下当前提交号
+git reset --hard HEAD~1     # 假装删错了
+git reflog --oneline | head -n 3
+git reset --hard 刚才记下的提交号
+git log --oneline -1</pre></div>
+<p><b>这一步的关键是「先记下提交号」</b>——真实场景里你往往是删完才想救，那就从 <code class="inline">reflog</code> 里找：<b>找 HEAD 移动之前那一条</b>，格式是 <code class="inline">HEAD@{1}</code> 或直接写提交号。<br><b>以后做危险操作前跑一次 <code class="inline">git log --oneline -1</code></b>，成本两秒，救命。</p>
+</details>
+
+<h3>第 8 题 · 看某个文件从建库到现在改过多少次、每次改了什么</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>git log --oneline -- one.txt
+git log -p -- one.txt</pre></div>
+<p><b><code class="inline">-- 文件路径</code> 前面那两个横线不能省</b>：它把「路径」和「分支名」分开，避免同时存在一个叫 <code class="inline">one.txt</code> 的分支时产生歧义。<br><code class="inline">--follow</code> 还能跟踪文件改名：<code class="inline">git log --follow -p -- 新文件名</code>。<b>查「这段奇怪的代码是谁、什么时候、为什么加的」，就是用这条。</b></p>
+</details>
+<div class="ok"><b>八题里第 5、6、7 是「出事之后怎么救」的三条：</b>冲突能放弃、信息能改、历史能捞回。<b>这三个练熟，你用 Git 就不会再怕操作。</b>怕的根源从来不是命令难，是不知道错了能不能回头。</div>
+</section>
+
+<section>
+  <h2><span class="n">10</span>笔记与必做三件事</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D025 Git 基础笔记
+
+## 一、三区
+工作区 --add--> 暂存区 --commit--> 仓库 --push--> 远端
+
+## 二、status 两列
+左 = 暂存区，右 = 工作区
+M  = 已 add 待 commit
+ M = 改了还没 add
+?? = 未跟踪
+
+## 三、diff 三种
+git diff          工作区 vs 暂存区
+git diff --cached 暂存区 vs 最新提交（commit 前必看）
+git diff HEAD     工作区 vs 最新提交
+
+## 四、我今天制造的冲突
+（贴冲突标记 + 我怎么解的）
+
+## 五、reset 三档
+--soft 退指针，改动留暂存区
+--mixed 退指针 + 重置暂存区
+--hard 连工作区一起丢（先 stash！）
+
+## 六、踩到的坑
+1. .gitignore 对已跟踪文件无效 → git rm --cached
+2.
+
+## 七、还没弄明白的
+1.</pre></div>
+<ol class="task">
+<li><b>把 <code class="inline">~/git-lab/demo</code> 的冲突完整走一遍</b>：制造 → 看标记 → 手工解 → add → commit → <code class="inline">git log --graph</code> 看到分叉和汇合。<b>不许用 <code class="inline">--abort</code> 跳过</b>，今天至少要成功解一次。</li>
+<li><b>第 7 题的「救回」自己演一遍</b>：故意 <code class="inline">reset --hard</code> 掉一个提交，再用 reflog 捞回来。<b>亲手救回来一次，以后再也不会怕 reset。</b></li>
+<li><b>搞清楚你的 <code class="inline">gl</code> 到底做了什么</b>：把它逐行念一遍，对照今天的知识说明每一步在动哪个区。<b>特别是 <code class="inline">git pull --rebase</code>——今天的图里它对应「把本地提交接到远端最新提交后面」，明天 D026 会讲透。</b></li>
+</ol>
+<div class="warn"><b>今天不碰：remote / push / pull / tag / rebase 的原理</b>（D026）、<code class="inline">git bisect</code>（用不上）、<code class="inline">git flow</code> 之类的工作流（团队才需要）。<b>今天只把「本地仓库」这一层弄透。</b></div>
+<div class="ok"><b>四小时后你应该能：</b>说清 <code class="inline">git add</code> 和 <code class="inline">git commit</code> 各动了哪一格；看到 <code class="inline">UU</code> 知道该怎么办；知道 <code class="inline">--hard</code> 之前要先 stash；删错了知道去 reflog 找。<b>这些就是「不怕 Git」的全部内容。</b></div>
+</section>
+
+<footer>
+  <p>📌 D025 的产出是 <b><code>~/git-lab/</code> 下那个含冲突与合并的演练仓库</b>（本地即可，不用 push）。</p>
+  <p>明天 D026：<b>Git 进阶 + 作品集上传</b>——remote、PR、tag、rebase，以及「作品集到底单开仓库还是放子目录」这个决定。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

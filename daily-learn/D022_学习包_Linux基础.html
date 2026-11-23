@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D022 学习包 · Linux 基础</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 022 · 第 4 周 · 阶段二开始</div>
+  <h1>Linux 基础：把终端当成第二个桌面</h1>
+  <p>Python 写完之后，真正的活儿都在终端里。今天不讲新语法，只练手——<b>20 条命令、2 个核心工具、1 个关键差异</b>。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🖥 Mac 主线 · Windows 对照</span>
+    <span>🔍 find / grep 组合</span>
+    <span>📦 产出：20 条命令实操记录</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：四个小时，别在装系统上耗掉</h2>
+<div class="timeline">
+<div class="tl"><b>30 分钟</b><span>第 1、2 节：两边各要准备什么、文件都放哪（准备本身只要两分钟）</span></div>
+<div class="tl"><b>90 分钟</b><span>第 3 节：20 条命令逐条敲，边敲边记</span></div>
+<div class="tl"><b>60 分钟</b><span>第 4、5 节：find + grep 组合、引号与通配符</span></div>
+<div class="tl"><b>40 分钟</b><span>第 6 节：BSD 与 GNU 的差异，照着报错改一遍</span></div>
+<div class="tl"><b>20 分钟</b><span>第 7、8 节：练习 + 记录整理成文件</span></div>
+</div>
+<div class="note"><b>今天的产出不是「看懂了」，是一份文件。</b>新建 <code class="inline">~/python-learn/day22/命令实操记录.md</code>，每敲一条命令就把它和真实输出贴进去。<b>四小时后，这份文件就是你的速查表初稿</b>——D028 要交的那份 <code class="inline">linux-cheatsheet.md</code>，八成内容今天就能写完。</div>
+<div class="purple"><b>判断「真会了」的标准：不看笔记，能说出「要干这件事该用哪条命令、它会在哪几个地方出错」。</b>只会背命令名没用，真实场景里卡住你的永远是路径写错、权限不够、文件名带空格这三件事。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>开始之前：Mac 与 Windows 各要准备什么</h2>
+<p>今天要练的东西——<b>路径、权限、管道、ssh</b>——两台机器都能做，但<b>准备工作和会撞的坑完全不是一套</b>。Mac 走主线，Windows 那台当对照：同一件事两边各敲一遍，差别不用背，敲完自己就记住了。</p>
+
+<h3>一张表看完两边的差别</h3>
+<table>
+<tr><th>项目</th><th>Mac（主线）</th><th>Windows（对照）</th></tr>
+<tr><td>终端</td><td>系统自带 Terminal 或 iTerm，<b>打开就有</b></td><td>Git Bash（已经装了），或 WSL2（要装 3–5 GB）</td></tr>
+<tr><td>shell</td><td>交互用 <code>zsh</code>，脚本跑 <code>bash 3.2</code></td><td><code>bash 5.3</code>（Git Bash 自带）</td></tr>
+<tr><td>命令血统</td><td><b>BSD</b>：<code>ls -G</code>、<code>sed -i ''</code>、<code>date -j -f</code></td><td><b>GNU</b>：<code>ls --color</code>（新版 macOS 也认）、<code>sed -i</code>、<code>date -d</code></td></tr>
+<tr><td>家目录</td><td><code>/Users/你的名字</code></td><td><code>/c/Users/你的名字</code>（<b>不是</b> <code>/home/</code>）</td></tr>
+<tr><td>盘符</td><td>只有一个根 <code>/</code>，外接盘挂在 <code>/Volumes</code></td><td>每个盘挂成一个目录：<code>/c</code>、<code>/d</code></td></tr>
+<tr><td><code>sudo</code></td><td>有</td><td><b>没有</b></td></tr>
+<tr><td><code>/var/log</code></td><td>存在，读它要权限</td><td><b>不存在</b>（只模拟了 <code>/etc</code> 和 <code>/usr</code>）</td></tr>
+<tr><td>权限位 <code>chmod</code></td><td>真的，改完立刻生效</td><td><b>假的：看着执行成功，权限压根没变</b></td></tr>
+<tr><td>换行符</td><td>LF</td><td>编辑器默认 CRLF，跨机器会炸</td></tr>
+</table>
+<p>这张表里有两行<b>决定你今天在哪儿做哪一节</b>：权限位那行决定 D023 的 <code class="inline">chmod</code> 必须回 Mac 做；命令血统那行决定第 6 节的差异表要按机器分开读。</p>
+
+<h3>Mac：三步，两分钟</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 1) 确认你在哪个 shell 里敲命令
+echo $SHELL
+zsh --version
+bash --version | head -n 1
+
+# 2) 建练习目录（放项目外面，别污染 ~/python-learn）
+mkdir -p ~/linux-lab/{logs,docs,src/utils}
+cd ~/linux-lab && pwd</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">/bin/zsh
+zsh 5.9 (x86_64-apple-darwin23.0)
+GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin23)
+/Users/loogn/linux-lab</pre></div>
+<div class="note"><b>版本号不必一模一样，但有两件事要记住：</b>① 交互敲命令用的是 <b>zsh</b>，配置写在 <code class="inline">~/.zshrc</code>（你的 <code class="inline">gl</code> 别名就在那儿）；② 写脚本时第一行写 <code class="inline">#!/bin/bash</code>，而 <b>macOS 自带的 bash 是 3.2 版，2007 年的</b>——没有关联数组、没有 <code class="inline">mapfile</code>、没有 <code class="inline">${var^^}</code> 大写转换。<b>D024 写脚本时会正面撞上这个坑</b>，今天先记着。</div>
+
+<h3>Windows：先看清你手里是什么</h3>
+<p>Windows 有两条路。<b>WSL2 是真正的 Linux</b>，但要在 C 盘装一个完整发行版；<b>Git Bash 是 MSYS2 模拟出来的 Unix 环境</b>，不用装、不用重启，代价是它<b>不是真的 Unix</b>——下面这些差异都是从这儿来的。</p>
+<div class="codebox"><button class="copy">复制</button><pre># 1) 先确认你打开的是 Git Bash 还是 WSL
+uname -a
+echo $HOME
+
+# 2) 家目录与盘符长什么样
+df -h /c
+
+# 3) 建练习目录（写法和 Mac 完全一样）
+mkdir -p ~/linux-lab/{logs,docs,src/utils}
+cd ~/linux-lab && pwd</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">MINGW64_NT-10.0-19045 DESKTOP-XXXXXXX 3.6.9-b4195d69.x86_64 2026-06-06 17:49 UTC x86_64 Msys
+/c/Users/dell
+Filesystem      Size  Used Avail Use% Mounted on
+C:              105G   81G   25G  77% /c
+/c/Users/dell/linux-lab</pre></div>
+<div class="note"><b>看到 <code class="inline">MINGW64</code> 就是 Git Bash，看到 <code class="inline">Linux ... microsoft-standard-WSL2</code> 才是真 Linux。</b>两者的命令长得像，但遇到差异时按不同的路查。<br>C 盘现在剩 25G，<b>装得起 WSL2，但今天没必要</b>：Git Bash 已经能跑通今天 90% 的命令，等 D027 真要 80 端口对公网时再考虑。</div>
+
+<h3>两个必须记住的相反结论</h3>
+<div class="warn"><b>一、<code class="inline">chmod</code> 在 Git Bash 里是装饰品。</b><br>
+实测：一个文件 <code class="inline">chmod 700</code> 之后再 <code class="inline">ls -l</code>，权限位仍然显示 <code class="inline">-rw-r--r--</code>；从 Windows 侧 <code class="inline">os.stat().st_mode</code> 看是 <code class="inline">0o666</code>。<b>命令不报错、退出码 0，但什么都没改</b>——因为 NTFS 根本没有 Unix 权限位这套东西。<br>
+所以<b>D023 的权限一节必须在 Mac（或真 Linux）上做</b>，在 Windows 上练只会练出一个错误印象。</div>
+<div class="warn"><b>二、两台机器的命令血统是反的。</b><br>
+Mac 是 <b>BSD</b>，<b>第 6 节那张差异表里「BSD 列」才是你要的</b>；Git Bash 是 <b>GNU</b>（<code class="inline">sed 4.9</code>、<code class="inline">ls 8.32</code>、<code class="inline">date -d</code> 都能用），那张表对它<b>正好反过来读</b>。<br>
+最实用的用法：<b>网上抄到一条命令，先在 Mac 上试，报错了再想「是不是 GNU 写法」</b>。别拿 Windows 上跑通的写法去 Mac 上直接提交。</div>
+<div class="danger"><b>不要把网上抄来的 <code class="inline">sudo rm -rf</code> 粘进终端就回车。</b>今天会出现好几次 <code class="inline">rm -r</code>，规则只有一条：<b>敲完先不按回车，从左往右读一遍路径</b>。删错东西没有回收站，<code class="inline">/Volumes</code> 和 <code class="inline">~</code> 之间只差几个字符。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>目录结构：文件到底放在哪</h2>
+<p>Unix 的世界只有一个树根 <code class="inline">/</code>，没有 C 盘、D 盘那种「盘符」。你需要记住的只有下面这些。</p>
+<div class="tree">/                          ← 根，所有路径的起点
+├── Users/
+│   └── loogn/             ← 你的家目录，写作 ~ 或 $HOME
+│       ├── python-learn/  ← 你的代码在这儿
+│       ├── Desktop/ Documents/ Downloads/
+│       └── .zshrc         ← 以点开头 = 隐藏文件
+├── Applications/          ← .app 都在这
+├── Library/               ← 系统和 App 的配置、缓存（别手删）
+├── System/                ← 系统本体（别碰）
+├── private/
+│   ├── etc/    → /etc     ← 全局配置（软链接）
+│   ├── tmp/    → /tmp     ← 临时文件，重启可能清空
+│   └── var/
+│       └── log/ → /var/log ← 系统日志
+├── opt/homebrew/          ← Apple Silicon 上 Homebrew 装的东西
+├── usr/
+│   ├── bin/               ← 系统命令（ls、grep 都在这）
+│   └── local/bin/         ← 手动装的东西
+└── Volumes/               ← 外接硬盘、DMG 挂载点</div>
+<div class="note"><b>Linux 服务器上会长得不一样</b>：家目录是 <code class="inline">/home/用户名</code>、配置文件在 <code class="inline">/etc/nginx/</code>、网站文件常放 <code class="inline">/var/www/</code>、日志在 <code class="inline">/var/log/nginx/</code>。<b>D027 部署时你会天天和这三个目录打交道</b>，今天先记住形状。<br><b>Windows 的 Git Bash 又是另一种形状</b>：没有 <code class="inline">/var</code>，每个盘单独挂成 <code class="inline">/c</code>、<code class="inline">/d</code>，家目录在 <code class="inline">/c/Users/你的名字</code>。你在那儿建 <code class="inline">~/linux-lab</code>，实际落在 <code class="inline">C:\Users\你的名字\linux-lab</code>。</div>
+<h3>三种路径写法，只有一种是「绝对」的</h3>
+<table>
+<tr><th>写法</th><th>含义</th><th>例子</th></tr>
+<tr><td><code>/Users/loogn/src</code></td><td><b>绝对路径</b>，从根开始，在哪敲都一样</td><td>脚本、crontab、nginx 配置里必须用这种</td></tr>
+<tr><td><code>./src</code> <code>../logs</code></td><td><b>相对路径</b>，相对于当前目录</td><td>手动操作时省事</td></tr>
+<tr><td><code>~</code> <code>~/python-learn</code></td><td><code>~</code> 由 shell 展开成家目录</td><td>注意：<b>引号里的 <code>~</code> 不展开</b></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~ && pwd
+cd ~/python-learn && pwd
+cd .. && pwd</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">/Users/loogn
+/Users/loogn/python-learn
+/Users/loogn</pre></div>
+<div class="warn"><b><code class="inline">cd</code> 不带参数 = 回家目录；<code class="inline">cd -</code> = 回上一个目录。</b>这两个是最高频的省事技巧，比敲全路径快得多。<b>还有一个坑：<code class="inline">cd</code> 成功不输出任何东西。</b>在脚本里判断「目录存不存在」不能靠看输出，要看退出码 <code class="inline">echo $?</code> 是不是 0。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>20 条命令：分成五组，一组一组敲</h2>
+<p>先建一个练习目录，后面所有命令都在里面跑。<b>写在项目外面，免得污染 <code class="inline">~/python-learn</code></b>。</p>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/linux-lab/{logs,docs,src/utils}
+cd ~/linux-lab
+printf '2026-11-20 10:00:01 GET /index.html 200 512\n2026-11-20 10:00:05 POST /api/login 401 88\n2026-11-20 10:00:09 GET /about.html 200 1024\n2026-11-20 10:01:02 GET /index.html 200 512\n2026-11-20 10:02:30 GET /api/users 500 64\n' &gt; logs/access.log
+printf 'note one\n' &gt; docs/readme.txt
+printf 'python\n' &gt; src/main.py
+printf 'helper\n' &gt; src/utils/helper.py
+ls -R</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">docs		logs		src
+
+./docs:
+readme.txt
+
+./logs:
+access.log
+
+./src:
+main.py	utils
+
+./src/utils:
+helper.py</pre></div>
+<div class="note"><b><code class="inline">mkdir -p ~/linux-lab/{logs,docs,src/utils}</code> 这一行里有两个新东西</b>：<code class="inline">-p</code> 让父目录自动建、已存在也不报错；<b>花括号展开</b>是 shell 做的，它在命令执行前就把这一行变成了 <code class="inline">mkdir -p ~/linux-lab/logs ~/linux-lab/docs ~/linux-lab/src/utils</code>。<code class="inline">touch</code>、<code class="inline">cp</code>、<code class="inline">rm</code> 全都吃这一套。</div>
+
+<h3>第一组 · 我在哪、这有什么（4 条）</h3>
+<table>
+<tr><th>命令</th><th>干什么</th><th>最容易忘的参数</th></tr>
+<tr><td><code>pwd</code></td><td>打印当前绝对路径</td><td>—</td></tr>
+<tr><td><code>ls</code></td><td>列目录</td><td><code>-a</code> 连隐藏文件、<code>-l</code> 长格式、<code>-h</code> 人类可读大小、<code>-t</code> 按时间</td></tr>
+<tr><td><code>cd</code></td><td>切目录</td><td><code>cd -</code> 回上一个、<code>cd ~</code> 回家</td></tr>
+<tr><td><code>tree</code> / <code>ls -R</code></td><td>看整个结构</td><td>macOS 没自带 <code>tree</code>，用 <code>ls -R</code> 或 <code>brew install tree</code></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+ls
+ls -la</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">docs	logs	src
+total 0
+drwxr-xr-x   5 loogn  staff   160 Nov 22 18:02 .
+drwxr-x---+ 28 loogn  staff   896 Nov 22 18:02 ..
+drwxr-xr-x   2 loogn  staff    64 Nov 22 18:02 docs
+drwxr-xr-x   3 loogn  staff    96 Nov 22 18:02 logs
+drwxr-xr-x   3 loogn  staff    96 Nov 22 18:02 src</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>ls -l logs</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">-rw-r--r--  1 loogn  staff  218 Nov 22 18:02 access.log</pre></div>
+<div class="note"><b><code class="inline">ls -l</code> 那一行从左到右是：权限 / 硬链接数 / 属主 / 属组 / 大小 / 修改时间 / 名字。</b>时间和小大随你的文件变，<b>但第一列的 10 个字符结构永远一样</b>：<code class="inline">d</code> 表示目录（<code class="inline">-</code> 是普通文件），之后 9 位是「属主 / 属组 / 其他人」各自的 <code class="inline">rwx</code>。<code class="inline">drwxr-xr-x</code> 读作：这是个目录，属主能读写进，其他人只能读和进。<b>D023 讲 chmod 就是改这 10 个字符里的后 9 位。</b><br>另外 <code class="inline">.</code> 和 <code class="inline">..</code> 也在列表里——它们就是「当前目录」和「上级目录」，是真实存在的条目，不是比喻。</div>
+<div class="codebox"><button class="copy">复制</button><pre>ls -la | wc -l
+ls -a ~/python-learn | head -n 5</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">       6
+.
+..
+.git
+.gitignore
+README.md</pre></div>
+<div class="note"><b><code class="inline">.git</code> 和 <code class="inline">.gitignore</code> 平时看不见，是因为 <code class="inline">ls</code> 默认跳过点开头的文件。</b>所以「我明明有 .git，为什么 ls 看不到」不是丢了，是藏着。<b>这条也是 .gitignore 生效范围容易搞错的原因之一。</b></div>
+
+<h3>第二组 · 增、删、改（5 条）</h3>
+<table>
+<tr><th>命令</th><th>干什么</th><th>关键点</th></tr>
+<tr><td><code>mkdir -p a/b/c</code></td><td>建目录</td><td><code>-p</code> 递归建、已存在不报错</td></tr>
+<tr><td><code>touch f.txt</code></td><td>建空文件 / 改时间戳</td><td>已存在时不覆盖内容</td></tr>
+<tr><td><code>cp 源 目标</code></td><td>复制文件</td><td>目录要 <code>-r</code>；<code>-i</code> 覆盖前问一句</td></tr>
+<tr><td><code>mv 源 目标</code></td><td>移动 / <b>改名</b></td><td>Unix 里改名就是移动，没有单独的 rename 命令</td></tr>
+<tr><td><code>rm 文件</code></td><td>删除</td><td>目录要 <code>-r</code>；<b>没有回收站</b></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+cp logs/access.log logs/access.log.bak
+mv logs/access.log.bak logs/old.log
+cp -r docs docs_copy
+ls logs docs_copy
+rm -r docs_copy
+ls
+</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">access.log	old.log
+readme.txt
+docs	logs	src</pre></div>
+<div class="danger"><b><code class="inline">rm</code> 是本课程里唯一一个「敲错就没了」的命令。</b>三个自保动作，从今天开始养成：<br>① <b>先 <code class="inline">ls</code> 看一眼要删的东西</b>，再删；② 删除时用<b>完整相对路径</b>，不要站在家目录敲 <code class="inline">rm -r *</code>；③ <b>永远不要 <code class="inline">rm -rf ~/</code> 或 <code class="inline">rm -rf /</code></b>——带 <code class="inline">-r</code> 的 <code class="inline">rm</code> 加错一个空格，删的是整个目录。<br>需要「可恢复的删除」时装 <code class="inline">brew install trash</code>，之后用 <code class="inline">trash 文件</code> 进废纸篓。今天不用装，知道有这个东西就行。</div>
+
+<h3>第三组 · 看文件内容（5 条）</h3>
+<table>
+<tr><th>命令</th><th>干什么</th><th>什么时候用</th></tr>
+<tr><td><code>cat f</code></td><td>一次全打出来</td><td>短文件；<b>大文件别用</b>，会刷屏</td></tr>
+<tr><td><code>head -n 20 f</code></td><td>前 20 行</td><td>看格式、看表头</td></tr>
+<tr><td><code>tail -n 20 f</code></td><td>后 20 行</td><td>看最新日志</td></tr>
+<tr><td><code>tail -f f</code></td><td>跟着文件长，实时刷</td><td><b>盯日志必备</b>，<code>Ctrl+C</code> 退出</td></tr>
+<tr><td><code>less f</code></td><td>分页看，可搜索</td><td>看大文件：<code>/关键词</code> 搜、<code>q</code> 退出</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+cat logs/access.log | head -n 2
+head -n 2 logs/access.log
+tail -n 1 logs/access.log
+wc -l logs/access.log</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">2026-11-20 10:00:01 GET /index.html 200 512
+2026-11-20 10:00:05 POST /api/login 401 88
+2026-11-20 10:00:01 GET /index.html 200 512
+2026-11-20 10:00:05 POST /api/login 401 88
+2026-11-20 10:02:30 GET /api/users 500 64
+       5 logs/access.log</pre></div>
+<div class="warn"><b><code class="inline">wc -l</code> 数的是「换行符个数」，不是「行数」。</b>文件最后一行如果没有换行符，一个 3 行的文件会数出 2——<b>11-22 修作品集时就栽在这上面</b>：<code class="inline">sample_access.log</code> 末行没换行，<code class="inline">wc -l</code> 显示 8 实际 9 行。写脚本统计日志行数时，这个差值会让你对不上账。</div>
+<div class="note"><b><code class="inline">cat f | head</code> 是多余写法</b>——<code class="inline">head -n 2 f</code> 效果一样还少起一个进程。但先 <code class="inline">cat</code> 再接管道有个好处：<b>读起来顺</b>，写长管道时不容易漏。两种都能跑，别纠结。<b><code class="inline">less</code> 里按 <code class="inline">G</code> 跳到末尾、<code class="inline">g</code> 回头、<code class="inline">/</code> 搜索、<code class="inline">n</code> 下一个匹配</b>，这四个键够用一年。</div>
+
+<h3>第四组 · 找东西（3 条）</h3>
+<table>
+<tr><th>命令</th><th>找什么</th><th>例子</th></tr>
+<tr><td><code>find</code></td><td><b>按文件属性找文件</b>：名字、类型、时间、大小</td><td><code>find . -name "*.py"</code></td></tr>
+<tr><td><code>grep</code></td><td><b>按内容找行</b></td><td><code>grep -rn "python" .</code></td></tr>
+<tr><td><code>which</code></td><td>这条命令到底是哪个程序</td><td><code>which -a python3</code></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+find . -name "*.py"
+find . -type d
+which -a python3
+echo $?</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">./src/main.py
+./src/utils/helper.py
+.
+./docs
+./logs
+./src
+./src/utils
+/opt/homebrew/bin/python3
+/usr/bin/python3
+0</pre></div>
+<div class="note"><b><code class="inline">which -a</code> 把所有同名程序都列出来，按 <code class="inline">$PATH</code> 顺序排。</b>上面这个输出解释了为什么「明明装了新版 Python 却跑出旧版」——<b>排在前面的先被用</b>。<code class="inline">echo $?</code> 打印上一条命令的退出码：0 成功、非 0 失败，<b>这个数字在 D020 已经练过，在 shell 里它是唯一的判断依据。</b></div>
+
+<h3>第五组 · 统计与容量（3 条）</h3>
+<table>
+<tr><th>命令</th><th>干什么</th><th>典型组合</th></tr>
+<tr><td><code>sort</code> / <code>uniq</code></td><td>排序 / 去重计数</td><td><code>sort | uniq -c | sort -rn</code> = <b>出现次数排行</b></td></tr>
+<tr><td><code>cut</code> / <code>awk</code></td><td>按列切 / 按列算</td><td><code>cut -d' ' -f5</code> 取第 5 列</td></tr>
+<tr><td><code>du</code> / <code>df</code></td><td>目录占多大 / 磁盘还剩多少</td><td><code>du -sh */</code>、<code>df -h</code></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+cut -d' ' -f4 logs/access.log | sort | uniq -c | sort -rn
+cut -d' ' -f5 logs/access.log | sort | uniq -c | sort -rn
+awk '{s+=$6} END{print "总字节", s}' logs/access.log
+du -sh logs src</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">   2 /index.html
+   1 /api/users
+   1 /api/login
+   1 /about.html
+   3 200
+   1 500
+   1 401
+总字节 2200
+8.0K	logs
+8.0K	src</pre></div>
+<div class="note"><b><code class="inline">du</code> 那两个数在你机器上不会是 8.0K，也不是任何固定值——因为它数的是「磁盘占用」，不是「文件有多少字节」。</b>文件在磁盘上按块分配，一个 209 字节的日志也要占满一整个 4K 块，所以 <code class="inline">logs</code> 里两个文件报 8.0K，<code class="inline">src</code> 里两个 <code class="inline">.py</code> 也报 8.0K。<b>块多大由文件系统决定</b>：macOS 的 APFS 是 4K，Windows 的 NTFS 簇大小不同，同一份文件两边 <code class="inline">du</code> 出来能差一倍以上。<br><b>所以要分清两个问题</b>：问「这个文件到底多少字节」用 <code class="inline">ls -l</code> 或 <code class="inline">wc -c</code>；问「它占了我多少盘」才用 <code class="inline">du</code>。<b>内容大小和占用空间是两件事，1 个字节的文件也占 4K。</b><br>自己验证：<code class="inline">printf 'a' &gt; small.txt; ls -l small.txt; du -h small.txt</code> —— 前者说 1 字节，后者说 4.0K。</div>
+<div class="warn"><b>顺序和格式是固定的：</b><code class="inline">uniq -c</code> 把计数放在前面，<code class="inline">sort -rn</code> 按数字倒序。<b>注意 <code class="inline">uniq</code> 只能合并「相邻」的重复行</b>——不先 <code class="inline">sort</code> 就直接 <code class="inline">uniq -c</code>，散落各处的同一个值会被算成好几份。<b>这个坑几乎人人踩一次。</b></div>
+<div class="ok"><b>20 条到这儿已经全了。</b>数一遍：<code class="inline">pwd ls cd tree</code> / <code class="inline">mkdir touch cp mv rm</code> / <code class="inline">cat head tail less wc</code> / <code class="inline">find grep which</code> / <code class="inline">sort uniq cut awk du df</code>。<b>其中真正每天都会用的不超过 8 个，其余的都是「需要时能想起来有它」就够了。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>find 与 grep：真正拉开差距的两个命令</h2>
+<p>别的命令是「操作已知的文件」，这两个是「<b>在不知道文件在哪、也不知道内容长什么样的时候找到它</b>」。真实工作里 80% 的时间花在这上面。</p>
+<h3>find 的四个维度</h3>
+<table>
+<tr><th>参数</th><th>按什么找</th><th>例子</th></tr>
+<tr><td><code>-name</code></td><td>文件名（<b>要加引号</b>）</td><td><code>find . -name "*.py"</code></td></tr>
+<tr><td><code>-type</code></td><td><code>f</code> 文件 / <code>d</code> 目录 / <code>l</code> 软链接</td><td><code>find . -type d</code></td></tr>
+<tr><td><code>-mtime</code></td><td>多少天内改过（<code>-1</code> = 一天内）</td><td><code>find . -name "*.py" -mtime -1</code></td></tr>
+<tr><td><code>-size</code></td><td>大小（<code>+10M</code> = 大于 10MB）</td><td><code>find . -size +10M</code></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+find . -name "*.py" -mtime -1
+find . -name "*.py" -exec wc -l {} \;</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">./src/main.py
+./src/utils/helper.py
+1 src/main.py
+1 src/utils/helper.py</pre></div>
+<div class="note"><b><code class="inline">-exec ... {} \;</code> 是 find 的「对每个结果执行一条命令」，<code class="inline">{}</code> 是占位符，<code class="inline">\;</code> 是结束标记（分号必须转义，否则被 shell 吃掉）。</b><br>结果多时用 <code class="inline">+</code> 代替 <code class="inline">\;</code> 更快——<code class="inline">find . -name "*.py" -exec wc -l {} +</code> 会把所有文件名攒成一条命令，只启动一次 <code class="inline">wc</code>。<b>两者输出格式略有不同（<code class="inline">+</code> 会多一行 total），但结果一样。</b></div>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+find . -name "*.py" | xargs wc -l</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out"> 1 ./src/main.py
+ 1 ./src/utils/helper.py
+ 2 total</pre></div>
+<div class="warn"><b><code class="inline">xargs</code> 和 <code class="inline">-exec</code> 的区别，一句话：<code class="inline">xargs</code> 把输出「变成参数列表」交给下一条命令，整批处理；<code class="inline">-exec \;</code> 是逐个处理。</b><br><b>致命坑：文件名带空格时 <code class="inline">xargs</code> 会切错。</b><code class="inline">my note.txt</code> 会被当成两个参数 <code class="inline">my</code> 和 <code class="inline">note.txt</code>。解法是两头都加 <code class="inline">-0</code>：<code class="inline">find . -print0 | xargs -0 rm</code>——用 <code class="inline">\0</code> 当分隔符，空格就安全了。<b>删文件的场景，务必加 <code class="inline">-0</code>。</b></div>
+
+<h3>grep 的六个参数</h3>
+<table>
+<tr><th>参数</th><th>含义</th></tr>
+<tr><td><code>-r</code></td><td>递归进子目录（<b>找代码必带</b>）</td></tr>
+<tr><td><code>-n</code></td><td>显示行号（<b>找代码必带</b>）</td></tr>
+<tr><td><code>-i</code></td><td>忽略大小写</td></tr>
+<tr><td><code>-c</code></td><td>只输出匹配的行数</td></tr>
+<tr><td><code>-l</code></td><td>只输出<b>文件名</b>，不输出内容</td></tr>
+<tr><td><code>-v</code></td><td><b>反选</b>：输出不匹配的行</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+grep " 500 " logs/access.log
+grep -c "GET" logs/access.log
+grep -rn "python" .
+grep -rn --include="*.py" "helper" .
+grep -v " 200 " logs/access.log</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">2026-11-20 10:02:30 GET /api/users 500 64
+4
+./src/main.py:1:python
+./src/utils/helper.py:1:helper
+2026-11-20 10:00:05 POST /api/login 401 88
+2026-11-20 10:02:30 GET /api/users 500 64</pre></div>
+<div class="note"><b><code class="inline">grep -v</code> 是排错时最值钱的参数：</b>「除了这些正常行，还剩什么」——<code class="inline">grep -v " 200 " access.log</code> 一行就把所有非 200 请求筛出来了，比写正则匹配 4xx/5xx 快得多。<br><b><code class="inline">--include="*.py"</code> 限定只搜某种文件</b>，避免在 <code class="inline">.git</code>、<code class="inline">node_modules</code>、<code class="inline">__pycache__</code> 里翻出一堆噪音——不加它搜一个大项目会刷半小时。</div>
+
+<h3>三个实战配方（直接抄进实操记录）</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 配方 1：这个项目里提到 TODO 的 Python 文件，按修改时间排
+grep -rn --include="*.py" "TODO" . | cut -d: -f1 | sort -u | xargs ls -lt 2&gt;/dev/null | head -n 5
+
+# 配方 2：当前目录下大于 50MB 的文件，按大小排（没有输出 = 没有这么大的文件）
+find . -type f -size +50M -exec ls -l {} + | sort -k5 -n | tail -n 5
+
+# 配方 3：日志里出现最多的前 5 个 URL
+awk '{print $4}' ~/linux-lab/logs/access.log | sort | uniq -c | sort -rn | head -n 5</pre></div>
+<div class="note"><b>配方 3 里的 <code class="inline">$4</code> 是按今天这份练习日志的列位置写的</b>（字段依次是日期 / 时间 / 方法 / URL / 状态 / 字节）。<b>真实 nginx 日志第 1 列是客户端 IP</b>，所以「找访问最多的 IP」只要把 <code class="inline">$4</code> 换成 <code class="inline">$1</code>——D020 的 <code class="inline">logtool</code> 里那段 Top IP 统计就是这个意思。<b>拿别人的日志做统计前，先 <code class="inline">head -n 1</code> 看一眼列的顺序，别硬套字段号。</b></div>
+<div class="warn"><b>把配方 3 的路径换成 <code class="inline">/var/log/system.log</code> 试一下，多半会报 <code class="inline">Permission denied</code></b>——系统日志普通用户读不了。<b>为什么读不了、怎么才能读，是 D023 的主题。</b>今天先在 <code class="inline">~/linux-lab/logs/access.log</code> 上把逻辑跑通，明天讲完权限再回来看真日志。</div>
+<div class="ok"><b>这三条配方覆盖了 90% 的「找东西」需求：按内容找文件、按大小找文件、按频次统计。</b>记不住参数没关系，记这三条的形状就够了——<b>管道串起来的意义就是「每一步只干一件小事，把结果交给下一步」</b>，这也是 shell 和 Python 最像的地方。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>通配符与引号：为什么 <code class="inline">rm</code> 会删过头</h2>
+<p><b>这一节比前面五节加起来都重要。</b>路径写错只是找不到，引号写错是真会删错东西。</p>
+<h3>通配符是 shell 先展开的，不是命令自己认的</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab/logs
+echo *.log
+echo "*.log"
+echo '*.log'</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">access.log old.log
+*.log
+*.log</pre></div>
+<div class="note"><b>看第一行：<code class="inline">echo *.log</code> 打出来的不是 <code class="inline">*.log</code>，而是目录里的文件名。</b>因为 shell 在把参数交给 <code class="inline">echo</code> 之前，就已经把 <code class="inline">*.log</code> 展开成了实际匹配的文件。<b>这就是「glob 展开」</b>——命令本身根本没见过星号。<br>加引号就阻止了展开：<code class="inline">"*.log"</code> 和 <code class="inline">'*.log'</code> 都是原样传过去。所以 <b><code class="inline">find . -name "*.py"</code> 的引号是必须的</b>——不加的话，shell 会在当前目录展开成 <code class="inline">main.py helper.py</code>，find 只会去查这两个名字，别处的全漏了。</div>
+<h3>三种引号，记住这三行就够</h3>
+<table>
+<tr><th>写法</th><th><code>$变量</code> 展开吗</th><th>通配符展开吗</th><th>用在哪</th></tr>
+<tr><td><code>"双引号"</code></td><td><b>展开</b></td><td>不展开</td><td><b>默认就用这个</b></td></tr>
+<tr><td><code>'单引号'</code></td><td>不展开</td><td>不展开</td><td>要写含 <code>$</code> 的字面量，如 awk 脚本</td></tr>
+<tr><td>不加引号</td><td>展开</td><td><b>展开</b></td><td>只在确定要匹配文件时用</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+name=access
+echo "logs/$name.log"
+echo 'logs/$name.log'
+awk '{print $4}' logs/access.log | head -n 1</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">logs/access.log
+logs/$name.log
+/index.html</pre></div>
+<div class="warn"><b>最后一行是重点：awk 的 <code class="inline">{print $4}</code> 必须用单引号。</b>用双引号的话，shell 会先把 <code class="inline">$4</code> 当成「脚本的第 4 个参数」展开成空，awk 收到的是 <code class="inline">{print }</code>，什么都不打印、也不报错。<b>「不报错但结果不对」是 shell 里最常见的失败方式。</b></div>
+<h3>文件名带空格：一个永远不会自己消失的坑</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+touch "my note.txt"
+ls
+find . -name "my note.txt"
+find . -name "*.txt" | xargs wc -l</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">docs		logs		my note.txt	src
+./my note.txt
+wc: ./my: open: No such file or directory
+wc: note.txt: open: No such file or directory
+1 ./docs/readme.txt
+1 total</pre></div>
+<p>换成用空字符分隔，就完全正常了：</p>
+<div class="codebox"><button class="copy">复制</button><pre>find . -name "*.txt" -print0 | xargs -0 wc -l</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">1 ./docs/readme.txt
+0 ./my note.txt
+1 total</pre></div>
+<div class="note"><b>对比这两行输出，问题一清二楚：</b>不带 <code class="inline">-0</code> 时，<code class="inline">./my note.txt</code> 被切成了两个参数，<code class="inline">wc</code> 找不到叫 <code class="inline">./my</code> 的文件。<b>带 <code class="inline">-print0</code> / <code class="inline">-0</code> 用空字符分隔，空格就不再是问题。</b><br><b>规则：脚本里遍历文件，一律用 <code class="inline">find ... -print0 | xargs -0</code> 或者 <code class="inline">find ... -exec ... {} +</code>，不要用裸管道。</b>手动敲命令时可以偷懒，写成脚本就必须严谨——脚本是要重复跑的，一次踩上就天天踩。</div>
+<div class="purple"><b>zsh 的额外差异（今天就撞得到）：</b>在你的 Mac 上敲 <code class="inline">ls *.py</code> 而当前目录没有 py 文件时，zsh 会直接报 <code class="inline">zsh: no matches found: *.py</code> 并<b>不执行命令</b>；而 bash 会把字面量 <code class="inline">*.py</code> 传给 <code class="inline">ls</code>，由 <code class="inline">ls</code> 报 <code class="inline">No such file or directory</code>。<b>同一个错误，两套报错文字</b>——搜报错时两种都搜一下。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>BSD 与 GNU：同一件事，两种写法</h2>
+<p><b>今天最实际的一节。</b>你搜到的每条 Linux 命令，在 Mac 上大概有 5% 会报错——因为 macOS 用的是 BSD 版本的这些工具，不是 GNU 版本。参数长得像，行为不一样。</p>
+<div class="note"><b>如果你在 Windows 的 Git Bash 里对照，它属于「GNU」那一列。</b>实测那台机器上是 <code class="inline">sed 4.9</code>、<code class="inline">ls 8.32</code>，<code class="inline">date -d</code>、<code class="inline">sed -i</code> 都能直接用——<b>表里「报错长什么样」那列对它一律不成立</b>。这也是为什么第 1 节说两边的血统是反的：同一张表，Mac 看右两列，Windows 看左两列。</div>
+<div class="warn"><b>先纠一处我自己写错的地方：这张表第一行对你这台 Mac 不成立。</b>2026-11 实测确认，<code class="inline">ls --color=auto</code> 在 macOS 26 上<b>不报错、还真的上了色</b>——苹果把 FreeBSD 上游的改动并了进来，系统 <code class="inline">ls</code> 已经认 <code class="inline">--color=when</code>。可 macOS 14 及更早仍然报 <code class="inline">ls: illegal option -- -</code>。<b>同一个参数，两台 Mac 上结论相反，网上教程谁说的都对——在他那台上。</b><br>所以「报错长什么样」那一列要这样读：<b>它描述的是旧版 macOS，不一定是你手上这台。</b></div>
+<h3>三十秒查清你手上这个命令是哪一版</h3>
+<p><b>这是今天真正该带走的能力。</b>不是背哪条会报错，而是任何一条从网上抄来的命令，你能在三秒内判断它在这台机器上行不行。</p>
+<div class="codebox"><button class="copy">复制</button><pre># 1) 有没有别名在偷偷改参数
+type ls
+
+# 2) 这个参数认不认（认就不报 illegal option）
+ls --color=never &gt; /dev/null 2&gt;&amp;1 &amp;&amp; echo "认" || echo "不认"
+
+# 3) 认参数 ≠ 真会上色，看字节里有没有 033
+ls --color=always | od -c | head -3</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">ls is /bin/ls
+认
+0000000 033 [ 0 m 033 [ 0 0 ; 3 4 m d o c s 033 [ 0 m  
+</pre></div>
+<p>第 3 步是关键：<b><code class="inline">033</code> 就是 ESC，颜色靠它和后面的 <code class="inline">[0;34m</code> 这类控制序列实现，不是终端自己给文件名染的色。</b>看到 <code class="inline">033</code> 说明真的输出了颜色码；只看到文件名、没有 <code class="inline">033</code>，说明这个参数被接受了但没生效。</p>
+<h3>颜色怎么关掉</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+ls --color=never         # 只要这一次不要颜色
+\ls                       # 绕过别名，直接调原始的 ls
+echo $CLICOLOR           # 空 = 没开；有值说明环境变量在给 ls 上色</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">docs	logs	my note.txt	src
+docs	logs	my note.txt	src
+（第三行是空的：echo $CLICOLOR 什么都没打印，说明这个变量没设）</pre></div>
+<div class="note"><b>颜色不会「残留」到下一条命令。</b><code class="inline">--color=auto</code> 是这一次调用的参数，不是全局设置，敲完就没了——下一条 <code class="inline">ls</code> 有没有颜色，只看那一条自己怎么被调用。<br>
+<b>但如果你发现「一直都有颜色」，那不是残留，是别名。</b>很多教程和 oh-my-zsh 会在 <code class="inline">~/.zshrc</code> 里写 <code class="inline">alias ls='ls -G'</code> 或 <code class="inline">export CLICOLOR=1</code>，于是每条 <code class="inline">ls</code> 都自带颜色。查一下 <code class="inline">type ls</code> 和 <code class="inline">echo $CLICOLOR</code> 就清楚了，改也只需要改那一行。</div>
+<div class="danger"><b>反过来有一条硬规则：<code class="inline">--color=always</code> 绝不能进管道。</b>实测（GNU ls 8.32）：</div>
+<div class="codebox"><button class="copy">复制</button><pre>ls --color=always | grep -c '^a.txt'   # 期望 1，实际 0
+ls --color=never  | grep -c '^a.txt'   # 期望 1，实际 1</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">0
+1</pre></div>
+<p><b>原因：每个文件名前面都被塞了 <code class="inline">033[0m033[00;31m</code> 这样的前缀，所以行首不再是 <code class="inline">a</code>，<code class="inline">^</code> 锚点直接失配。</b>更坑的是 <code class="inline">--color=always</code> 让字节数从 9 涨到 37，你 <code class="inline">wc -c</code> 出来的大小也不对了。<b>所以 <code class="inline">auto</code> 不是「随便选的默认值」，它是唯一安全的选择：终端里给你看颜色，管道里自动变干净。</b></p>
+<div class="note"><b>为什么值得多花这三十秒：</b>「参数认不认」和「功能生不生效」是两件事，中间隔着一层。<code class="inline">--color=auto</code> 里的 <code class="inline">auto</code> 就是那层的开关——<b>输出到终端才上色，输出到管道或文件就自动关掉</b>。这也是为什么 <code class="inline">ls | grep</code> 永远不会被颜色码污染，而 <code class="inline">ls --color=always | grep</code> 会（见下面那条）。</div>
+<table>
+<tr><th>你想干的事</th><th>Linux / Git Bash（GNU）</th><th>macOS（BSD）</th><th>报错长什么样</th></tr>
+<tr><td>ls 带颜色</td><td><code>ls --color=auto</code></td><td><code>ls -G</code>（或 <code>CLICOLOR=1</code>）；<b>macOS 26 起 <code>--color</code> 也认</b></td><td>仅旧版 macOS：<code>ls: illegal option -- -</code></td></tr>
+<tr><td>原地改文件</td><td><code>sed -i 's/a/b/' f</code></td><td><code>sed -i '' 's/a/b/' f</code></td><td>不报错，<b>但会生成一个叫 <code>s/a/b/</code> 的文件</b></td></tr>
+<tr><td>按日期算时间戳</td><td><code>date -d "2026-11-22" +%s</code></td><td><code>date -j -f "%Y-%m-%d" "2026-11-22" +%s</code></td><td><code>date: illegal option -- d</code></td></tr>
+<tr><td>时间戳转日期</td><td><code>date -d @1700000000</code></td><td><code>date -r 1700000000</code></td><td>同上</td></tr>
+<tr><td>取文件真实路径</td><td><code>readlink -f f</code></td><td><code>realpath f</code>（macOS 13+）；<b>macOS 26 起 <code>readlink -f</code> 也认</b></td><td>仅旧版 macOS：<code>readlink: illegal option -- f</code></td></tr>
+<tr><td>看文件大小</td><td><code>stat -c "%s %n" f</code></td><td><code>stat -f "%z %N" f</code></td><td><code>stat: illegal option -- c</code></td></tr>
+<tr><td>grep 用 PCRE</td><td><code>grep -P "\d+"</code></td><td><b>没有</b>，用 <code>grep -E</code> 或 <code>brew install grep</code> 后用 <code>ggrep -P</code></td><td><code>grep: invalid option -- P</code></td></tr>
+<tr><td>find 打印属性</td><td><code>find . -printf "%s\n"</code></td><td><b>没有 <code>-printf</code></b>，用 <code>-exec stat</code></td><td><code>find: -printf: unknown primary</code></td></tr>
+<tr><td>看 tab 字符</td><td><code>cat -A f</code></td><td><code>cat -et f</code></td><td><code>cat: illegal option -- A</code></td></tr>
+<tr><td>服务管理</td><td><code>systemctl restart nginx</code></td><td><code>brew services restart nginx</code></td><td><code>command not found: systemctl</code></td></tr>
+<tr><td>装软件</td><td><code>apt install x</code></td><td><code>brew install x</code></td><td><code>command not found: apt</code></td></tr>
+<tr><td>看内存</td><td><code>free -h</code></td><td><code>vm_stat</code> / 活动监视器</td><td><code>command not found: free</code></td></tr>
+</table>
+<div class="danger"><b>这张表里最阴的是 <code class="inline">sed -i</code>：它不报错。</b>在 macOS 上敲 <code class="inline">sed -i 's/旧/新/' 文件</code>，BSD sed 会把 <code class="inline">s/旧/新/</code> 当成「备份文件的后缀名」，于是<b>文件名变成 <code class="inline">文件s/旧/新/</code>，原文件的内容还在里面</b>，而你以为改完了。等你发现时，目录里多了一个名字奇怪的垃圾文件。<b>11-22 清理 tab 就差点用这个，最后改用 <code class="inline">perl -i -pe</code>——perl 两边都通，记不住参数时它是最省心的替代品。</b></div>
+<h3>这张表要拆成两半看：会松动的，和不会松动的</h3>
+<p>你这台机器上已经有两条<strong>不成立</strong>了，都是实测出来的：<code class="inline">ls --color=auto</code>（rc=0，上了色）、<code class="inline">readlink -f docs</code>（rc=0，输出 <code class="inline">/Users/loogn/linux-lab/docs</code>）。<b>原因同一个：苹果从 macOS 26 起把 FreeBSD 上游的改动并了进来，而 FreeBSD 这些年一直在往 GNU 的长选项靠。</b></p>
+<table>
+<tr><th>类别</th><th>表里哪些</th><th>会不会松动</th></tr>
+<tr><td><b>长选项支持</b></td><td><code>ls --color</code>、<code>readlink -f</code></td><td><b>会，而且已经在松</b>。BSD 系为了兼容 Linux 脚本，陆续补上 GNU 风格的长参数。今天能用不代表明年还能用——反过来说，今天报错也不代表明年还报错</td></tr>
+<tr><td><b>语义与设计</b></td><td><code>sed -i</code> 要备份后缀、<code>date -d</code> vs <code>-j -f</code>、<code>stat -c</code> vs <code>-f</code>、<code>grep -P</code>、<code>find -printf</code>、<code>cat -A</code></td><td><b>不会</b>。这些不是「还没实现」，是<b>两边各自选择了不同的做法</b>。比如 BSD 的 <code>sed -i</code> 强制给备份后缀，是它的设计意图；<code>date -j -f</code> 是另一种解析思路。没有谁要向谁让步</td></tr>
+<tr><td><b>整套生态</b></td><td><code>systemctl</code>、<code>apt</code>、<code>free</code></td><td><b>不会</b>。这不是参数差异，是<b>换了操作系统</b>：macOS 没有 systemd、没有 apt、内存管理方式也不同</td></tr>
+</table>
+<div class="note"><b>所以你判断一条命令能不能用，先问它属于哪一类：</b>是<b>长选项</b>（查一下、试一下就知道）、还是<b>语义</b>（一定要改写法）、还是<b>整套生态</b>（根本别找，直接换 Mac 的做法）。<b>第一类会随时间变，后两类不会——这就是为什么「背结论」的价值有限，「当场试」的价值很高。</b></div>
+<h3>写脚本时的可移植写法（绕过差异，而不是记住差异）</h3>
+<p>下面这些是<b>两边都能跑</b>的写法。用它们，脚本就不用写 <code class="inline">if [ "$(uname)" = Darwin ]</code> 那种分支：</p>
+<table>
+<tr><th>你要的</th><th>别用（只在一侧通）</th><th>用这个（两边都通）</th></tr>
+<tr><td>绝对路径</td><td><code>readlink -f</code></td><td><code>realpath f</code></td></tr>
+<tr><td>原地改文件</td><td><code>sed -i</code></td><td><code>perl -i -pe 's/旧/新/' f</code></td></tr>
+<tr><td>文件字节数</td><td><code>stat -c %s</code> / <code>stat -f %z</code></td><td><code>wc -c &lt; f</code></td></tr>
+<tr><td>找出文件再处理</td><td><code>find -printf</code></td><td><code>find . -name "*.py" -exec wc -l {} \;</code></td></tr>
+<tr><td>正则匹配</td><td><code>grep -P</code></td><td><code>grep -E</code>（够用就别上 PCRE）</td></tr>
+<tr><td>看不可见字符</td><td><code>cat -A</code> / <code>cat -et</code></td><td><code>od -c f</code>，或 <code>perl -ne 'print "$.: $_" if /\t/' f</code></td></tr>
+</table>
+<div class="warn"><b>第二行值得单独记：<code class="inline">perl -i -pe</code> 是唯一一个「两边语义完全一致」的原地编辑方案。</b>11-22 清 tab 那次就是靠它，不然 <code class="inline">sed -i</code> 在 Mac 上会静默生成一个叫 <code class="inline">s/\t//g</code> 的垃圾文件。<b>记不住参数的时候，perl 是最省心的退路——它从上世纪就在两边长得一样。</b></div>
+<h3>怎么判断「我这台报的这个错是不是 BSD 的锅」</h3>
+<ol>
+<li><b>看报错里有没有 <code class="inline">illegal option</code> 或 <code class="inline">unknown primary</code>。</b>有 = 参数不被支持，八成是 BSD 与 GNU 的差异。</li>
+<li><b>看搜索结果里的命令有没有长参数（<code class="inline">--help</code> 那种双横线）。</b>BSD 工具大多只认单字母短参数，<code class="inline">--long-option</code> 基本都会报 <code class="inline">illegal option</code>。<b>但这道界线在松动</b>——macOS 26 的 <code class="inline">ls</code> 认了 <code class="inline">--color</code>、<code class="inline">readlink</code> 认了 <code class="inline">-f</code>，所以「报错」永远是最终判据，「应该会报错」不是。<b>判断方法：拿一个真实存在的文件当靶子，加 <code class="inline">; echo "rc=$?"</code> 一起跑。</b>靶子不存在时，你分不清「参数不支持」和「文件不存在」——今天的 <code class="inline">readlink -f f</code> 就是这么静默的。</li>
+<li><b>两边都要用就装 GNU 版</b>：<code class="inline">brew install coreutils gnu-sed grep findutils</code>，装完这些命令带 <code class="inline">g</code> 前缀（<code class="inline">gls</code> <code class="inline">gsed</code> <code class="inline">ggrep</code> <code class="inline">gfind</code>）。<b>今天不用装</b>，等 D024 写脚本真需要了再说。</li>
+</ol>
+<div class="note"><b>想亲手看 GNU 的行为？</b>你的 Mac 上有 OrbStack，起一个 Linux 容器就有完整的 GNU 环境：<code class="inline">docker run --rm -it alpine sh</code>（在 OrbStack 里跑，镜像很小）。<b>同一条命令两边各敲一次，差异就记住了</b>——比背这张表有效得多。这一步可选，不装也没关系。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>练习八道：在终端里做完，别只用眼睛看</h2>
+<p>全部基于 <code class="inline">~/linux-lab</code>。前五道直接能跑，后三道要组合。<b>先自己敲，跑不出来再看答案。</b></p>
+
+<h3>第 1 题 · 建一个三层目录，一次命令完成</h3>
+<p>在 <code class="inline">~/linux-lab</code> 下建 <code class="inline">archive/2026/11</code> 三层，且如果 <code class="inline">archive</code> 已存在不要报错。</p>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/linux-lab/archive/2026/11
+ls -R ~/linux-lab/archive</pre></div>
+<p>关键是 <code class="inline">-p</code>：它同时负责「递归创建」和「已存在不报错」两件事。不用 <code class="inline">-p</code> 时父目录不存在会直接 <code class="inline">No such file or directory</code>。</p>
+</details>
+
+<h3>第 2 题 · 找出所有 .py 文件，统计总行数</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+find . -name "*.py" | xargs wc -l
+# 只要总数：
+find . -name "*.py" | xargs wc -l | tail -n 1</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out"> 1 ./src/main.py
+ 1 ./src/utils/helper.py
+ 2 total</pre></div>
+<p><code class="inline">tail -n 1</code> 取最后一行（<code class="inline">total</code>）。<b>文件名可能带空格时要把管道换成 <code class="inline">-print0 | xargs -0</code></b>。</p>
+</details>
+
+<h3>第 3 题 · 日志里 4xx 和 5xx 各有多少条</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+grep -cE " (4|5)[0-9][0-9] " logs/access.log
+# 分开数：
+grep -cE " 4[0-9][0-9] " logs/access.log
+grep -cE " 5[0-9][0-9] " logs/access.log</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">2
+1
+1</pre></div>
+<p>要点是<b>状态码两边要有空格</b>：只写 <code class="inline">4[0-9][0-9]</code> 会把 URL 里的数字（如 <code class="inline">/api/v4</code>）和字节数（如 <code class="inline">1024</code>）也算进去。<b>正则写得越松，假阳性越多</b>——D015 的教训在这里同样适用。</p>
+</details>
+
+<h3>第 4 题 · 找出访问次数最多的 URL（前 3 个）</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+awk '{print $4}' logs/access.log | sort | uniq -c | sort -rn | head -n 3</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">   2 /index.html
+   1 /api/users
+   1 /api/login</pre></div>
+<p>四步管道：<b>取列 → 排序 → 计数去重 → 按次数倒序 → 取前 3</b>。<b>中间的 <code class="inline">sort</code> 不能省</b>，因为 <code class="inline">uniq</code> 只合并相邻重复行。</p>
+</details>
+
+<h3>第 5 题 · 把 access.log 里所有 500 的行单独存成一个文件</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+grep " 500 " logs/access.log &gt; logs/errors.log
+cat logs/errors.log
+wc -l logs/errors.log</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">2026-11-20 10:02:30 GET /api/users 500 64
+       1 logs/errors.log</pre></div>
+<p><code class="inline">&gt;</code> 会<b>覆盖</b>目标文件，<code class="inline">&gt;&gt;</code> 才是追加。<b>第一次写用 <code class="inline">&gt;</code>，循环里累加用 <code class="inline">&gt;&gt;</code></b>——反过来会导致文件里只有最后一行，这个 bug 在写脚本时天天出现（D023 细讲）。</p>
+</details>
+
+<h3>第 6 题 · 找出 docs 目录里所有含 "note" 的行，带文件名和行号</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+grep -rni "note" docs/</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">docs/readme.txt:1:note one</pre></div>
+<p><code class="inline">-r</code> 递归、<code class="inline">-n</code> 行号、<code class="inline">-i</code> 忽略大小写。输出格式固定是 <code class="inline">文件:行号:内容</code>，<b>所以可以用 <code class="inline">cut -d: -f1</code> 把文件名单独切出来</b>。</p>
+</details>
+
+<h3>第 7 题 · 找出当前目录下占用空间最大的 3 个目录</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+du -sh */ | sort -h | tail -n 3</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">4.0K	docs/
+8.0K	logs/
+8.0K	src/</pre></div>
+<p><b>三个目录都在，都只有几 K——因为每个里面只放了一两个文件，而 <code class="inline">du</code> 按 4K 块向上取整</b>，<code class="inline">readme.txt</code> 只有 9 个字节也报 4.0K（数字随文件系统变，见第 3 节那段说明）；<code class="inline">logs</code> 和 <code class="inline">src</code> 同为 8.0K 时先后顺序不固定。<b><code class="inline">du -sh */</code> 只统计一级子目录、不展开</b>；<code class="inline">sort -h</code> 按「人类可读大小」排（<code class="inline">1K &lt; 2M &lt; 3G</code>，普通 <code class="inline">sort</code> 会把 <code class="inline">10K</code> 排在 <code class="inline">2M</code> 后面）。<b>如果 <code class="inline">sort -h</code> 在你的系统上报错，说明 BSD sort 版本老，改用 <code class="inline">du -sk */ | sort -n | tail -n 3</code>（<code class="inline">-k</code> 单位统一为 KB，<code class="inline">-n</code> 按数字排）。</b></p>
+</details>
+
+<h3>第 8 题 · 一条命令：找出所有 .log 文件里含 "500" 的文件名（不输出内容）</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+grep -rl "500" --include="*.log" .</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">./logs/access.log
+./logs/old.log</pre></div>
+<p><code class="inline">-l</code>（小写 L）只输出文件名。<b>出现两个是因为「第二组」里用 <code class="inline">cp</code> + <code class="inline">mv</code> 复制过一份 <code class="inline">old.log</code></b>——它内容一样，自然也命中。<b>这正好是那句老话的现场版：练习目录里留下的副本，会到处污染你的统计结果。</b><br>用法上很实用：<b>先 <code class="inline">-l</code> 定位是哪几个文件，再对单个文件 <code class="inline">grep -n</code> 看具体行</b>，比一上来就递归全文搜索好读得多。</p>
+</details>
+<div class="ok"><b>八题里如果有三道以上卡住，说明缺的不是命令，是「把命令串起来」的感觉。</b>那就把第 4 题那条四级管道默写三遍：<code class="inline">awk 取列 | sort | uniq -c | sort -rn</code>。这一条通吃所有「统计出现次数」的需求——访问最多的 IP、最频繁的错误码、最常见的 URL，全是一个形状。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>今天的笔记模板与必做三件事</h2>
+<p>新建 <code class="inline">~/python-learn/day22/命令实操记录.md</code>，按下面填。<b>今天记的每一条，都是 D028 那份速查表的原材料。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre># D022 命令实操记录
+
+## 环境
+- 主线：MacBook Air（Apple Silicon）· 终端默认 zsh · bash 3.2
+- 对照：Windows · Git Bash（GNU 工具，不是真 Linux）
+- 练习目录：~/linux-lab
+
+## 一、20 条命令（命令 / 干什么 / 我实际跑出来的样子）
+| 命令 | 干什么 | 备注 |
+| --- | --- | --- |
+| pwd | 打印当前路径 | |
+| ls -la | 长格式 + 隐藏文件 | 第一列 10 位是权限 |
+| ... | | |
+
+## 二、五个最常用的管道组合
+1. awk '{print $1}' f | sort | uniq -c | sort -rn | head  ← 频次排行
+2.
+3.
+4.
+5.
+
+## 三、BSD 与 GNU 差异（我实际踩到的）
+- sed -i 要写 sed -i ''
+- （自己补：哪条命令你照着 Linux 教程抄、在 Mac 上报错了？）
+
+## 四、今天犯的错误
+1.
+2.
+3.
+
+## 五、还没弄明白的
+1.</pre></div>
+<ol class="task">
+<li><b>20 条命令全部在 <code class="inline">~/linux-lab</code> 里真敲一遍</b>，把输出贴进笔记。<b>不许只看不敲</b>——照抄和手敲的差别，在于手敲会遇到「路径写错」和「引号忘了」这两类错误，而这两类才是真实工作里的卡点。</li>
+<li><b>第 4 节的三个配方各跑一次</b>，第 3 个配方改成读 <code class="inline">logs/access.log</code>（避开 <code class="inline">/var/log</code> 的权限问题）。跑出结果再解释每一步在干什么。</li>
+<li><b>第 6 节那张 BSD 表，至少亲手验证三条</b>：<code class="inline">sed -i</code>、<code class="inline">date -d</code>、<code class="inline">stat -c</code>。<b>这三条在 macOS 上稳定报错，二十年没松动，是最好的判据；</b><code class="inline">ls --color</code> 那条要看版本（你的 macOS 26 反而能用），别拿它当标准。如果手边有 Windows，<b>同样三条在 Git Bash 里全都不报错</b>，这就是「两台机器血统相反」最直接的证据。</li>
+</ol>
+<div class="warn"><b>今天不碰的东西：</b>chmod / chown（D023）、vim（D023）、管道重定向的完整语法（D023）、tar（D023）、ssh（D023）。<b>今天看到 <code class="inline">Permission denied</code> 不用管，那是明天的内容。</b>一天只装一天的货，装多了会串。</div>
+<div class="ok"><b>四小时后你应该有的感觉：</b>打开终端不再发怵，知道自己在哪个目录、知道文件在哪、知道怎么找到一个字符串藏在哪个文件第几行。<b>这就是「能用终端干活」和「只会复制粘贴命令」的分界线。</b></div>
+</section>
+
+<footer>
+  <p>📌 D022 的产出是 <b><code>day22/命令实操记录.md</code></b>（20 条命令 + 5 组管道 + BSD 差异），在 <code>~/python-learn</code> 里，今天就可以 <code>gl</code> 推上去。</p>
+  <p>明天 D023：<b>权限、vim、管道重定向、tar、ssh</b>——今天那个 <code>Permission denied</code> 会在明天被彻底解释清楚。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

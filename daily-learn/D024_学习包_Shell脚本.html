@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D024 学习包 · Shell 脚本</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 024 · Linux 基础（三）</div>
+  <h1>Shell 脚本：把今天敲过的命令变成明天不用敲</h1>
+  <p>脚本不是新语言，<b>它是把你已经在终端里敲的东西写进文件</b>。今天唯一的产出是一个真能用的备份脚本。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🐚 bash（macOS 是 3.2）</span>
+    <span>⏰ crontab 定时</span>
+    <span>📦 产出：backup.sh</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配</h2>
+<div class="timeline">
+<div class="tl"><b>30 分钟</b><span>第 1、2 节：脚本怎么跑、变量怎么写</span></div>
+<div class="tl"><b>40 分钟</b><span>第 3 节：条件判断（<code>[ ]</code> 与 <code>[[ ]]</code>）</span></div>
+<div class="tl"><b>40 分钟</b><span>第 4、5 节：循环、函数、参数</span></div>
+<div class="tl"><b>40 分钟</b><span>第 6 节：健壮性三件套 + trap</span></div>
+<div class="tl"><b>50 分钟</b><span>第 7、8 节：写 backup.sh 并跑通</span></div>
+<div class="tl"><b>40 分钟</b><span>第 9 节：crontab + 练习 + 笔记</span></div>
+</div>
+<div class="note"><b>今天的判断标准不是「语法对不对」，是「这个脚本别人拿去能不能直接跑」。</b>三个具体指标：<b>路径不能写死</b>（用 <code class="inline">$1</code> 或 <code class="inline">$HOME</code>）、<b>出错要停</b>（<code class="inline">set -euo pipefail</code>）、<b>每一步要有日志</b>（不然跑失败了不知道卡在哪）。<b>这三点做到，脚本就及格了。</b></div>
+<div class="purple"><b>shell 脚本和 Python 的分工，先划清楚：</b>超过 100 行、要处理数据结构、要写单元测试 → <b>用 Python</b>。而「串几条命令、定时跑、部署后执行一次」→ <b>用 shell</b>。<b>用 shell 写业务逻辑是自找麻烦</b>，它的长处是「调度别的程序」，不是「计算」。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>第一个脚本：三行就够，但有四个细节</h2>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/linux-lab/sh &amp;&amp; cd ~/linux-lab/sh
+cat &gt; hello.sh &lt;&lt;'EOF'
+#!/bin/bash
+# 我的第一个脚本
+echo "当前目录：$(pwd)"
+echo "参数个数：$#"
+EOF
+chmod 755 hello.sh
+./hello.sh</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">当前目录：/Users/loogn/linux-lab/sh
+参数个数：0</pre></div>
+<table>
+<tr><th>细节</th><th>为什么必须</th></tr>
+<tr><td>第一行 <code>#!/bin/bash</code></td><td><b>告诉系统用哪个解释器</b>。不写的话，<code>./x.sh</code> 会用当前 shell 的默认解释器跑，在别人的机器上可能变成 sh（功能更少）</td></tr>
+<tr><td><code>chmod 755</code></td><td>没有 x 位就只能 <code>bash x.sh</code>，不能 <code>./x.sh</code>（昨天的权限知识）</td></tr>
+<tr><td><code>&lt;&lt;'EOF'</code> 里的单引号</td><td><b>让 EOF 里的 <code>$</code> 不被展开</b>，原样写进文件。去掉引号，<code>$(pwd)</code> 会在<b>写入时</b>就被求值，脚本里存的是一句死字符串</td></tr>
+<tr><td><code>echo "..."</code> 带引号</td><td>不带引号时，多个空格会被压成一个，<code>*</code> 会被展开成文件名（昨天第 5 节）</td></tr>
+</table>
+<h3>三种执行方式，行为不一样</h3>
+<table>
+<tr><th>方式</th><th>发生什么</th><th>什么时候用</th></tr>
+<tr><td><code>./hello.sh</code></td><td><b>起一个新进程</b>，用 shebang 指定的解释器</td><td><b>正常执行脚本都用这个</b></td></tr>
+<tr><td><code>bash hello.sh</code></td><td>起一个新 bash 进程，<b>忽略 shebang</b></td><td>调试，或脚本没有 x 权限时</td></tr>
+<tr><td><code>source hello.sh</code></td><td><b>在当前 shell 里跑</b>，变量和函数会留在当前会话</td><td>要加载配置（<code>source ~/.zshrc</code>）</td></tr>
+</table>
+<div class="warn"><b>第三种会污染你的当前会话。</b>脚本里如果写了 <code class="inline">cd /tmp</code>，用 <code class="inline">source</code> 执行完之后，<b>你的终端就停在 /tmp 了</b>，而 <code class="inline">./</code> 执行不会。<b>这就是为什么改了 <code class="inline">.zshrc</code> 之后要 <code class="inline">source ~/.zshrc</code></b>——它必须影响当前会话，否则新加的别名不生效。</div>
+<h3>macOS 的 bash 是 3.2，2007 年的版本</h3>
+<div class="codebox"><button class="copy">复制</button><pre>bash --version | head -n 1</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin23)</pre></div>
+<p><b>这个版本号意味着网上一半的「bash 教程」会跑不通。</b>下面这些是 4.0 以后才有的，在 macOS 自带 bash 里会报 <code class="inline">bad substitution</code> 或 <code class="inline">command not found</code>：</p>
+<table>
+<tr><th>写法</th><th>作用</th><th>macOS 3.2 怎么办</th></tr>
+<tr><td><code>${var^^}</code> / <code>${var,,}</code></td><td>转大写 / 小写</td><td>用 <code>tr '[:lower:]' '[:upper:]'</code></td></tr>
+<tr><td><code>declare -A map</code></td><td>关联数组（字典）</td><td><b>没有</b>，改用两个平行数组或干脆用 Python</td></tr>
+<tr><td><code>mapfile -t arr &lt; f</code></td><td>把文件读成数组</td><td>用 <code>while read -r line; do ...; done &lt; f</code></td></tr>
+<tr><td><code>cmd &amp;&gt;&gt; log</code></td><td>追加 stdout+stderr</td><td>用 <code>cmd &gt;&gt; log 2&gt;&amp;1</code></td></tr>
+<tr><td><code>${var,,}</code> 之类的花活</td><td>大小写转换</td><td>同上，用 tr</td></tr>
+</table>
+<div class="note"><b>两个选择：</b>① <b>把脚本写成 3.2 兼容的</b>（推荐，因为你写的脚本多半还要拿到 Linux 服务器上跑，而服务器上的 bash 通常更新，兼容 3.2 就两边都能跑）；② <code class="inline">brew install bash</code> 装新版，脚本第一行写 <code class="inline">#!/opt/homebrew/bin/bash</code>——<b>但这样脚本就只能在你的 Mac 上跑了</b>。<br><b>今天所有示例都是 3.2 兼容写法</b>，你照抄不会踩坑。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>变量：三条规则，一个必须背下来的坑</h2>
+<h3>赋值时不能有空格</h3>
+<div class="codebox"><button class="copy">复制</button><pre>name="loogn"        # 对
+count=3             # 对
+# name = "loogn"    # 错！shell 会把 name 当成命令名去执行
+dir=/tmp/mydir
+echo "$name 有 $count 个文件，目录 $dir"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">loogn 有 3 个文件，目录 /tmp/mydir</pre></div>
+<div class="danger"><b><code class="inline">name = "loogn"</code> 报的错是 <code class="inline">name: command not found</code>，不是「语法错误」。</b>因为 shell 把这一行理解成「执行一个叫 <code class="inline">name</code> 的命令，参数是 <code class="inline">=</code> 和 <code class="inline">loogn</code>」。<b>赋值和比较在 shell 里长得太像，这是所有人第一个踩的坑。</b><br><b>判断规则：等号两边有空格 = 比较/命令；没空格 = 赋值。</b></div>
+<h3><code>$var</code> 和 <code>${var}</code>：什么时候必须加花括号</h3>
+<div class="codebox"><button class="copy">复制</button><pre>file="report"
+echo "$file.txt"        # 正常：点不是变量名字符，$file 到点就结束
+echo "$file_2026"       # 出错：shell 去找一个叫 file_2026 的变量（不存在）
+echo "${file}_2026"     # 正确：花括号划清边界</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">report.txt
+
+report_2026</pre></div>
+<div class="warn"><b>第二行不报错，只是输出一个空行。</b>变量名允许包含字母、数字、下划线，所以 <code class="inline">$file_2026</code> 里 shell 认为变量名是 <code class="inline">file_2026</code>，拿到空值；而 <code class="inline">$file.txt</code> 里的点号不是变量名字符，<b>反而正好是安全的</b>。<br><b>习惯：只要变量后面紧跟字母、数字、下划线，一律写 <code class="inline">${}</code>。加括号永远不会错。</b>文件名拼接的场合尤其容易忘：<code class="inline">"backup-${name}-${stamp}.tar.gz"</code>。</div>
+<h3>命令替换与算术</h3>
+<div class="codebox"><button class="copy">复制</button><pre>today=$(date +%Y-%m-%d)
+n=$(ls | wc -l | tr -d ' ')
+echo "今天 $today，当前目录有 $n 项"
+
+a=7
+b=2
+echo $((a / b))        # 整数除法
+echo $((a % b))
+echo $((a * b))</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">今天 2026-11-22，当前目录有 3 项
+3
+1
+14</pre></div>
+<div class="note"><b><code class="inline">$(( ))</code> 只能算整数。</b>要做小数得用 <code class="inline">awk</code> 或 <code class="inline">bc</code>：<code class="inline">echo "7/2" | bc -l</code> 得到 <code class="inline">3.50000000000000000000</code>。<b>这一条和 D001 的 <code class="inline">7 / 2 == 3</code> 是同一个道理</b>——shell 的算术比 Python 还简陋，别指望它算浮点。<br><b><code class="inline">tr -d ' '</code> 是干嘛的：</b><code class="inline">wc -l</code> 在某些系统上输出带前导空格（<code class="inline">"      3"</code>），直接塞进字符串会多出空格，做数字比较时可能出错。删掉空格最省事。</div>
+<h3>默认值与只读</h3>
+<div class="codebox"><button class="copy">复制</button><pre>log_dir="${LOG_DIR:-$HOME/logs}"
+echo "$log_dir"
+
+readonly MAX=7
+# MAX=8   # 会报 MAX: readonly variable
+
+echo "脚本名 $0"
+echo "第一个参数 ${1:-（没给）}"
+echo "参数个数 $#"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">/Users/loogn/logs
+脚本名 ./vars.sh
+第一个参数 （没给）
+参数个数 0</pre></div>
+<div class="ok"><b><code class="inline">${VAR:-默认值}</code> 是 shell 里最实用的语法之一</b>：变量没设时用默认值，设了就用变量。<b>它让「不传参数也能跑」这件事变成一行</b>，不用写 if 判断。<br>相关的还有 <code class="inline">${VAR:=默认值}</code>（没设时顺便赋值）、<code class="inline">${VAR:?错误信息}</code>（没设就报错退出）。<b>最后一个在必填参数上特别好用</b>：<code class="inline">SRC="${1:?用法: backup.sh 源目录}"</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>条件判断：<code>[ ]</code> 里的空格不是排版，是语法</h2>
+<div class="codebox"><button class="copy">复制</button><pre>f=~/linux-lab/logs/access.log
+
+if [ -f "$f" ]; then
+  echo "是文件，行数：$(wc -l &lt; "$f")"
+else
+  echo "不存在：$f"
+fi
+
+if [ -d ~/linux-lab ]; then echo "目录存在"; fi
+if [ -z "${UNSET_VAR}" ]; then echo "变量是空的"; fi</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">是文件，行数：5
+目录存在
+变量是空的</pre></div>
+<div class="danger"><b><code class="inline">[ -f "$f" ]</code> 里每个空格都不能少。</b><code class="inline">[</code> 是一个<b>命令</b>（等价于 <code class="inline">test</code>），它必须收到 <code class="inline">]</code> 作为最后一个参数。<b>写成 <code class="inline">[-f "$f"]</code> 会报 <code class="inline">[-f: command not found</code>。</b><br>还有一条：<b><code class="inline">"$f"</code> 的引号必须加。</b>变量为空时，不加引号会变成 <code class="inline">[ -f ]</code>——只收到一个参数，测试结果永远是「真」，你的判断形同虚设。</div>
+<h3>常用的判断条件</h3>
+<table>
+<tr><th>对文件</th><th>对字符串</th><th>对数字</th></tr>
+<tr><td><code>-e</code> 存在</td><td><code>-z "$s"</code> 为空</td><td><code>-eq</code> 等于</td></tr>
+<tr><td><code>-f</code> 是普通文件</td><td><code>-n "$s"</code> 非空</td><td><code>-ne</code> 不等</td></tr>
+<tr><td><code>-d</code> 是目录</td><td><code>"$a" = "$b"</code> 相等</td><td><code>-lt</code> 小于</td></tr>
+<tr><td><code>-r</code> 可读 / <code>-w</code> 可写 / <code>-x</code> 可执行</td><td><code>"$a" != "$b"</code> 不等</td><td><code>-gt</code> 大于</td></tr>
+</table>
+<div class="warn"><b>数字比较不能用 <code class="inline">&lt;</code> <code class="inline">&gt;</code>，字符串比较不能用 <code class="inline">-eq</code>，这两条会静默出错。</b><code class="inline">[ 10 &lt; 9 ]</code> 会被当成「重定向」，在当前目录建一个叫 <code class="inline">9</code> 的文件然后返回真。<b>所以 shell 里数字一律用 <code class="inline">-eq/-lt/-gt</code>，字符串一律用 <code class="inline">=</code> <code class="inline">!=</code>。</b></div>
+<h3><code>[ ]</code> 和 <code>[[ ]]</code> 的区别</h3>
+<table>
+<tr><th></th><th><code>[ ]</code>（POSIX test）</th><th><code>[[ ]]</code>（bash 内建）</th></tr>
+<tr><td>变量为空时</td><td><b>会崩</b>，必须加引号</td><td>安全，不加引号也行</td></tr>
+<tr><td><code>&amp;&amp;</code> <code>||</code></td><td>不行，要写 <code>-a</code> <code>-o</code></td><td>可以</td></tr>
+<tr><td>正则 <code>=~</code></td><td>不支持</td><td><b>支持</b></td></tr>
+<tr><td>可移植性</td><td><b>所有 sh 都认</b></td><td>只有 bash/zsh 认</td></tr>
+</table>
+<div class="note"><b>今天统一用 <code class="inline">[[ ]]</code>，因为文件头写的是 <code class="inline">#!/bin/bash</code>，bash 一定有它。</b>网上很多教程用 <code class="inline">[ ]</code> 是为了兼容 <code class="inline">#!/bin/sh</code>——<b>但 sh 在 macOS 上是 bash 3.2 的兼容模式，在 Ubuntu 上是 dash，行为不一致</b>，所以别写 <code class="inline">#!/bin/sh</code>。<br><b>用 <code class="inline">[[ ]]</code> 之后，变量不加引号也安全</b>，这是它最大的好处：<code class="inline">[[ -f $f ]]</code> 在 <code class="inline">$f</code> 为空时是「假」，不会崩也不会永远真。</div>
+<h3>case：多重判断比 if-elif 干净</h3>
+<div class="codebox"><button class="copy">复制</button><pre>mode="${1:-text}"
+case "$mode" in
+  text|csv)  echo "输出格式：$mode" ;;
+  json)      echo "输出格式：JSON" ;;
+  -h|--help) echo "用法: demo.sh [text|csv|json]" ;;
+  *)         echo "不认识的参数：$mode" &gt;&amp;2; exit 2 ;;
+esac</pre></div>
+<div class="note"><b><code class="inline">;;</code> 是 case 的分隔符</b>，每个分支结尾都要有。<code class="inline">*</code> 分支相当于 <code class="inline">else</code>，<b>处理未知参数一定要有它，并 <code class="inline">exit 2</code></b>——<b>退出码 2 是「用法错误」的约定</b>，和 D020 的 argparse 一致。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>循环与参数：两个必须一次性学对的点</h2>
+<h3>for 循环</h3>
+<div class="codebox"><button class="copy">复制</button><pre>for f in ~/linux-lab/logs/*.log; do
+  echo "$(basename "$f"): $(wc -l &lt; "$f") 行"
+done
+
+for i in 1 2 3; do
+  echo "第 $i 次"
+done
+
+for i in $(seq 1 3); do echo "seq $i"; done</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">access.log: 5 行
+old.log: 5 行
+第 1 次
+第 2 次
+第 3 次
+seq 1
+seq 2
+seq 3</pre></div>
+<h3>逐行读文件：<code>while read</code> 才对</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 对：一次读一行，保留空格
+while IFS= read -r line; do
+  echo "[$line]"
+done &lt; ~/linux-lab/logs/access.log
+
+# 错：for 会把每一行按空格切成词
+for line in $(cat ~/linux-lab/logs/access.log); do
+  echo "[$line]"
+done | head -n 3</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">[2026-11-20 10:00:01 GET /index.html 200 512]
+[2026-11-20 10:00:05 POST /api/login 401 88]
+...（共 5 行，每行完整）
+[2026-11-20]
+[10:00:01]
+[GET]</pre></div>
+<div class="danger"><b><code class="inline">for line in $(cat 文件)</code> 是 shell 里最经典的错误写法。</b>命令替换会把输出按<b>空格和换行</b>切开，于是每一行被拆成 6 个词，循环跑了 30 次而不是 5 次。<b>而且它看起来「能跑」，只是结果错得离谱。</b><br><b>正确写法三件套：<code class="inline">while IFS= read -r line; do ...; done &lt; 文件</code></b><br>· <code class="inline">IFS=</code> 防止行首行尾空格被吃掉<br>· <code class="inline">-r</code> 防止反斜杠被转义<br>· <code class="inline">&lt; 文件</code> 放在 <code class="inline">done</code> 后面，<b>不要用 <code class="inline">cat 文件 | while ...</code></b>——管道会让循环在子 shell 里跑，循环里设的变量外面读不到</div>
+<div class="codebox"><button class="copy">复制</button><pre># 反例：管道版，变量留不下来
+count=0
+cat ~/linux-lab/logs/access.log | while read -r line; do
+  count=$((count + 1))
+done
+echo "管道版数出来：$count"
+
+# 正例：重定向版
+count=0
+while read -r line; do
+  count=$((count + 1))
+done &lt; ~/linux-lab/logs/access.log
+echo "重定向版数出来：$count"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">管道版数出来：0
+重定向版数出来：5</pre></div>
+<div class="warn"><b>这个差异非常隐蔽：两个版本都能「正常结束」，只是第一个的计数丢了。</b>原因是管道右边的 <code class="inline">while</code> 在<b>子 shell</b> 里执行，改的是子 shell 的 <code class="inline">count</code>，父 shell 的还是 0。<b>任何「循环里累加、循环后用」的写法，都不能用管道。</b></div>
+<h3>脚本参数：<code>$1</code> <code>$@</code> <code>$#</code> <code>shift</code></h3>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt; args.sh &lt;&lt;'EOF'
+#!/bin/bash
+echo "脚本名：$0"
+echo "参数个数：$#"
+echo "全部参数（带引号）：$@"
+echo "第一个：$1"
+shift
+echo "shift 之后第一个：$1"
+EOF
+bash args.sh one two three</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">脚本名：args.sh
+参数个数：3
+全部参数（带引号）：one two three
+第一个：one
+shift 之后第一个：two</pre></div>
+<div class="note"><b><code class="inline">"$@"</code> 和 <code class="inline">$@</code> 的区别，是 shell 里最细也最重要的一处：</b>带引号时，每个参数保持独立（<code class="inline">"one" "two"</code>）；不带引号时，会被重新按空格切分。<b>转发参数时一律写 <code class="inline">"$@"</code></b>——这是唯一能完整传递「参数个数和内容」的写法。<br><code class="inline">$*</code> 则会把所有参数拼成一个字符串，<b>需要「把它们当成一个整体」时才用</b>，实战里很少。<b>记一条就够：函数或脚本转发参数，写 <code class="inline">"$@"</code>。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>函数：返回值不是值，是退出码</h2>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt; func.sh &lt;&lt;'EOF'
+#!/bin/bash
+log() {
+  local level="$1"; shift
+  printf '[%s] %-5s %s\n' "$(date +%H:%M:%S)" "$level" "$*"
+}
+
+is_log_file() {
+  [[ "$1" == *.log ]]
+}
+
+log INFO "开始处理"
+if is_log_file "access.log"; then
+  log INFO "是日志文件"
+else
+  log WARN "不是日志文件"
+fi
+log ERROR "演示一条错误"
+EOF
+bash func.sh</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">[19:30:01] INFO  开始处理
+[19:30:01] INFO  是日志文件
+[19:30:01] ERROR 演示一条错误</pre></div>
+<div class="warn"><b><code class="inline">return</code> 只能返回 0–255 的整数，而且它是「退出状态」，不是「返回值」。</b>想返回一段文本，用 <code class="inline">echo</code> 输出，调用方用 <code class="inline">$(函数名)</code> 接：</div>
+<div class="codebox"><button class="copy">复制</button><pre>get_size() {
+  du -sh "$1" | cut -f1
+}
+size=$(get_size ~/linux-lab/logs)
+echo "logs 大小：$size"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">logs 大小：5.0K</pre></div>
+<div class="note"><b>两条约定，建议从今天起固定下来：</b><br>① <b>函数内部变量一律加 <code class="inline">local</code></b>，否则会污染全局，几个函数共用一个变量名时互相踩。<br>② <b>「函数成功/失败」靠 <code class="inline">return 0/1</code>，配合 <code class="inline">if 函数名; then</code> 使用；「函数产出什么」靠 <code class="inline">echo</code></b>。这两件事分开，脚本才读得懂。<br><b>上面那个 <code class="inline">log()</code> 函数建议直接抄进你的所有脚本</b>——<code class="inline">local level="$1"; shift</code> 这一手是把第一个参数取出来、剩下的全交给 <code class="inline">$*</code>，是 shell 里处理「可选前缀参数」的标准写法。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>健壮性：让脚本出错就停，而不是错着跑完</h2>
+<p><b>这一节比前面五节加起来更能决定你的脚本能不能给别人用。</b>默认情况下，shell 遇到错误会<b>继续往下执行</b>——删错了目录照样往下跑，备份失败了照样报告「完成」。</p>
+<h3>三个开关，写在脚本第二行</h3>
+<div class="codebox"><button class="copy">复制</button><pre>#!/bin/bash
+set -euo pipefail</pre></div>
+<table>
+<tr><th>开关</th><th>作用</th><th>不开会怎样</th></tr>
+<tr><td><code>-e</code></td><td>任何命令失败（退出码非 0）立即退出</td><td><b>错误被忽略，后面的步骤在错误状态上继续跑</b></td></tr>
+<tr><td><code>-u</code></td><td>用未定义的变量就报错退出</td><td><code>$UNSET</code> 展开成空，拼出一个像 <code>/backup/.tar.gz</code> 的怪路径</td></tr>
+<tr><td><code>-o pipefail</code></td><td>管道里任何一个命令失败，整条算失败</td><td>昨天讲过：<code>ls nope | head</code> 报成功</td></tr>
+</table>
+<div class="warn"><b><code class="inline">set -e</code> 有几个「管不到」的地方，必须知道：</b><br>① <b>在 <code class="inline">if</code> 条件里的命令失败不会退出</b>（这是特性，不然 <code class="inline">if grep ...</code> 就没法用了）；<br>② <b><code class="inline">cmd || true</code> 结尾的命令不算失败</b>；<br>③ <b>管道只有最后一个命令的退出码会被检查</b>，除非加了 <code class="inline">pipefail</code>。<br><b>所以 <code class="inline">set -e</code> 不是万能的</b>——关键步骤还是要自己写 <code class="inline">if ! 命令; then</code> 处理。</div>
+<h3>trap：不管怎么退出，都把临时文件清掉</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt; trap-demo.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -euo pipefail
+
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"; echo "退出时清理：$TMPFILE"' EXIT
+
+echo "临时文件：$TMPFILE"
+echo "数据" &gt; "$TMPFILE"
+ls -l "$TMPFILE"
+EOF
+bash trap-demo.sh</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">临时文件：/var/folders/xx/.../T/tmp.AbC123
+-rw-------  1 loogn  staff  5 Nov 22 19:35 /var/folders/xx/.../T/tmp.AbC123
+退出时清理：/var/folders/xx/.../T/tmp.AbC123</pre></div>
+<p><b>验证 trap 真的生效</b>：把输出里那个路径复制出来，<code class="inline">ls -l 那个路径</code>，应该报 <code class="inline">No such file or directory</code>——<b>脚本退出时它被删掉了</b>。</p>
+<div class="note"><b><code class="inline">mktemp</code> 是唯一正确的临时文件写法</b>——它生成一个不重名的路径并创建文件。<b>不要写 <code class="inline">TMP=/tmp/mydata.txt</code></b>：两个实例同时跑就互相覆盖，还可能因为别人预先建好同名文件而被利用（符号链接攻击）。<br><b><code class="inline">trap ... EXIT</code> 的意思是「脚本无论怎么结束（正常、报错、Ctrl+C）都执行这句」</b>，这是保证「不给系统留垃圾」的标准做法。<b>D027 部署脚本里会用到同样的结构。</b></div>
+<div class="ok"><b>到这里，一个「可以交给别人」的脚本就有雏形了：</b><code class="inline">set -euo pipefail</code> 打底、<code class="inline">mktemp</code> + <code class="inline">trap</code> 处理临时文件、<code class="inline">log()</code> 函数输出过程。<b>剩下的就是具体业务——也就是下面那个备份脚本。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>写 backup.sh：分四步，每步都能单独验</h2>
+<p><b>别一次写完再跑。</b>按下面四步走，每步加一小块、跑一次看结果。这样出错时你知道是哪一块的问题。</p>
+<h3>第 1 步 · 骨架 + 参数</h3>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/linux-lab/bin &amp;&amp; cd ~/linux-lab/bin
+cat &gt; backup.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -euo pipefail
+
+SRC="${1:-$HOME/python-learn}"
+DEST="${2:-$HOME/backups}"
+KEEP="${KEEP:-7}"
+
+log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
+
+log "源目录：$SRC"
+log "备份到：$DEST"
+log "保留份数：$KEEP"
+EOF
+chmod 755 backup.sh
+./backup.sh</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">[19:40:02] 源目录：/Users/loogn/python-learn
+[19:40:02] 备份到：/Users/loogn/backups
+[19:40:02] 保留份数：7</pre></div>
+<div class="note"><b>注意 <code class="inline">KEEP="${KEEP:-7}"</code> 和 <code class="inline">DEST="${2:-...}"</code> 的区别</b>：<code class="inline">KEEP</code> 从<b>环境变量</b>取（可以 <code class="inline">KEEP=3 ./backup.sh</code>），<code class="inline">DEST</code> 从<b>第二个位置参数</b>取。<b>前者适合「偶尔调一下」的配置，后者适合「每次都要指定」的输入。</b>不区分的话，参数一多就乱了。</div>
+<h3>第 2 步 · 加打包</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt; backup.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -euo pipefail
+
+SRC="${1:-$HOME/python-learn}"
+DEST="${2:-$HOME/backups}"
+KEEP="${KEEP:-7}"
+STAMP=$(date +%Y%m%d-%H%M%S)
+NAME="backup-$(basename "$SRC")-$STAMP.tar.gz"
+
+log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
+
+[[ -d "$SRC" ]] || { log "错误：$SRC 不是目录"; exit 1; }
+
+mkdir -p "$DEST"
+log "开始打包 $SRC"
+tar -czf "$DEST/$NAME" \
+    --exclude="__pycache__" \
+    --exclude=".git" \
+    --exclude="*.pyc" \
+    -C "$(dirname "$SRC")" "$(basename "$SRC")"
+log "完成：$DEST/$NAME ($(du -h "$DEST/$NAME" | cut -f1))"
+EOF
+./backup.sh</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">[19:42:11] 开始打包 /Users/loogn/python-learn
+[19:42:15] 完成：/Users/loogn/backups/backup-python-learn-20261122-194211.tar.gz (1.2M)</pre></div>
+<div class="note"><b><code class="inline">[[ -d "$SRC" ]] || { ...; exit 1; }</code> 这一行值得单独看：</b>它等价于「如果不是目录，就打印错误并退出」。<b>花括号里的最后一条命令后面必须有 <code class="inline">;</code></b>，倒数第二条也必须有——<b>这是 shell 花括号的语法要求，少一个就报错。</b><br><b>为什么用 <code class="inline">-C "$(dirname "$SRC")"</code> 而不是直接 <code class="inline">tar -czf out.tar.gz "$SRC"</code>：</b>直接打绝对路径，包里会带完整的 <code class="inline">/Users/loogn/...</code> 层级，解压时还原出一串嵌套目录。<b>先 <code class="inline">cd</code> 到上一级、用相对名打包，解压出来才是干净的。</b></div>
+<h3>第 3 步 · 清理旧备份</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt;&gt; backup.sh &lt;&lt;'EOF'
+
+COUNT=$(ls -1 "$DEST"/backup-*.tar.gz 2&gt;/dev/null | wc -l | tr -d ' ')
+log "现有 $COUNT 个备份，保留最近 $KEEP 个"
+if [[ "$COUNT" -gt "$KEEP" ]]; then
+  ls -1t "$DEST"/backup-*.tar.gz | tail -n +$((KEEP + 1)) | while read -r old; do
+    rm -f "$old"
+    log "删除旧备份 $(basename "$old")"
+  done
+fi
+EOF</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">[19:45:03] 开始打包 /Users/loogn/python-learn
+[19:45:06] 完成：/Users/loogn/backups/backup-python-learn-20261122-194503.tar.gz (1.2M)
+[19:45:06] 现有 8 个备份，保留最近 7 个
+[19:45:06] 删除旧备份 backup-python-learn-20261115-194001.tar.gz</pre></div>
+<div class="warn"><b><code class="inline">ls -1t</code> 的 <code class="inline">-t</code> 是按修改时间<b>倒序</b>（最新在前），所以 <code class="inline">tail -n +8</code> 拿到的就是「第 8 个及之后」= 最旧的。</b>这里用的是 <code class="inline">tail -n +N</code>（从第 N 行到最后），<b>不是</b> <code class="inline">tail -n N</code>（最后 N 行）——<b>差一个 <code class="inline">+</code> 号，行为完全相反</b>，写错就会把最新的删掉、留下最旧的。<br><b>删之前先 <code class="inline">echo</code> 演练一遍</b>（D023 的铁律），确认要删的是最旧那几个再真删。</div>
+<h3>第 4 步 · 完整版（可直接用）</h3>
+<div class="codebox"><button class="copy">复制</button><pre>#!/bin/bash
+set -euo pipefail
+
+# 用法: ./backup.sh [源目录] [备份目录]
+#       KEEP=3 ./backup.sh ~/python-learn ~/backups
+
+SRC="${1:-$HOME/python-learn}"
+DEST="${2:-$HOME/backups}"
+KEEP="${KEEP:-7}"
+STAMP=$(date +%Y%m%d-%H%M%S)
+NAME="backup-$(basename "$SRC")-$STAMP.tar.gz"
+
+log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
+
+# 前置检查
+[[ -d "$SRC" ]] || { log "错误：源目录不存在 $SRC"; exit 1; }
+command -v tar &gt;/dev/null || { log "错误：没有 tar"; exit 1; }
+
+mkdir -p "$DEST"
+
+# 打包
+log "开始打包 $SRC"
+tar -czf "$DEST/$NAME" \
+    --exclude="__pycache__" \
+    --exclude=".git" \
+    --exclude="*.pyc" \
+    -C "$(dirname "$SRC")" "$(basename "$SRC")"
+
+SIZE=$(du -h "$DEST/$NAME" | cut -f1)
+log "完成：$NAME ($SIZE)"
+
+# 清理旧备份
+COUNT=$(ls -1 "$DEST"/backup-*.tar.gz 2&gt;/dev/null | wc -l | tr -d ' ')
+if [[ "$COUNT" -gt "$KEEP" ]]; then
+  log "共 $COUNT 个备份，清理到只剩 $KEEP 个"
+  ls -1t "$DEST"/backup-*.tar.gz | tail -n +$((KEEP + 1)) | while read -r old; do
+    rm -f "$old"
+    log "删除 $(basename "$old")"
+  done
+fi
+
+log "全部完成"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre># 验收：连续跑 4 次，看它是否真的只留 3 个
+KEEP=3 ./backup.sh ~/python-learn ~/backups-demo
+KEEP=3 ./backup.sh ~/python-learn ~/backups-demo
+KEEP=3 ./backup.sh ~/python-learn ~/backups-demo
+KEEP=3 ./backup.sh ~/python-learn ~/backups-demo
+ls -1 ~/backups-demo</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">[19:50:01] 开始打包 /Users/loogn/python-learn
+[19:50:04] 完成：backup-python-learn-20261122-195001.tar.gz (1.2M)
+[19:50:04] 共 1 个备份，清理到只剩 3 个
+...
+[19:51:20] 共 4 个备份，清理到只剩 3 个
+[19:51:20] 删除 backup-python-learn-20261122-195001.tar.gz
+[19:51:20] 全部完成
+backup-python-learn-20261122-195040.tar.gz
+backup-python-learn-20261122-195055.tar.gz
+backup-python-learn-20261122-195120.tar.gz</pre></div>
+<div class="ok"><b>这就是今天的产出。</b>它做到了一件事：<b>连续跑很多次不会把磁盘塞满，且每次都能说清自己做了什么。</b>把它放进 <code class="inline">~/python-learn/day24/</code> 一起提交。</div>
+<div class="warn"><b>两个「测试时才会发现」的问题，提前告诉你：</b><br>① 连续两次在同一秒内跑，<b>时间戳相同、文件名相同</b>，第二次会覆盖第一次。<b>加 <code class="inline">$$</code>（进程号）后缀能避免</b>：<code class="inline">NAME="backup-$STAMP-$$.tar.gz"</code>。<br>② <b><code class="inline">DEST</code> 目录如果本身在 <code class="inline">SRC</code> 里面</b>，备份会把自己的旧备份也打进去，越备越大。<b>检查一下 <code class="inline">DEST</code> 不是 <code class="inline">SRC</code> 的子目录</b>，或者加 <code class="inline">--exclude</code>。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>crontab：让脚本自己按时跑</h2>
+<p>backup.sh 现在要手动执行。<b>定时任务的意义是「你忘了它也会跑」，这也是它危险的原因</b>——写错的定时任务会每天删一次你的东西。</p>
+<h3>五个字段，顺序别记反</h3>
+<div class="tree">*  *  *  *  *  要执行的命令
+│  │  │  │  │
+│  │  │  │  └── 星期几（0–7，0 和 7 都是周日）
+│  │  │  └───── 月（1–12）
+│  │  └──────── 日（1–31）
+│  └─────────── 小时（0–23）
+└────────────── 分钟（0–59）</div>
+<table>
+<tr><th>想什么时候跑</th><th>写法</th></tr>
+<tr><td>每天凌晨 3:00</td><td><code>0 3 * * *</code></td></tr>
+<tr><td>每 6 小时一次</td><td><code>0 */6 * * *</code></td></tr>
+<tr><td>每周一 9:30</td><td><code>30 9 * * 1</code></td></tr>
+<tr><td>每月 1 号 0:05</td><td><code>5 0 1 * *</code></td></tr>
+<tr><td>每 5 分钟</td><td><code>*/5 * * * *</code></td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>crontab -l                 # 看现在有什么（第一次会报 no crontab）
+crontab -e                 # 编辑
+crontab -l                 # 编辑完再确认一遍</pre></div>
+<p>加进去的内容长这样（<b>绝对路径，不能写 <code class="inline">~/</code></b>）：</p>
+<div class="codebox"><button class="copy">复制</button><pre># 每天 03:00 备份 python-learn
+0 3 * * * /Users/loogn/linux-lab/bin/backup.sh /Users/loogn/python-learn /Users/loogn/backups &gt;&gt; /Users/loogn/backups/cron.log 2&gt;&amp;1</pre></div>
+<div class="danger"><b>cron 环境和你终端里的环境几乎完全不同，这是定时任务失败的第一原因。</b>三条必须遵守：<br>① <b>路径写绝对路径</b>。cron 不会加载 <code class="inline">~/.zshrc</code>，你的 <code class="inline">PATH</code>、别名、<code class="inline">gl</code> 函数全都不存在。<br>② <b>命令里的每个可执行文件最好都用绝对路径</b>，或者脚本开头自己 <code class="inline">export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</code>。<br>③ <b>一定要把输出重定向进日志文件</b>（上面的 <code class="inline">&gt;&gt; cron.log 2&gt;&amp;1</code>）。cron 默认会把输出发邮件，而你的机器没有邮件服务，<b>结果就是「什么都没发生」，连报错都看不到。</b></div>
+<h3>macOS 上的额外两关</h3>
+<ul>
+<li><b>cron 需要「完全磁盘访问权限」。</b>如果脚本要读你的家目录下的文件，需要到「系统设置 → 隐私与安全性 → 完全磁盘访问权限」里把 <code class="inline">cron</code> 加上。<b>不加的表现是脚本能跑、但读到的目录是空的。</b></li>
+<li><b>Mac 更适合用 launchd</b>（<code class="inline">~/Library/LaunchAgents/</code> 下的 plist）。cron 在 macOS 上能用，但苹果更推荐 launchd，而且笔电睡眠时会错过触发时间，launchd 有「错过后补跑」的配置。<b>今天先用 crontab 学会五个字段的含义</b>，真要在 Mac 上做长期定时任务，D027 之后再考虑 launchd。</li>
+</ul>
+<div class="codebox"><button class="copy">复制</button><pre># 验证：先设一个每分钟跑的测试任务，确认真的会触发
+* * * * * /bin/date &gt;&gt; /tmp/cron-test.log 2&gt;&amp;1
+# 等两分钟，然后
+cat /tmp/cron-test.log
+# 确认能跑之后，把这个测试任务删掉（crontab -e 里删那一行）</pre></div>
+<div class="ok"><b>「先设一个只写时间的测试任务」，是配置定时任务的标准第一步。</b>它把「cron 有没有在工作」和「我的脚本对不对」两个问题分开了——<b>不然任务没跑起来，你会以为是脚本写错了，查半天。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>练习八道</h2>
+<p>前四道是语法，后四道是「真场景」。<b>每道都跑一遍再点答案。</b></p>
+
+<h3>第 1 题 · 写一个脚本，接受一个目录参数，输出里面有多少个 .py 文件</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt; count_py.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -euo pipefail
+dir="${1:?用法: count_py.sh 目录}"
+[[ -d "$dir" ]] || { echo "不是目录：$dir" &gt;&amp;2; exit 1; }
+n=$(find "$dir" -name "*.py" -type f | wc -l | tr -d ' ')
+echo "$dir 下有 $n 个 .py 文件"
+EOF
+chmod 755 count_py.sh
+./count_py.sh ~/linux-lab</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">/Users/loogn/linux-lab 下有 2 个 .py 文件</pre></div>
+<p><b><code class="inline">${1:?...}</code> 是必填参数的写法</b>：没传参就打印这条消息并退出（退出码 1），<b>比你自己写 if 判断少三行</b>。<br><code class="inline">tr -d ' '</code> 不能省，否则 <code class="inline">n</code> 里带前导空格。</p>
+</details>
+
+<h3>第 2 题 · 判断一个文件是不是「今天改过」的</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>f=~/linux-lab/logs/access.log
+if [[ -n "$(find "$f" -mtime -1 2&gt;/dev/null)" ]]; then
+  echo "最近一天内改过"
+else
+  echo "超过一天没动"
+fi</pre></div>
+<p><code class="inline">find 文件 -mtime -1</code> 在「一天内改过」时会输出文件名，否则什么都不输出——<b>用 <code class="inline">-n</code> 判断输出是否为空</b>，就得到了布尔值。<br><b>这是 shell 里做「有没有」判断的通用套路</b>：命令有输出 = 有，输出为空 = 没有。<b>别去找「判断文件时间的运算符」，它不存在。</b></p>
+</details>
+
+<h3>第 3 题 · 遍历一组目录，跳过不存在的，打印每个的大小</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>for d in ~/python-learn ~/linux-lab ~/nope; do
+  if [[ ! -d "$d" ]]; then
+    echo "跳过（不存在）：$d" &gt;&amp;2
+    continue
+  fi
+  echo "$(basename "$d") $(du -sh "$d" | cut -f1)"
+done</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">python-learn 1.2M
+linux-lab 5.0K
+跳过（不存在）：/Users/loogn/nope</pre></div>
+<p><b>大小数字随你的目录变，格式才是重点</b>：<code class="inline">basename</code> 取最后一段目录名、<code class="inline">du -sh | cut -f1</code> 取大小。<b><code class="inline">continue</code> 跳过本轮、<code class="inline">break</code> 跳出整个循环</b>，这两个别混。<br>把「跳过」的消息写到 <code class="inline">&gt;&amp;2</code>（stderr），<b>这样正常的输出进管道时不会混进异常信息</b>——昨天讲过的分流原则。</p>
+</details>
+
+<h3>第 4 题 · 用 case 写一个简单的参数解析</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -v|--verbose) VERBOSE=1; shift ;;
+    -o|--output)  OUT="$2"; shift 2 ;;
+    -h|--help)    echo "用法: $0 [-v] [-o 文件]"; exit 0 ;;
+    *)            echo "未知参数：$1" &gt;&amp;2; exit 2 ;;
+  esac
+done
+echo "verbose=${VERBOSE:-0} output=${OUT:-（未指定）}"</pre></div>
+<p><b><code class="inline">shift 2</code> 是因为 <code class="inline">-o</code> 吃掉了两个参数</b>（选项本身 + 它的值）。<b>忘记 <code class="inline">shift</code> 会导致死循环</b>——<code class="inline">$#</code> 永远不变，<code class="inline">while</code> 永不结束。<b>这是手写参数解析最常见的 bug，遇到卡住先查 shift。</b><br><b>参数超过三个、或者需要 <code class="inline">--key=value</code> 形式时，别手写——脚本里调 Python 的 argparse 更省事</b>（D020 就是干这个的）。</p>
+</details>
+
+<h3>第 5 题 · 统计一个目录里各个扩展名各有多少个文件</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>find ~/linux-lab -type f | sed 's/.*\.//' | sort | uniq -c | sort -rn</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre># 你的目录里数字会不同，格式是这样（次数在前，扩展名在后，按次数倒序）：
+      4 log
+      3 py
+      3 txt
+      2 md</pre></div>
+<p><b><code class="inline">sed 's/.*\.//'</code> 是「删掉最后一个点之前的所有内容」</b>，剩下的就是扩展名。<b><code class="inline">.*</code> 是贪婪匹配，会匹配到最后一个点</b>——所以 <code class="inline">a.b.txt</code> 得到 <code class="inline">txt</code> 而不是 <code class="inline">b.txt</code>。<br><b>没有扩展名的文件会被算成一个「整路径」的怪键</b>，真实目录里要加一层过滤：<code class="inline">grep -v '/'</code>。</p>
+</details>
+
+<h3>第 6 题 · 让脚本在失败时清理临时目录并打印失败行号</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>#!/bin/bash
+set -euo pipefail
+TMPDIR_X=$(mktemp -d)
+cleanup() {
+  local rc=$?
+  rm -rf "$TMPDIR_X"
+  if [[ $rc -ne 0 ]]; then
+    echo "失败于第 ${BASH_LINENO[0]} 行，退出码 $rc" &gt;&amp;2
+  fi
+}
+trap cleanup EXIT</pre></div>
+<p><b><code class="inline">trap ... EXIT</code> 在正常退出和报错退出时都会执行</b>，所以要在里面判断 <code class="inline">$?</code> 区分两种情况。<b>注意先存 <code class="inline">local rc=$?</code></b>——<code class="inline">rm</code> 一执行，<code class="inline">$?</code> 就被覆盖了。<br><code class="inline">${BASH_LINENO[0]}</code> 在 bash 3.2 里可用，<b>但它给的是「触发 trap 的那一层的行号」，不一定是出错那一行</b>——精确行号要靠 <code class="inline">set -E</code> + <code class="inline">trap ... ERR</code> 配合。<b>够用就好，别为这个折腾太久。</b></p>
+</details>
+
+<h3>第 7 题 · 写一个「部署后自检」脚本：检查目录存在、端口通、进程在跑</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>#!/bin/bash
+set -uo pipefail     # 故意不加 -e：要跑完所有检查再汇总
+
+fail=0
+check() {
+  local name="$1"; shift
+  if "$@" &gt;/dev/null 2&gt;&amp;1; then
+    printf '  OK   %s\n' "$name"
+  else
+    printf '  FAIL %s\n' "$name"; fail=1
+  fi
+}
+
+check "静态目录存在"   test -d /var/www/html
+check "80 端口在监听"  nc -z 127.0.0.1 80
+check "nginx 进程在跑" pgrep -x nginx
+
+[[ $fail -eq 0 ]] &amp;&amp; echo "全部通过" || { echo "有检查未通过"; exit 1; }</pre></div>
+<p><b>这里故意不加 <code class="inline">set -e</code></b>：自检脚本的价值是「一次性告诉我哪些挂了」，如果第一个失败就退出，你只能一个个改一个个重跑。<b>什么时候该关掉 <code class="inline">-e</code>，就看「是不是要收集全部问题」。</b><br><b><code class="inline">check()</code> 那个 <code class="inline">"$@"</code> 是把剩余参数整条当命令执行</b>——这是写「通用检查器」的标准手法。D027 部署完会直接用到它。</p>
+</details>
+
+<h3>第 8 题 · 给 backup.sh 加上「锁」，防止上一次还没跑完就又启动</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>LOCK="/tmp/backup.lock"
+if ! mkdir "$LOCK" 2&gt;/dev/null; then
+  echo "已有备份在跑，本次跳过" &gt;&amp;2
+  exit 1
+fi
+trap 'rmdir "$LOCK"' EXIT</pre></div>
+<p><b><code class="inline">mkdir</code> 是原子操作</b>——两个进程同时执行，只有一个能成功，另一个报「已存在」。<b>用一个目录当锁，比自己判断「有没有锁文件」可靠</b>（后者有竞态窗口）。<br><b>为什么必须有锁：</b>定时任务每小时跑一次、而某次备份因为数据变大跑了 90 分钟，就会出现两个备份进程同时打包，<b>同时写同一个文件名，最后一个把前一个覆盖成半截文件</b>——你会在恢复的时候才发现备份是坏的。</p>
+</details>
+<div class="ok"><b>八题里第 4、6、8 是「从能跑升级到能放心用」的三道门槛。</b>第 4 题决定你的脚本接不接得住参数，第 6 题决定失败时你查不查得出来，第 8 题决定它会不会在某个半夜自己搞坏自己。<b>个人小工具可以不管，但一旦挂了定时任务，这三个都得有。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">10</span>笔记与必做三件事</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D024 Shell 脚本笔记
+
+## 一、语法速记
+- 赋值不能有空格：name="x"
+- 变量后接字母数字下划线 → 用 ${name}
+- 数字比较：-eq -lt -gt   字符串：= !=
+- 判断：用 [[ ]]，比 [ ] 安全
+- 读文件：while IFS= read -r line; do ...; done &lt; 文件
+- 转发参数：函数里写 "$@"
+
+## 二、健壮性三件套
+#!/bin/bash
+set -euo pipefail
+
+## 三、我的 backup.sh 跑通记录
+（贴第一次失败的报错 + 怎么改的）
+
+## 四、macOS bash 3.2 让我踩到的
+1. ${var^^} 报 bad substitution
+2.
+
+## 五、crontab
+0 3 * * *  绝对路径 &gt;&gt; 日志 2&gt;&amp;1
+cron 不读 .zshrc —— 路径全写绝对
+
+## 六、还没弄明白的
+1.</pre></div>
+<ol class="task">
+<li><b>把 backup.sh 完整跑通四次以上</b>，用 <code class="inline">KEEP=3</code> 验证清理逻辑。看到「删除旧备份」那一行打出<b>最旧</b>的文件名，才算真做对了。<b>如果打出的是最新的，说明 <code class="inline">tail -n</code> 少写了 <code class="inline">+</code>。</b></li>
+<li><b>用 <code class="inline">bash -n 脚本.sh</code> 检查语法</b>（不执行，只查语法错），再用 <code class="inline">shellcheck 脚本.sh</code> 看有没有隐患（<code class="inline">brew install shellcheck</code>）。<b>shellcheck 会指出「变量没加引号」「这个 <code class="inline">for</code> 会按空格切词」这类问题</b>，是 shell 脚本唯一好用的静态检查工具。</li>
+<li><b>把 <code class="inline">backup.sh</code> 和笔记放进 <code class="inline">day24/</code>，<code class="inline">gl</code> 推上去。</b>顺便把 <code class="inline">~/linux-lab/bin/</code> 也留一份——D027 部署时还要用它。</li>
+</ol>
+<div class="warn"><b>不要现在就挂 crontab。</b>先用一周手动跑，确认它稳定、日志看得懂、清理逻辑没删错，再挂定时。<b>「先定时再验证」是很多数据丢失事故的开头。</b></div>
+<div class="ok"><b>四小时后你应该能：</b>看到一个重复劳动就知道能不能写成脚本；写出带参数、有日志、出错会停的脚本；知道什么时候该关掉 <code class="inline">set -e</code>；能给脚本加锁和清理。<b>这几件事加起来，就是「会用 shell 自动化」。</b></div>
+</section>
+
+<footer>
+  <p>📌 D024 的产出是 <b><code>day24/backup.sh</code> + 脚本笔记</b>，今天可以 <code>gl</code> 推上去。</p>
+  <p>明天 D025：<b>Git 基础</b>——三区模型、分支合并、手工解冲突。<b>你已经在用 <code>gl</code> 了，但明天要搞清它每一步到底动了什么。</b></p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

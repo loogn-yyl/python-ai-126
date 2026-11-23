@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D023 学习包 · 权限、vim、管道、tar、ssh</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 023 · Linux 基础（二）</div>
+  <h1>权限、vim、管道、tar、ssh：五件绕不过去的工具</h1>
+  <p>昨天那个 <code style="color:#fff">Permission denied</code> 今天解释清楚。顺便把编辑文件、打包、连服务器这三件事一次拿下。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🔐 chmod 那 10 个字符</span>
+    <span>📝 vim 二十个操作</span>
+    <span>📦 产出：5 组命令 + vim 小抄</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配：今天东西多，但每样只需会最常用的那部分</h2>
+<div class="timeline">
+<div class="tl"><b>40 分钟</b><span>第 1 节：权限的三种人、三个位、一个反直觉的坑</span></div>
+<div class="tl"><b>50 分钟</b><span>第 2 节：管道与重定向，尤其 <code>2&gt;&amp;1</code> 的顺序</span></div>
+<div class="tl"><b>30 分钟</b><span>第 3 节：tar 打包解包，够用就行</span></div>
+<div class="tl"><b>50 分钟</b><span>第 4 节：vim，跟着 <code>vimtutor</code> 走一遍</span></div>
+<div class="tl"><b>40 分钟</b><span>第 5 节：ssh 密钥登录</span></div>
+<div class="tl"><b>30 分钟</b><span>第 6、7 节：五组组合 + 练习 + 写成笔记</span></div>
+</div>
+<div class="note"><b>今天的产出是两份文件：</b><code class="inline">day23/命令组合.md</code>（5 组）和 <code class="inline">day23/vim速查.md</code>。<b>vim 小抄不要抄网上的</b>——只写你自己用了两次以上还不熟的键，抄满一页用不上等于没写。</div>
+<div class="purple"><b>今天的顺序不能乱：</b>权限 → 管道 → tar → vim → ssh。<b>因为后面每一样都会用到前面</b>——tar 解出来的文件权限不对会读不了，ssh 密钥权限太宽会被拒绝，vim 存盘失败多半是因为文件属主不是你。<b>这些「串起来才出现」的问题，是今天最值钱的部分。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>权限：那 10 个字符到底在说什么</h2>
+<p>昨天 <code class="inline">ls -l</code> 的第一列你没细看，今天把它拆开。整个权限系统只有三个维度：<b>谁</b>、<b>能做什么</b>、<b>对什么</b>。</p>
+<h3>先认字符</h3>
+<div class="tree">-  rwx  r-x  r--   1  loogn  staff   218  Nov 22 18:02  access.log
+│  │    │    │
+│  │    │    └── 其他人（other）：r-- 只能读
+│  │    └─────── 同组用户（group）：r-x 能读、能进目录
+│  └──────────── 属主（user）：rwx 能读能写能进
+└─────────────── 类型：- 普通文件  d 目录  l 软链接</div>
+<table>
+<tr><th>位</th><th>对文件的意思</th><th>对<b>目录</b>的意思（不一样！）</th></tr>
+<tr><td><b>r</b>（4）</td><td>能读内容（<code>cat</code>）</td><td>能列出里面有什么（<code>ls</code>）</td></tr>
+<tr><td><b>w</b>（2）</td><td>能改内容（写入、编辑）</td><td><b>能在里面新建、删除、改名文件</b></td></tr>
+<tr><td><b>x</b>（1）</td><td>能执行（脚本、程序）</td><td><b>能进入（<code>cd</code>）和访问里面的文件</b></td></tr>
+</table>
+<div class="danger"><b>全章最反直觉的一条：删一个文件，靠的是它<b>所在目录</b>的 w 位，不是文件自己的 w 位。</b><br>一个文件即使设成 <code class="inline">r--r--r--</code>（谁都只读），只要它所在目录你有 w 权限，<b>照样能删掉它</b>——因为「删除」改的是目录里的名单，不是文件内容。<br><b>反过来，你对文件有 w 权限，但目录没有 w，你改得动内容、删不掉文件。</b>这两件事在真实环境里天天打架。</div>
+<h3>数字写法：4 = r、2 = w、1 = x，三个加起来</h3>
+<table>
+<tr><th>数字</th><th>字符</th><th>含义</th><th>什么时候用</th></tr>
+<tr><td><code>7</code></td><td><code>rwx</code></td><td>读写执行全给</td><td>目录、脚本</td></tr>
+<tr><td><code>6</code></td><td><code>rw-</code></td><td>读写，不能执行</td><td>普通数据文件</td></tr>
+<tr><td><code>5</code></td><td><code>r-x</code></td><td>读和执行，不能改</td><td>目录（能进不能改）、只读脚本</td></tr>
+<tr><td><code>4</code></td><td><code>r--</code></td><td>只读</td><td>配置文件、证书</td></tr>
+<tr><td><code>0</code></td><td><code>---</code></td><td>什么都不给</td><td>极少用</td></tr>
+</table>
+<p>三个数字按<b>属主、组、其他人</b>顺序排，这就是你天天见的那三个：</p>
+<table>
+<tr><th>写法</th><th>等价</th><th>典型场景</th></tr>
+<tr><td><code>chmod 755 目录</code></td><td><code>rwxr-xr-x</code></td><td><b>目录的默认正确答案</b>：我能改，别人能进能看</td></tr>
+<tr><td><code>chmod 644 文件</code></td><td><code>rw-r--r--</code></td><td><b>普通文件的默认正确答案</b>：我能改，别人能看</td></tr>
+<tr><td><code>chmod 600 私钥</code></td><td><code>rw-------</code></td><td><b>只有我能看</b>。ssh 私钥必须是这个，否则拒绝使用</td></tr>
+<tr><td><code>chmod +x 脚本</code></td><td>给三组都加 x</td><td>让 <code>./脚本.sh</code> 能跑</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+mkdir -p perm &amp;&amp; cd perm
+echo "hello" &gt; a.txt
+chmod 644 a.txt
+ls -l a.txt
+chmod 600 a.txt
+ls -l a.txt
+chmod +x a.txt
+ls -l a.txt</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">-rw-r--r--  1 loogn  staff  6 Nov 22 19:10 a.txt
+-rw-------  1 loogn  staff  6 Nov 22 19:10 a.txt
+-rwx--x--x  1 loogn  staff  6 Nov 22 19:10 a.txt</pre></div>
+<div class="warn"><b>看第三行：<code class="inline">chmod +x</code> 在 macOS 上给三组都加了执行位</b>（<code class="inline">rwx--x--x</code>）。它不会改 r 和 w，只在原来基础上加 x。<b>所以「<code class="inline">chmod +x</code> 之后就安全了」是错的</b>——它会把「其他人」也变成可执行。<br><b>给脚本加执行权，用 <code class="inline">chmod 755 脚本.sh</code> 更准确</b>：属主全权限、其他人只读和执行，不多不少。</div>
+<h3>符号写法：有时候比数字好读</h3>
+<div class="codebox"><button class="copy">复制</button><pre>chmod u+x  script.sh     # 只给属主加执行
+chmod go-w file          # 去掉组和其他人的写权限
+chmod a+r  report.md     # 所有人可读（a = all）
+chmod -R 755 site/       # 递归改整个目录（小心）</pre></div>
+<div class="note"><b>什么时候用符号写法：</b>只想<b>加减某一个位</b>、不想推测其他位现在是什么的时候。比如「把这个私钥变成只有我能读」，<code class="inline">chmod 600</code> 最直接；「把这三个脚本批量加上执行权限」，<code class="inline">chmod +x *.sh</code> 最省事。<b>其他情况一律用三位数字</b>——数字写的是「最终状态」，符号写的是「相对变化」，前者不容易出错。</div>
+<h3>umask：为什么新建的文件是 644</h3>
+<div class="codebox"><button class="copy">复制</button><pre>umask</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">022</pre></div>
+<p><b>新建文件 = 666 减掉 umask，新建目录 = 777 减掉 umask。</b><code class="inline">umask 022</code> 就是「从默认权限里拿走其他人的写权限」：666 − 022 = 644，777 − 022 = 755。所以你从来不用手动设这两个数——<b>它们是 umask 算出来的。</b></p>
+<h3>chown 和 sudo：为什么有些东西你改不了</h3>
+<div class="codebox"><button class="copy">复制</button><pre>ls -l /etc/hosts
+sudo cat /etc/hosts | head -n 3
+whoami
+groups</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">-rw-r--r--  1 root  wheel  213 Nov 20 09:12 /etc/hosts
+##
+# Host Database
+##
+loogn
+staff admin _lpadmin _lpoperator ...</pre></div>
+<div class="note"><b><code class="inline">/etc/hosts</code> 的属主是 <code class="inline">root</code>，你只有 r 权限，所以只能看不能改。</b>要改就得用 <code class="inline">sudo</code>——它不是「管理员密码」那么笼统，准确说是<b>「以 root 身份执行这一条命令」</b>，命令结束后立刻退回你自己。<br><b>你的账户在 <code class="inline">admin</code> 组里，这才是能用 sudo 的原因。</b>不在这个组里的账户，密码输对了也会被拒。</div>
+<div class="danger"><b><code class="inline">sudo chown -R 你的用户名 ~/</code> 和 <code class="inline">sudo chmod -R 777 /</code> 是两条能毁掉系统的命令。</b>前者的常见事故是<b>手滑多打一个空格</b>（<code class="inline">sudo chown -R loogn /</code>）；后者会把所有系统文件变成人人可改，系统直接不再可信。<br><b>用 <code class="inline">-R</code> 之前，先不加 <code class="inline">-R</code> 跑一遍看范围；路径里凡是出现 <code class="inline">/</code> 结尾、<code class="inline">*</code>、<code class="inline">~</code>，都要读三遍。</b></div>
+<div class="ok"><b>回答昨天的 <code class="inline">Permission denied</code>：</b>不是你操作错了，是那个文件的权限里没给你 r（读）或 x（进目录）。<b>排查顺序固定三步</b>：<code class="inline">ls -l</code> 看属主和权限 → <code class="inline">whoami</code> 看你是谁 → <code class="inline">ls -ld</code> 看上级目录你能不能进。<b>90% 的权限问题卡在「上级目录没有 x 位」</b>，而不是文件本身。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>管道与重定向：三个流，四个符号</h2>
+<p>shell 里每个命令都有三个通道：<b>标准输入 stdin（0）</b>、<b>标准输出 stdout（1）</b>、<b>标准错误 stderr（2）</b>。所有重定向都是在这三个数字上做文章。</p>
+<table>
+<tr><th>符号</th><th>作用</th><th>例子</th></tr>
+<tr><td><code>&gt;</code></td><td>stdout 写进文件，<b>覆盖</b></td><td><code>ls -l &gt; list.txt</code></td></tr>
+<tr><td><code>&gt;&gt;</code></td><td>stdout 追加到文件末尾</td><td><code>echo hi &gt;&gt; log.txt</code></td></tr>
+<tr><td><code>2&gt;</code></td><td>stderr 写进文件</td><td><code>ls nope 2&gt; err.txt</code></td></tr>
+<tr><td><code>&amp;&gt;</code></td><td>stdout 和 stderr 都写进文件</td><td><code>make &amp;&gt; build.log</code></td></tr>
+<tr><td><code>&lt;</code></td><td>用文件当 stdin</td><td><code>wc -l &lt; access.log</code></td></tr>
+<tr><td><code>|</code></td><td>前一个的 stdout 当后一个的 stdin</td><td><code>cat f | grep err</code></td></tr>
+<tr><td><code>tee</code></td><td>一边写文件一边往屏幕打</td><td><code>... | tee out.txt</code></td></tr>
+<tr><td><code>/dev/null</code></td><td>黑洞，丢掉不要的输出</td><td><code>cmd 2&gt;/dev/null</code></td></tr>
+</table>
+<h3>最容易错的一行：<code>2&gt;&amp;1</code> 的位置</h3>
+<p>想把「正常输出 + 报错」都存进文件，写法是 <code class="inline">&gt; out.txt 2&gt;&amp;1</code>。写成 <code class="inline">2&gt;&amp;1 &gt; out.txt</code> 就错了。<b>差别在于「<code class="inline">2&gt;&amp;1</code> 复制的是那一刻 stdout 指向哪里」。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre># 对：先把 stdout 指向文件，再把 stderr 也指到同一个地方
+ls nope &gt; out1.txt 2&gt;&amp;1
+cat out1.txt
+
+# 错：此刻 stdout 还指着屏幕，stderr 就被复制成了「屏幕」
+ls nope 2&gt;&amp;1 &gt; out2.txt
+cat out2.txt</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">ls: nope: No such file or directory
+（out2.txt 是空的，报错跑到屏幕上去了）</pre></div>
+<div class="note"><b>记法：从左往右读，<code class="inline">&amp;1</code> 的意思是「1 号现在指哪儿，我就指哪儿」。</b>所以 <code class="inline">&gt; out.txt 2&gt;&amp;1</code> 读作「1 号去 out.txt，2 号跟着 1 号」——对；<code class="inline">2&gt;&amp;1 &gt; out.txt</code> 读作「2 号跟着 1 号（此时是屏幕），然后 1 号去 out.txt」——2 号被留在了屏幕上。<br><b>在 bash 里 <code class="inline">&amp;&gt; out.txt</code> 一句就能做到同样的事，更省心</b>；但脚本的第一行如果写 <code class="inline">#!/bin/sh</code>，<code class="inline">&amp;&gt;</code> 不一定支持，还是用 <code class="inline">&gt; f 2&gt;&amp;1</code> 最稳。</div>
+<h3>覆盖还是追加：一个能让脚本「只输出最后一行」的 bug</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+for i in 1 2 3; do
+  echo "第 $i 行" &gt; /tmp/loop.txt
+done
+cat /tmp/loop.txt</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">第 3 行</pre></div>
+<div class="note"><b>循环里写 <code class="inline">&gt;</code>，每圈都把文件清空重写，最后只剩最后一遍。</b>改成 <code class="inline">&gt;&gt;</code> 才是三条都在。这个 bug 的特征是「<b>程序没报错、文件也有内容、只是少了很多</b>」——比崩溃难查得多。<b>写循环时默认用 <code class="inline">&gt;&gt;</code>，除非你明确想重建整个文件。</b></div>
+<h3>tee 与 /dev/null</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+grep " 500 " logs/access.log | tee /tmp/err500.log | wc -l
+cat /tmp/err500.log
+ls nope 2&gt; /dev/null
+echo "上一句的退出码: $?"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">1
+2026-11-20 10:02:30 GET /api/users 500 64
+上一句的退出码: 1</pre></div>
+<div class="note"><b><code class="inline">tee</code> 的价值：既要存文件又要看结果。</b>不加 tee 的话，命令一接管道，输出就全跑到下一步去了，屏幕上是空的。<br><b><code class="inline">2&gt;/dev/null</code> 只丢掉报错、保留正常输出</b>；<code class="inline">&gt;/dev/null 2&gt;&amp;1</code> 是「什么都不要」。<b>注意 <code class="inline">2&gt;/dev/null</code> 不会改变退出码</b>——上面 <code class="inline">echo $?</code> 仍然是 1，说明 <code class="inline">ls</code> 失败了。<b>丢掉输出 ≠ 假装成功</b>，脚本里判断成败始终看退出码。</div>
+<h3>管道的退出码取最后一个，这是个陷阱</h3>
+<div class="codebox"><button class="copy">复制</button><pre>ls nope | head -n 1
+echo "默认: $?"
+set -o pipefail
+ls nope | head -n 1
+echo "开了 pipefail: $?"</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">默认: 0
+开了 pipefail: 1</pre></div>
+<div class="warn"><b>默认情况下，管道的退出码只看<b>最后一个</b>命令</b>——<code class="inline">ls nope</code> 明明失败了，但 <code class="inline">head</code> 成功，整条管道就报成功。<b>在脚本里这意味着「错误被吞掉，后面的步骤照常跑」。</b><br><code class="inline">set -o pipefail</code> 让管道里<b>任何一个</b>命令失败，整条就算失败。<b>D024 写脚本时这三个开关会一起用：<code class="inline">set -euo pipefail</code>。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>tar：打包和压缩是两件事</h2>
+<p><b>tar 只负责「打包」（把多个文件装进一个），压缩是额外加的。</b>所以参数里既有 <code class="inline">-c</code>（create）又有 <code class="inline">-z</code>（用 gzip 压缩），两个一起写才是 <code class="inline">.tar.gz</code>。</p>
+<table>
+<tr><th>要干的事</th><th>命令</th><th>记忆</th></tr>
+<tr><td>打包并压缩</td><td><code>tar -czf out.tar.gz 目录/</code></td><td><b>c</b>reate <b>z</b>ip <b>f</b>ile</td></tr>
+<tr><td>看包里有什么（不解开）</td><td><code>tar -tzf out.tar.gz</code></td><td><b>t</b>ell</td></tr>
+<tr><td>解压到当前目录</td><td><code>tar -xzf out.tar.gz</code></td><td><b>x</b>tract</td></tr>
+<tr><td>解压到指定目录</td><td><code>tar -xzf out.tar.gz -C /目标/目录</code></td><td><b>C</b>hange dir</td></tr>
+<tr><td>打包时排除某些文件</td><td><code>tar -czf out.tar.gz --exclude="*.log" 目录/</code></td><td>—</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+tar -czf /tmp/lab.tar.gz .
+tar -tzf /tmp/lab.tar.gz | head -n 8
+mkdir -p /tmp/lab-restore
+tar -xzf /tmp/lab.tar.gz -C /tmp/lab-restore
+ls /tmp/lab-restore</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">./
+./logs/
+./logs/access.log
+./logs/old.log
+./docs/
+./docs/readme.txt
+./src/
+./src/main.py
+docs  logs  my note.txt  src</pre></div>
+<div class="warn"><b><code class="inline">-f</code> 后面必须<b>紧跟</b>文件名，中间不能塞别的参数。</b><code class="inline">tar -czf out.tar.gz dir</code> 里 <code class="inline">out.tar.gz</code> 是 <code class="inline">-f</code> 的值，<code class="inline">dir</code> 才是要打包的目录。写成 <code class="inline">tar -cfz out.tar.gz dir</code> 会把 <code class="inline">z</code> 当成文件名，生成一个叫 <code class="inline">z</code> 的文件——<b>不报错，只是结果不对。</b><br>另外<b>打包时最好先 <code class="inline">cd</code> 到目标目录的上一级，用相对路径</b>（<code class="inline">tar -czf out.tar.gz myproject</code>）；用绝对路径会把整条 <code class="inline">/Users/loogn/...</code> 打进去，解压时还原出一堆嵌套目录。</div>
+<div class="danger"><b>解压别人的 tar 包之前，一定先 <code class="inline">tar -tzf</code> 看一眼内容。</b>tar 包里可以有 <code class="inline">../../</code> 这种路径，解压时能写到当前目录外面去（叫「tar 路径穿越」）。<b>看一遍列表花三秒，能避免把文件覆盖到系统目录。</b>再谨慎一点：先解到一个空目录里 <code class="inline">-C /tmp/check</code>，看完再搬。</div>
+<div class="note"><b><code class="inline">.tar.gz</code> 和 <code class="inline">.zip</code> 怎么选：</b>给自己备份、给 Linux 服务器传，用 <code class="inline">.tar.gz</code>（保留权限位和符号链接）；<b>要发给用 Windows 的人，用 <code class="inline">zip -r out.zip 目录</code></b>，Windows 双击就能开。<b><code class="inline">.tar.gz</code> 在 Windows 资源管理器里是打不开的</b>，别在这上面浪费对方时间。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>vim：只需要会二十个操作，就够改配置文件了</h2>
+<p>先说清楚<b>为什么非学不可</b>：任何一台 Linux 服务器上都有 vim 或 vi，<b>但不一定有 nano</b>。你今天可能觉得 vim 反人类，等你 ssh 上一台机器、发现只有 vi 时，会庆幸自己练过。</p>
+<div class="ok"><b>最好的入门方式不是看这一节，是敲这个命令：</b><code class="inline">vimtutor</code>（macOS 自带，中文界面）。<b>它是一份交互式教程，45 分钟做完，比任何速查表都有效。</b>今天的目标是做完第一章到第三章。<b>下面的内容当复习用。</b></div>
+<h3>核心只有一件事：你在哪个模式</h3>
+<div class="tree">        按 i          按 Esc
+普通模式 ────────▶ 插入模式
+   │  ▲              │
+   │  └──────────────┘
+   │
+   │  按 :
+   ▼
+命令行模式  ──  输入 wq 回车  ──▶  存盘退出</div>
+<table>
+<tr><th>模式</th><th>能干什么</th><th>怎么进</th></tr>
+<tr><td><b>普通模式</b></td><td>移动、删除、复制、粘贴（<b>按键就是命令</b>）</td><td>打开就是，按 <code>Esc</code> 随时回来</td></tr>
+<tr><td><b>插入模式</b></td><td>像普通编辑器一样打字</td><td><code>i</code> 光标前插 / <code>a</code> 后插 / <code>o</code> 下一行新开</td></tr>
+<tr><td><b>命令行模式</b></td><td>保存、退出、替换、跳转</td><td><code>:</code></td></tr>
+</table>
+<div class="danger"><b>新手最常卡住的地方：不知道自己在哪个模式，打字全是命令。</b>看到屏幕上出现 <code class="inline">-- INSERT --</code> 就是插入模式；什么都没显示就是普通模式。<b>迷路了就按两下 <code class="inline">Esc</code>，回到普通模式再想。</b>这也是为什么很多人「一进 vim 就出不来」——他一直在普通模式里打字，<code class="inline">:wq</code> 根本打不进去。</div>
+<h3>二十个操作（够用一年）</h3>
+<table>
+<tr><th>要干的事</th><th>按键</th><th>说明</th></tr>
+<tr><td>存盘退出</td><td><code>:wq</code></td><td><b>最常按的三个字符</b></td></tr>
+<tr><td>不存盘退出</td><td><code>:q!</code></td><td>改坏了想重来</td></tr>
+<tr><td>只存盘不退出</td><td><code>:w</code></td><td>—</td></tr>
+<tr><td>上下左右</td><td><code>h j k l</code></td><td>方向键也能用，但手不离主键区更快</td></tr>
+<tr><td>跳到文件头 / 尾</td><td><code>gg</code> / <code>G</code></td><td>—</td></tr>
+<tr><td>跳到第 42 行</td><td><code>42G</code></td><td>看报错行号时用</td></tr>
+<tr><td>行首 / 行尾</td><td><code>0</code> / <code>$</code></td><td>—</td></tr>
+<tr><td>下一页 / 上半页</td><td><code>Ctrl+f</code> / <code>Ctrl+b</code></td><td>—</td></tr>
+<tr><td>删一个字 / 一整行</td><td><code>x</code> / <code>dd</code></td><td><code>dd</code> 删完还能 <code>p</code> 粘回来</td></tr>
+<tr><td>删 5 行</td><td><code>5dd</code></td><td>数字 = 次数，这个规则通用于所有操作</td></tr>
+<tr><td>撤销 / 重做</td><td><code>u</code> / <code>Ctrl+r</code></td><td><b>改错了先按 u</b>，别慌</td></tr>
+<tr><td>复制一行</td><td><code>yy</code></td><td>粘：<code>p</code></td></tr>
+<tr><td>复制 3 行</td><td><code>3yy</code></td><td>—</td></tr>
+<tr><td>搜索</td><td><code>/关键词</code></td><td><code>n</code> 下一个、<code>N</code> 上一个</td></tr>
+<tr><td>全局替换</td><td><code>:%s/旧/新/g</code></td><td><b>配置文件里最常用的一行</b></td></tr>
+<tr><td>只替换当前行</td><td><code>:s/旧/新/g</code></td><td>少了 <code>%</code> 就只作用于光标所在行</td></tr>
+<tr><td>进入可视模式选块</td><td><code>v</code> 然后移动</td><td>选中后 <code>d</code> 删、<code>y</code> 复制</td></tr>
+<tr><td>缩进 / 反缩进</td><td><code>&gt;&gt;</code> / <code>&lt;&lt;</code></td><td>可视模式下按 <code>&gt;</code> 可整块缩进</td></tr>
+<tr><td>显示行号</td><td><code>:set nu</code></td><td>想永久生效写进 <code>~/.vimrc</code></td></tr>
+<tr><td>打开另一个文件</td><td><code>:e 路径</code></td><td>—</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+cp /etc/hosts ./hosts.bak
+vim hosts.bak
+# 依次做：G 跳到末尾 → o 新开一行输入 # test → Esc → :wq
+tail -n 2 hosts.bak</pre></div>
+<div class="note"><b>上面这条流程今天必须练一遍，因为它是「改配置文件」的标准动作：</b>先 <code class="inline">cp</code> 备份 → 打开 → 改 → 存盘 → 用 <code class="inline">tail</code> 验证改到了。<b>直接改原文件、不留备份，是不管新手老手都会后悔的习惯。</b></div>
+<div class="warn"><b>存盘失败提示 <code class="inline">E45: 'readonly' option is set</code> 或 <code class="inline">Can't open file for writing</code>，十有八九是权限问题</b>（回到第 1 节）：文件属主不是你，或者目录没有 w 位。<b>两种解法</b>：<code class="inline">sudo vim 文件</code>，或者在 vim 里用 <code class="inline">:w !sudo tee %</code>（意思是「用 sudo 把当前缓冲区写回原文件」，<code class="inline">%</code> 代表当前文件名）。<b>第二种更安全</b>——它不会让整份编辑过程都以 root 身份进行。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>ssh：不用密码连服务器</h2>
+<p>D026 要传作品集、D027 要部署服务器，都靠 ssh。<b>现在就把密钥配好，后面两天会省很多事。</b></p>
+<h3>一次生成，长期使用</h3>
+<div class="codebox"><button class="copy">复制</button><pre>ssh-keygen -t ed25519 -C "loogn@mac"
+ls -l ~/.ssh</pre></div>
+<div class="tree">~/.ssh/
+├── id_ed25519       ← 私钥，绝对不能外传（权限 600）
+├── id_ed25519.pub   ← 公钥，随便给（权限 644）
+├── known_hosts      ← 连过的服务器指纹
+└── config           ← 别名配置（权限 600）</div>
+<div class="danger"><b>私钥文件（<code class="inline">id_ed25519</code>，没有 <code class="inline">.pub</code> 后缀的那个）等于你的身份。</b>它泄漏了，别人就能以你的身份 push 代码、登录服务器。<b>三条铁律</b>：① 不复制到任何聊天工具、网盘、笔记软件；② 不放进任何 git 仓库；③ 权限必须是 <code class="inline">600</code>——<b>权限太宽时 ssh 会直接拒绝使用这把钥匙</b>，这正是第 1 节那个「权限」的真实应用场景。<br><code class="inline">ssh-keygen</code> 会让你设一个 passphrase，<b>设了更安全，但要输密码</b>；本机个人用可以不设，直接回车两次。<b>共用电脑必须设。</b></div>
+<h3>把公钥装到服务器上</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 有 ssh-copy-id 的话（macOS 自带），一条命令搞定
+ssh-copy-id -p 22 用户名@服务器IP
+
+# 没有的话，手动追加到服务器的授权文件里
+cat ~/.ssh/id_ed25519.pub | ssh 用户名@服务器IP "mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys &amp;&amp; chmod 700 ~/.ssh &amp;&amp; chmod 600 ~/.ssh/authorized_keys"</pre></div>
+<div class="note"><b>注意最后那两个 <code class="inline">chmod</code>：<code class="inline">.ssh</code> 目录 700、<code class="inline">authorized_keys</code> 600。</b>这两个数字错了，ssh 会认为「这个文件被别人动过」，直接忽略你的公钥、退回密码登录，<b>而且不告诉你原因</b>。这是配置密钥登录最常见的失败点。</div>
+<h3>写 config：把长命令变成两个字母</h3>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/.ssh
+vim ~/.ssh/config
+chmod 600 ~/.ssh/config</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>Host myserver
+    HostName 192.168.10.20
+    User loogn
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519
+
+Host github.com
+    HostName ssh.github.com
+    Port 443
+    User git</pre></div>
+<div class="note"><b>配完之后 <code class="inline">ssh myserver</code> 四个字就够了</b>，不用再记 IP、用户名、端口。<b>第二段是给 GitHub 用的</b>——国内 22 端口经常被拦，走 443 端口能通。<b>你的 <code class="inline">gl</code> 能正常 push，多半就是靠这一段。</b></div>
+<h3>排错：连不上时看这三层</h3>
+<div class="codebox"><button class="copy">复制</button><pre>ssh -v myserver 2&gt;&amp;1 | tail -n 20</pre></div>
+<table>
+<tr><th>现象</th><th>大概率原因</th><th>怎么查</th></tr>
+<tr><td><code>Connection refused</code></td><td>机器开着，但 ssh 服务没跑 / 端口不对</td><td><code>nc -vz IP 端口</code></td></tr>
+<tr><td><code>Connection timed out</code></td><td>网络不通，或被防火墙/安全组挡了</td><td>先 <code>ping IP</code>，再看安全组</td></tr>
+<tr><td>还是问密码，公钥没生效</td><td><code>.ssh</code> 或 <code>authorized_keys</code> 权限太宽</td><td>服务器上 <code>chmod 700 ~/.ssh; chmod 600 ~/.ssh/authorized_keys</code></td></tr>
+<tr><td><code>Permission denied (publickey)</code></td><td>公钥没装上，或用了错的钥匙</td><td><code>ssh -v</code> 看它试了哪把</td></tr>
+<tr><td><code>WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED</code></td><td>服务器重装过，或真的有人在中间</td><td>确认是自己重装的，再 <code>ssh-keygen -R IP</code></td></tr>
+</table>
+<div class="warn"><b>最后那条警告不要习惯性删掉就重连。</b>它的意思是「这台服务器的指纹变了」——<b>可能是你重装了系统，也可能是有人在中间劫持</b>。只有在你确定自己重装过的情况下，才用 <code class="inline">ssh-keygen -R</code> 清掉旧记录。公用网络下见到它，先换网络再说。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>五组命令组合：今天的产出</h2>
+<p>单条命令不难，<b>难的是把五条串起来解决一件事</b>。这五组覆盖了日常八成场景，每组都跑一遍再写进笔记。</p>
+
+<h3>组合 1 · 找出占空间最多的东西</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 当前目录下每个子目录多大，倒序取前 5
+du -sh ~/python-learn/* 2&gt;/dev/null | sort -h | tail -n 5
+
+# 找出大于 50MB 的单个文件
+find ~ -type f -size +50M 2&gt;/dev/null -exec ls -lh {} \; | sort -k5 -n | tail -n 10</pre></div>
+<div class="note"><b><code class="inline">2&gt;/dev/null</code> 在这里是必需的</b>——<code class="inline">du</code> 和 <code class="inline">find</code> 走到没权限的目录会刷一屏 <code class="inline">Permission denied</code>，把真正的结果淹没。<b>这不是「隐藏错误」，是「过滤掉不相关的噪音」</b>，因为你本来就没打算统计那些目录。</div>
+
+<h3>组合 2 · 从日志里定位问题</h3>
+<div class="codebox"><button class="copy">复制</button><pre>log=~/linux-lab/logs/access.log
+
+# ① 状态码分布
+awk '{print $5}' $log | sort | uniq -c | sort -rn
+
+# ② 只看 5xx，带行号
+grep -n " 5[0-9][0-9] " $log
+
+# ③ 出错最多的 URL 前 3
+awk '$5&gt;=400 {print $4}' $log | sort | uniq -c | sort -rn | head -n 3
+
+# ④ 把错的行单独存一份，同时看有多少条
+grep " 5[0-9][0-9] " $log | tee ~/linux-lab/logs/err.log | wc -l</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">   3 200
+   1 500
+   1 401
+2:2026-11-20 10:00:05 POST /api/login 401 88
+5:2026-11-20 10:02:30 GET /api/users 500 64
+   1 /api/users
+   1 /api/login
+1</pre></div>
+<div class="note"><b>第 ③ 条里的 <code class="inline">$5&gt;=400</code> 是 awk 的条件判断</b>——它比正则更准确，<b>因为不依赖「状态码两边有空格」这种格式假设</b>。<code class="inline">awk '$5&gt;=400 {print $4}'</code> 读作「第 5 列的值大于等于 400 时，打印第 4 列」。<b>昨天用 grep 写正则筛 4xx/5xx，今天用 awk 一行就干净了</b>——这就是为什么两个工具都要会。</div>
+
+<h3>组合 3 · 打包备份，排除垃圾</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+tar -czf ~/backup-python-learn-$(date +%Y%m%d).tar.gz \
+    --exclude="__pycache__" \
+    --exclude=".git" \
+    --exclude="*.pyc" \
+    .
+
+ls -lh ~/backup-python-learn-*.tar.gz</pre></div>
+<div class="warn"><b><code class="inline">--exclude</code> 的路径要写对。</b>打包 <code class="inline">.</code> 时，tar 里的路径是 <code class="inline">./xxx</code>，所以 <code class="inline">--exclude=".git"</code> 能匹配 <code class="inline">./.git</code>；但如果写成 <code class="inline">--exclude="./.git"</code>，某些版本就匹配不上。<b>排除项目不对时，先 <code class="inline">tar -tzf</code> 看包里到底有什么</b>，别靠猜。<br>另外 <code class="inline">$(date +%Y%m%d)</code> 会展开成 <code class="inline">20261122</code>，<b>这样每次备份都是一个新文件名，不会互相覆盖</b>——D024 的备份脚本就靠这一句。</div>
+
+<h3>组合 4 · 批量改名 / 批量加权限</h3>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+mkdir -p rename-demo &amp;&amp; cd rename-demo
+touch a.txt b.txt c.txt
+
+# 把 .txt 全改成 .md（先 echo 演练，确认无误再执行）
+for f in *.txt; do echo "mv \"$f\" \"${f%.txt}.md\""; done
+
+# 确认后去掉 echo 真正执行
+for f in *.txt; do mv "$f" "${f%.txt}.md"; done
+ls</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">mv "a.txt" "a.md"
+mv "b.txt" "b.md"
+mv "c.txt" "c.md"
+a.md	b.md	c.md</pre></div>
+<div class="danger"><b>批量操作前先 <code class="inline">echo</code> 演练一遍，这是铁律。</b>上面第一轮循环只打印不执行，<b>用眼睛确认每一条都对</b>，第二遍才真删真改。<code class="inline">${f%.txt}</code> 是「去掉结尾的 .txt」，<code class="inline">${f%%.*}</code> 是「去掉第一个点之后的所有内容」——<b>一个 % 匹配最短、两个 %% 匹配最长</b>，这个区别在文件名带多个点时很致命。<br><b>还有：<code class="inline">"$f"</code> 外面的引号必须加</b>，否则文件名带空格时又会被切开（昨天的坑）。</div>
+
+<h3>组合 5 · 传到远程 / 从远程取回</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 传一个文件上去
+scp ~/backup-python-learn-20261122.tar.gz myserver:~/
+
+# 传整个目录（-r）
+scp -r ~/python-learn/day22 myserver:~/backup/
+
+# 从服务器拉一个文件下来
+scp myserver:/var/log/nginx/access.log ./access-from-server.log
+
+# 更推荐：rsync（断点续传、只传改动部分、能排除）
+rsync -avz --exclude="__pycache__" ~/python-learn/day22 myserver:~/backup/</pre></div>
+<div class="note"><b><code class="inline">scp</code> 简单，<code class="inline">rsync</code> 更适合重复同步。</b>差别在于 <code class="inline">scp</code> 每次都全量重传，<code class="inline">rsync</code> 只传差异部分。<b>传几十 MB 以上、或者要反复同步同一个目录，用 rsync</b>；偶尔传一个小文件，scp 更省脑子。macOS 两个都自带。<br><code class="inline">-avz</code> 三个字母：<b>a</b> 保留权限和时间（archive）、<b>v</b> 显示过程、<b>z</b> 传输时压缩。</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>练习八道</h2>
+<p>1–5 在本机就能做，6–8 需要第 5 节配好的 ssh（没有服务器就跳过，D027 再补）。</p>
+
+<h3>第 1 题 · 让一个脚本可执行，但其他人只能读</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+printf '#!/bin/bash\necho "跑了"\n' &gt; hello.sh
+chmod 755 hello.sh
+ls -l hello.sh
+./hello.sh</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">-rwxr-xr-x  1 loogn  staff  28 Nov 22 19:20 hello.sh
+跑了</pre></div>
+<p><b>为什么不用 <code class="inline">chmod +x</code></b>：它会连「其他人」的 x 也加上，变成 <code class="inline">rwx--x--x</code>（第 1 节实测过）。<code class="inline">755</code> 才是「我能改、别人能读能跑」。<br><b>另外注意 <code class="inline">./hello.sh</code> 前面那个 <code class="inline">./</code> 不能省</b>——直接敲 <code class="inline">hello.sh</code> 会在 <code class="inline">$PATH</code> 里找，而当前目录通常不在 <code class="inline">$PATH</code> 里。这是出于安全考虑：否则你在某个目录里 <code class="inline">cd</code> 进去，一个叫 <code class="inline">ls</code> 的恶意脚本就会被执行。</p>
+</details>
+
+<h3>第 2 题 · 把 stderr 丢掉，只保留正常输出</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>find / -name "ssh_config" 2&gt;/dev/null | head -n 5</pre></div>
+<p><code class="inline">2&gt;/dev/null</code> 把报错扔进黑洞，stdout 照常走管道。<b>不写这个，<code class="inline">find /</code> 会刷几十屏 <code class="inline">Permission denied</code></b>，真正的结果被埋在中间找不到。</p>
+</details>
+
+<h3>第 3 题 · 一条命令：统计 logs 目录下所有文件的总行数</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+find logs -type f -exec cat {} + | wc -l</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">      10</pre></div>
+<p><b>数字取决于你日志里有几行</b>（这里是 access.log 5 行 + old.log 5 行 = 10）。<b>关键是 <code class="inline">-exec cat {} +</code> 把所有文件内容拼成一条流</b>，再交给 <code class="inline">wc -l</code>。<br><b>不要写成 <code class="inline">wc -l logs/*</code></b>——那会每个文件单独给一行，最后再加个 total，你还得自己加总。</p>
+</details>
+
+<h3>第 4 题 · 打包一个目录，排除所有 .log 和 __pycache__</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/linux-lab
+tar -czf /tmp/clean.tar.gz --exclude="*.log" --exclude="__pycache__" .
+tar -tzf /tmp/clean.tar.gz</pre></div>
+<p><b>验证一步不能省</b>：<code class="inline">tar -tzf</code> 看一眼，确认 <code class="inline">access.log</code> 和 <code class="inline">old.log</code> 都不在列表里。<b>排除规则写错了不会报错</b>，只会安静地把你不想要的东西打进去。</p>
+</details>
+
+<h3>第 5 题 · 在一份配置文件里把所有 <code>8080</code> 换成 <code>8000</code>，只改这一处</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cp config.conf config.conf.bak 2&gt;/dev/null || touch config.conf
+vim config.conf
+# 在 vim 里输入：  :%s/8080/8000/g  然后回车，再 :wq</pre></div>
+<p><b><code class="inline">%</code> 表示整个文件</b>，<code class="inline">g</code> 表示每行的所有匹配（不加 g 只换每行第一个）。<b>少了 <code class="inline">%</code> 就只改光标那一行</b>——这是 vim 替换最容易出的错，改完以为全改了，其实只改了一处。<br><b>先 <code class="inline">cp</code> 备份</b>：<code class="inline">:%s</code> 是全局操作，<code class="inline">u</code> 虽然能撤销，但如果你顺手 <code class="inline">:wq</code> 又关了文件，就只能靠备份了。</p>
+</details>
+
+<h3>第 6 题 · 看 ssh 到底在做什么</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>ssh -vT git@github.com 2&gt;&amp;1 | tail -n 10</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">debug1: Offering public key: /Users/loogn/.ssh/id_ed25519 ED25519 SHA256:...
+debug1: Authentications that can continue: publickey
+Hi loogn-yyl! You've successfully authenticated, but GitHub does not provide shell access.</pre></div>
+<p><b>看到 <code class="inline">Hi 你的用户名!</code> 就说明密钥通了。</b>中间那行 <code class="inline">Offering public key</code> 是它在试哪把钥匙——<b>连不上时就看这一行，试的钥匙不对就是 <code class="inline">IdentityFile</code> 配错了。</b><br><code class="inline">-T</code> 是「不要分配终端」，<code class="inline">-v</code> 是「打印调试信息」，<code class="inline">2&gt;&amp;1</code> 把调试信息（走 stderr）也一起接进管道，<code class="inline">tail</code> 才能看到——<b>这三样缺一个都看不到输出</b>。</p>
+</details>
+
+<h3>第 7 题 · 给 .ssh 和私钥设正确的权限</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub
+chmod 600 ~/.ssh/config
+ls -l ~/.ssh</pre></div>
+<p><b>四种文件四个数，别混</b>：目录 700、私钥 600、公钥 644、config 600。<b>私钥是 600 而不是 400</b>，因为你偶尔要重新生成；<b>公钥 644</b> 因为本来就是要给别人看的。<br><b>权限太宽时 ssh 的表现是「默默不用这把钥匙」</b>，然后在 <code class="inline">ssh -v</code> 里给你一行 <code class="inline">WARNING: UNPROTECTED PRIVATE KEY FILE</code>。不主动看调试信息，根本不知道发生了什么。</p>
+</details>
+
+<h3>第 8 题 · 从服务器拉一个日志文件下来，只看错误行</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>scp myserver:/var/log/nginx/access.log ./remote-access.log
+awk '$9&gt;=400 {print}' ./remote-access.log | wc -l</pre></div>
+<p><b>注意真 nginx 日志的列号和练习日志不一样</b>：combined 格式第 1 列是 IP、第 9 列是状态码（前面有 IP、两个 <code class="inline">-</code>、时间（含空格，实际拆成两列）、请求（含引号，拆成三列））。<b>所以一定要先 <code class="inline">head -n 1</code> 看一行，再决定用第几列。</b><br>另外 <code class="inline">/var/log/nginx/</code> 普通用户读不了，直接 <code class="inline">scp</code> 会 <code class="inline">Permission denied</code>——<b>要么先用 sudo 拷一份到有权限的地方，要么配置 ssh 用户对该目录的读权限</b>。</p>
+</details>
+<div class="ok"><b>八题里第 2、4、5 是最常用的三个动作</b>：丢掉噪音、打包排除垃圾、改配置文件。这三个练熟，日常维护就不用求助别人了。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>两份笔记与必做三件事</h2>
+<p>今天写两份，都放在 <code class="inline">~/python-learn/day23/</code>。</p>
+<h3>① <code>命令组合.md</code></h3>
+<div class="codebox"><button class="copy">复制</button><pre># D023 五组命令组合
+
+## 1. 找占空间最多的东西
+du -sh ~/python-learn/* 2&gt;/dev/null | sort -h | tail -n 5
+# 我的实际输出：
+# （贴进来）
+
+## 2. 从日志定位问题
+# 状态码分布 / 只看 5xx / 出错最多的 URL / 单独存一份
+# 我的实际输出：
+
+## 3. 打包备份排除垃圾
+
+## 4. 批量改名 / 批量加权限
+
+## 5. 传到远程 / 从远程取回
+
+## 今天犯的错
+1.
+2.</pre></div>
+<h3>② <code>vim速查.md</code>（只写自己会忘的）</h3>
+<div class="codebox"><button class="copy">复制</button><pre># vim 速查（只记我用了还会忘的）
+
+## 保命三条
+- 迷路了：Esc Esc
+- 存盘退出：:wq
+- 不存盘退出：:q!
+
+## 我实际用到的
+| 动作 | 键 |
+| --- | --- |
+| 跳末尾 | G |
+| 跳第 N 行 | NG |
+| 删一行 | dd |
+| 撤销 | u |
+| 全局替换 | :%s/旧/新/g |
+| 搜索 | /关键词 然后 n |
+
+## 还没练熟的
+- 可视模式选块
+- 分屏</pre></div>
+<ol class="task">
+<li><b><code class="inline">vimtutor</code> 做完前三章</b>（约 30 分钟）。<b>这是今天唯一不能省的一步</b>——vim 是肌肉记忆，看会了不等于会。</li>
+<li><b>五组命令各跑一遍</b>，把真实输出贴进 <code class="inline">命令组合.md</code>。<b>组合 1 和组合 3 会在 D027 部署时直接用到，跑通了后面省事。</b></li>
+<li><b>配好 ssh 密钥</b>（如果还没配）：<code class="inline">ssh-keygen</code> → 把公钥加到 GitHub → <code class="inline">ssh -T git@github.com</code> 看到 <code class="inline">Hi</code>。<b>这一步做完，你的 <code class="inline">gl</code> 才算真正稳。</b></li>
+</ol>
+<div class="warn"><b>今天不碰：</b>Shell 脚本语法（D024）、git 的内部结构（D025）、nginx 配置（D027）。<b><code class="inline">for</code> 循环在组合 4 里出现了一下，那只是让你看到「批量操作长什么样」，明天才系统讲。</b></div>
+<div class="ok"><b>四小时后你应该能：</b>看到一个 <code class="inline">Permission denied</code> 知道往哪查；把一堆输出既存文件又看屏幕；把一个目录打包发走；在一台只有 vi 的机器上改配置文件；不用密码连服务器。<b>这五件事，就是「会用 Linux」的实际含义。</b></div>
+</section>
+
+<footer>
+  <p>📌 D023 的产出是 <b><code>day23/命令组合.md</code> + <code>day23/vim速查.md</code></b>，今天可以 <code>gl</code> 推上去。</p>
+  <p>明天 D024：<b>Shell 脚本</b>——变量、条件、循环、函数、crontab，产出一个真能用的 <code>backup.sh</code>。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

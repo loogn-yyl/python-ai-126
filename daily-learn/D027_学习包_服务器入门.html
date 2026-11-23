@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D027 学习包 · 服务器入门</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"应该看到";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 027 · 第 4 周收官</div>
+  <h1>服务器入门：让别人也能打开你的页面</h1>
+  <p>前三天的 ssh、tar、权限、脚本，今天全部用上。<b>目标只有一个：一个网址，点开能看到你写的页面。</b></p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🌐 ssh 部署</span>
+    <span>📄 nginx 静态托管</span>
+    <span>📦 产出：可访问的页面</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>先决定路线：零成本也能走完全流程</h2>
+<p><b>今天要练的六件事：连上 Linux、传文件、装软件、配 nginx、开端口、验证访问。</b>其中只有「公网 IP」这一项必须花钱，其余全都能在本地完成。<b>所以你有两条路，先选一条再动手。</b></p>
+<table>
+<tr><th></th><th>路线 A · 本地容器（零成本）</th><th>路线 B · 云服务器</th></tr>
+<tr><td>需要什么</td><td>你的 Mac + OrbStack（已装）</td><td>一台云主机 + 一点预算</td></tr>
+<tr><td>能得到什么</td><td><b>localhost:8080 和局域网 IP 能访问</b></td><td><b>公网 IP / 域名能访问</b></td></tr>
+<tr><td>练不到的</td><td>ssh 登录、systemd 服务管理、安全组</td><td>—</td></tr>
+<tr><td>适合</td><td><b>先把 nginx 和页面跑通</b></td><td>真的要给别人一个链接</td></tr>
+</table>
+<div class="ok"><b>建议：目标先定成「局域网能访问」。</b>原因很实际——<b>你今天要学的是 nginx 和文件权限，不是买机器。</b>容器路线能把这两件事完整练一遍，而且失败了删掉重来零成本。<b>等页面在局域网能打开、你自己觉得拿得出手了，再花钱买公网 IP 那一层。</b></div>
+<div class="warn"><b>关于价格，我不给具体数字。</b>云厂商的学生优惠、新用户首年价、活动价每年都在变，我报了也是过时的。<b>你需要自己去官网看「轻量应用服务器」的最低配</b>——今天这套 nginx 静态站，<b>最低配完全够</b>，不需要高配。真要买，<b>按年买比按月划算，但先按月试一个月</b>，确认自己会持续用再续。</div>
+<h3>路线 A：用 OrbStack 起一个带 nginx 的 Linux</h3>
+<p>OrbStack 能跑 Docker。下面这条命令起一个 nginx 容器，<b>把容器里的 80 端口映射到你 Mac 的 8080</b>，再把你的本地目录挂进去当网站根目录。</p>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/site
+cat &gt; ~/site/index.html &lt;&lt;'EOF'
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;我的第一台服务器&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;上线成功&lt;/h1&gt;
+  &lt;p&gt;这个页面由 nginx 提供，文件放在 Mac 上。&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+EOF
+
+docker run -d --name web -p 8080:80 \
+  -v ~/site:/usr/share/nginx/html:ro \
+  nginx:alpine
+
+curl -I http://localhost:8080</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">HTTP/1.1 200 OK
+Server: nginx/1.27.x
+Content-Type: text/html
+Content-Length: 186
+Last-Modified: ...
+Connection: keep-alive
+ETag: "..."
+Accept-Ranges: bytes</pre></div>
+<div class="note"><b><code class="inline">-p 8080:80</code> 的读法是「宿主机端口 : 容器端口」。</b>左边是你访问的、右边是 nginx 听的。<b>为什么不用 80 直接映射</b>：Mac 上 80 端口常被系统或其他软件占着，而且小于 1024 的端口需要 root 权限。<b>用 8080 起步，稳定了再考虑 80。</b><br><code class="inline">-v ~/site:/usr/share/nginx/html:ro</code> 是把本地目录挂进去，<b><code class="inline">:ro</code> 表示容器只能读</b>——这样容器出问题也改不了你的文件。<b>改完 <code class="inline">~/site/index.html</code>，刷新浏览器就生效，不用重启容器。</b></div>
+<div class="codebox"><button class="copy">复制</button><pre># 看 Mac 的局域网 IP（Wi-Fi 一般是 en0）
+ipconfig getifaddr en0
+
+# 手机/平板连同一个 Wi-Fi，浏览器打开 http://刚才那个IP:8080</pre></div>
+<div class="ok"><b>手机能打开，今天就算完成一半。</b>因为它证明了完整链路：<b>文件在磁盘上 → 通过挂载进了容器 → nginx 读到它 → 端口映射出来 → 局域网可达。</b>换成云服务器，这条链只差「最后一跳是公网」。<b>后面所有排错，都是在这条链上找断点。</b></div>
+<div class="warn"><b>容器路线的三个限制，先知道，别到时候以为是自己配错了：</b><br>① <b>没有 systemd</b>：<code class="inline">systemctl</code> 在容器里不工作，起停服务要用 <code class="inline">nginx -s reload</code> 或者直接重启容器；<br>② <b>没有 ssh</b>：容器里没有 sshd，进容器用 <code class="inline">docker exec -it web sh</code>；<br>③ <b>进程一退容器就停</b>：nginx 是容器的主进程，它挂了容器就结束了，用 <code class="inline">docker logs web</code> 看原因。<br><b>想练 ssh 和 systemctl，用云服务器，或者 OrbStack 里的「Linux 虚拟机」功能（不是容器，有完整 init 系统）。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>路线 B：买机器与开安全组</h2>
+<p><b>买之前先搞清楚一件事：云服务器默认是「什么端口都不通」的。</b>不是机器没开，是云厂商在<b>安全组 / 防火墙</b>那一层把流量挡了。<b>这是「我明明按教程配好了，为什么打不开」的第一大原因。</b></p>
+<h3>买入时只改三件事</h3>
+<ol>
+<li><b>镜像选 Ubuntu LTS</b>（不要选 CentOS 老版本、不要选带面板的镜像）。<b>LTS 的意思是长期支持，文档最多、教程最多。</b></li>
+<li><b>Login 方式选「SSH 密钥」</b>，如果只能选密码，就选一个强密码，<b>登进去第一件事改掉</b>（第 2 节）。</li>
+<li><b>不要勾「自动创建快照/备份」之外的花钱项</b>，尤其带宽——<b>按流量计费在被人扫到时会悄悄烧钱</b>，选固定带宽。</li>
+</ol>
+<h3>安全组要开三个端口</h3>
+<table>
+<tr><th>端口</th><th>协议</th><th>给谁</th><th>不开会怎样</th></tr>
+<tr><td><b>22</b></td><td>TCP</td><td><b>只给你的 IP</b>（能限定就限定）</td><td>连不上，ssh 超时</td></tr>
+<tr><td><b>80</b></td><td>TCP</td><td>所有人 <code>0.0.0.0/0</code></td><td>网页打不开</td></tr>
+<tr><td><b>443</b></td><td>TCP</td><td>所有人</td><td>HTTPS 打不开（今天可选）</td></tr>
+</table>
+<div class="danger"><b>不要把 22 端口开给 <code class="inline">0.0.0.0/0</code> 然后继续用密码登录。</b>公网 IP 上的 22 端口<b>几分钟内就会被扫到</b>，然后是一整天的暴力破解。两件事必须做其一：<b>① 安全组里 22 只放你当前的出口 IP；② 关掉密码登录，只认密钥</b>（下一节）。<b>两个都做最稳。</b><br>顺带：<b>3306（MySQL）、6379（Redis）永远不要开到公网</b>。D029 之后你会用到这两个端口，<b>它们只能在服务器内部或 ssh 隧道里访问</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>首次登录：十分钟内把安全底子打好</h2>
+<div class="codebox"><button class="copy">复制</button><pre># ① 用 root 登进去（云厂商给你的默认用户可能是 root 或 ubuntu）
+ssh root@你的公网IP
+
+# ② 看看系统版本和时间
+lsb_release -a
+date
+timedatectl | head -n 5</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre># ③ 建一个自己的普通用户，并给 sudo 权限
+adduser loogn
+usermod -aG sudo loogn
+
+# ④ 把自己的公钥装给这个用户（在本地 Mac 上执行）
+ssh-copy-id loogn@你的公网IP
+
+# ⑤ 用新用户登录，确认能 sudo
+ssh loogn@你的公网IP
+sudo whoami</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">root</pre></div>
+<div class="note"><b><code class="inline">sudo whoami</code> 输出 <code class="inline">root</code>，说明 sudo 权限生效了。</b>这是验证权限最省事的一条命令——<b>比去看 <code class="inline">/etc/sudoers</code> 快一百倍</b>。<br><b>为什么一定要建普通用户、不用 root 日常操作</b>：root 敲错一条 <code class="inline">rm -rf</code> 就是系统级的；普通用户加 sudo，至少每个危险操作都要再输一次密码，<b>那两秒就是你的最后一道防线</b>。</div>
+<h3>关掉密码登录，只认密钥</h3>
+<div class="codebox"><button class="copy">复制</button><pre>sudo vim /etc/ssh/sshd_config</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre># 找到并改成（前面的 # 要去掉）
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitRootLogin no
+
+# 顺手改端口（可选，能减少一大半扫描噪音）
+Port 2222</pre></div>
+<div class="danger"><b>改 <code class="inline">sshd_config</code> 有个著名的事故：改完 <code class="inline">reload</code>，然后自己再也连不上，只能去云控制台用 VNC 救援。</b><br><b>三个保命动作，一个都不能省：</b><br>① <b>改之前先备份</b>：<code class="inline">sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak</code>；<br>② <b>改完先检查语法</b>：<code class="inline">sudo sshd -t</code>，没输出才是对的；<br>③ <b>reload 之后，<u>另开一个终端</u>试登录</b>，<b>确认新连接能进，再关掉旧的那个</b>。<b>永远不要在当前会话里 reload 完就退出——那等于把门锁上再确认钥匙对不对。</b><br>另外改了 <code class="inline">Port 2222</code> 就必须同步改安全组，否则新端口不通。</div>
+<div class="codebox"><button class="copy">复制</button><pre>sudo sshd -t                    # 检查语法，无输出才是对的
+sudo systemctl reload ssh       # Ubuntu 上服务名是 ssh，不是 sshd
+# 另开终端确认：
+ssh -p 2222 loogn@你的公网IP</pre></div>
+<div class="note"><b><code class="inline">reload</code> 和 <code class="inline">restart</code> 的区别，在服务器上很重要：</b><code class="inline">reload</code> 让服务<b>重新读配置但不断已有连接</b>；<code class="inline">restart</code> 是<b>停掉再起，所有连接瞬断</b>。<b>改 nginx 配置、改 sshd 配置都用 reload</b>；只有升级了软件版本才需要 restart。<b>你要是对 sshd 用 restart，等于自己把脚下的地板抽掉。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>把页面传上去</h2>
+<p>D023 的组合 5 今天直接用上。<b>传文件有两个层次：偶尔传一次用 <code class="inline">scp</code>，反复同步用 <code class="inline">rsync</code>。</b></p>
+<div class="codebox"><button class="copy">复制</button><pre># 先在服务器上建好目录（用你自己的用户，不要 root）
+ssh myserver "mkdir -p ~/site"
+
+# 传单个文件
+scp ~/site/index.html myserver:~/site/
+
+# 传整个目录
+scp -r ~/site/. myserver:~/site/
+
+# 反复同步用 rsync（只传改动过的）
+rsync -avz --delete ~/site/ myserver:~/site/</pre></div>
+<div class="warn"><b><code class="inline">rsync --delete</code> 会删掉目标目录里「源目录没有的文件」。</b>这是它的价值（保证两边一致），也是它的风险（<b>路径少写一个 <code class="inline">/</code>，可能删错地方</b>）。<br><b>源路径末尾的斜杠很关键</b>：<code class="inline">~/site/</code> 是「site 里的内容」，<code class="inline">~/site</code> 是「site 这个目录本身」。<b>写 <code class="inline">rsync -avz --delete ~/site myserver:~/</code> 的后果和你想的可能不一样</b>。第一次用先不加 <code class="inline">--delete</code>，跑通了再加。</div>
+<div class="note"><b>为什么传到自己家目录 <code class="inline">~/site</code> 而不是直接传到 <code class="inline">/var/www/html</code>：</b>因为 <code class="inline">/var/www</code> 属主是 root，<code class="inline">scp</code> 没有权限写。<b>标准做法是「传到有权限的地方，再用 sudo 搬过去」</b>——下一步就这么做。<b>另一种做法是改 <code class="inline">/var/www</code> 的属主给你自己</b>，省掉每次 sudo，但安全性差一点（D023 第 1 节讲过 chown）。<b>先用 sudo 搬，稳。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>装 nginx，托管你的页面</h2>
+<div class="codebox"><button class="copy">复制</button><pre>sudo apt update
+sudo apt install -y nginx
+sudo systemctl enable --now nginx
+systemctl status nginx | head -n 5</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since ...
+       Docs: man:nginx(8)</pre></div>
+<div class="note"><b><code class="inline">enable --now</code> 是两个动作合一</b>：<code class="inline">enable</code> 让它<b>开机自启</b>，<code class="inline">--now</code> 顺手<b>现在启动</b>。<b>只 start 不 enable，重启服务器之后网站就没了</b>——这是「昨天还好好的，今天打不开」的经典原因。<b>Linux 上没有 macOS 的 <code class="inline">brew services</code>，用的是 <code class="inline">systemctl</code>。</b></div>
+<h3>看懂 nginx 的目录结构</h3>
+<div class="tree">/etc/nginx/
+├── nginx.conf                  ← 主配置，一般不用改
+├── sites-available/            ← 「可用的站点」定义都放这
+│   └── default
+├── sites-enabled/              ← 启用的站点（是上面的软链接）
+│   └── default → ../sites-available/default
+├── conf.d/                     ← 另一种放法，效果一样
+└── snippets/
+
+/var/www/html/                  ← 默认网站根目录（你的文件放这）
+/var/log/nginx/
+├── access.log                  ← 访问日志
+└── error.log                   ← 错误日志（排错看这个）</div>
+<div class="codebox"><button class="copy">复制</button><pre># 看看默认站点怎么配的
+cat /etc/nginx/sites-available/default</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm;
+
+    server_name _;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}</pre></div>
+<div class="note"><b>这五行是全部要害：</b><code class="inline">listen 80</code> 听哪个端口、<code class="inline">root</code> 网站文件在哪、<code class="inline">index</code> 默认打开哪个文件、<code class="inline">server_name</code> 匹配哪个域名（<code class="inline">_</code> 表示「兜底，谁访问都行」）、<code class="inline">try_files</code> 先找文件再找目录，都没有就 404。<br><b>要做的事只有一件：把文件放进 <code class="inline">/var/www/html/</code>。</b>配置一行都不用改。</div>
+<div class="codebox"><button class="copy">复制</button><pre># 搬文件 + 设属主 + 设权限（三步都要）
+sudo cp -r ~/site/. /var/www/html/
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+
+# 检查配置语法，然后 reload
+sudo nginx -t
+sudo systemctl reload nginx
+
+# 在本机验证
+curl -I http://localhost</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: ...
+Content-Type: text/html
+Content-Length: 186
+Last-Modified: ...
+Connection: keep-alive
+ETag: "..."
+Accept-Ranges: bytes</pre></div>
+<div class="danger"><b>为什么必须 <code class="inline">chown www-data</code>：nginx 的工作进程以 <code class="inline">www-data</code> 用户运行，不是 root。</b>文件属主是 root 且权限 644 时，nginx 能<b>读</b>（其他人有 r）；<b>但如果你把权限写成 600，nginx 就读不了，返回 403</b>。<br><b>403 Forbidden 在 nginx 里 90% 是这两个原因：</b>① 文件权限里「其他人」没有 r；② <code class="inline">index.html</code> 根本不在那个目录。<b>看到 403 先 <code class="inline">ls -l /var/www/html</code>，不要先改配置。</b></div>
+<div class="warn"><b><code class="inline">sudo nginx -t</code> 这一步不能省。</b>配置写错时 <code class="inline">reload</code> 会失败，<b>而失败的表现是「网站还开着，但用的是旧配置」</b>——你会以为改动没生效，其实是根本没加载。<b><code class="inline">nginx -t</code> 会明确指出哪一行错了，包括行号。</b></div>
+<h3>加一个自己的站点（不改 default）</h3>
+<div class="codebox"><button class="copy">复制</button><pre>sudo vim /etc/nginx/sites-available/mysite</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>server {
+    listen 80;
+    server_name mysite.local;      # 有域名就写域名，没有就写 _
+
+    root /var/www/mysite;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # 给静态资源加缓存（可选）
+    location ~* \.(css|js|png|jpg|svg)$ {
+        expires 7d;
+    }
+}</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>sudo mkdir -p /var/www/mysite
+sudo cp ~/site/index.html /var/www/mysite/
+sudo chown -R www-data:www-data /var/www/mysite
+
+# 启用：在 sites-enabled 里建软链接（这就是「启用」的全部含义）
+sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/
+
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx</pre></div>
+<div class="note"><b><code class="inline">sites-available</code> 和 <code class="inline">sites-enabled</code> 的分工，就是 D023 讲过的软链接：</b>配置写在 available 里，<b>启不启用看 enabled 里有没有那个链接</b>。<b>「停用一个站点」= 删掉 enabled 里的软链接</b>（<code class="inline">sudo rm /etc/nginx/sites-enabled/mysite</code>），配置本身还在，随时能再启用。<b>这比注释掉配置块干净得多。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>打不开的时候，按这个顺序查</h2>
+<p><b>「网页打不开」有五个不同的断点，从外往内一层层查，不要跳。</b>跳过任何一层，你都会在错误的地方浪费半小时。</p>
+<div class="tree">① 网络通不通         ping / 安全组
+② 端口通不通         nc -vz IP 80（本机没有 nc 就用 curl -v）
+③ nginx 在不在跑     systemctl status nginx
+④ nginx 有没有报错   tail /var/log/nginx/error.log
+⑤ 文件在不在、权限对不对  ls -l /var/www/html</div>
+<div class="codebox"><button class="copy">复制</button><pre># ① 网络
+ping -c 3 你的公网IP
+
+# ② 端口（在本地 Mac 上跑）
+nc -vz 你的公网IP 80
+
+# ③ 服务
+systemctl is-active nginx
+
+# ④ 日志（在服务器上跑，-f 可以实时看）
+sudo tail -n 30 /var/log/nginx/error.log
+
+# ⑤ 文件
+ls -l /var/www/html
+curl -I http://127.0.0.1</pre></div>
+<table>
+<tr><th>现象</th><th>断点</th><th>动作</th></tr>
+<tr><td>浏览器转圈到超时</td><td><b>① 或 ②</b></td><td>安全组没开 80；或者服务没起</td></tr>
+<tr><td>连接被拒绝（Connection refused）</td><td><b>③</b></td><td>nginx 没跑，<code>systemctl status nginx</code> 看原因</td></tr>
+<tr><td><b>403 Forbidden</b></td><td><b>⑤</b></td><td>权限里没有 r，或 index.html 不在</td></tr>
+<tr><td><b>404 Not Found</b></td><td><b>⑤</b></td><td>路径对不上：<code>root</code> 指的目录里没有这个文件</td></tr>
+<tr><td>502 Bad Gateway</td><td>—</td><td>nginx 在，但后面的程序挂了（今天没有后端，不会遇到）</td></tr>
+<tr><td>还是旧页面</td><td>—</td><td>浏览器缓存；或者 reload 失败用了旧配置</td></tr>
+</table>
+<div class="ok"><b>最有用的一条：先在服务器上 <code class="inline">curl -I http://127.0.0.1</code>。</b>如果本机能拿到 200，说明 nginx 和文件都没问题，<b>问题百分之百在外面（安全组、端口映射、DNS）</b>；如果本机都不行，<b>就别在外层浪费时间</b>。<b>这一步把「五个断点」一刀切成两半。</b></div>
+<div class="warn"><b>容器路线遇到 403，多半是挂载的目录权限问题。</b>容器里的 nginx 以 <code class="inline">nginx</code> 用户（UID 101）运行，<b>而你 Mac 上的文件是 UID 501</b>。<b>目录权限是 700 时，容器读不进去。</b>解法：给目录加「其他人可读执行」，<code class="inline">chmod -R a+rX ~/site</code>（<code class="inline">X</code> 大写 = 只给目录加 x，不给文件加）。</div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>域名与 HTTPS（可选，但值得知道）</h2>
+<p><b>如果只是自己练，公网 IP 直接访问就够了，这一节可以跳过。</b>但如果你要把链接发给别人，<b>一个 IP 加一个 http 的网址，说服力远不如一个域名加 HTTPS。</b></p>
+<h3>域名：一条 A 记录的事</h3>
+<ol>
+<li>买一个域名（便宜的几块到几十块一年，价格各平台浮动，自己比）。</li>
+<li>在域名的 DNS 里加一条 <b>A 记录</b>：<code class="inline">@</code> 或 <code class="inline">www</code> 指向你的<b>公网 IP</b>。</li>
+<li>等生效（几分钟到几小时），用 <code class="inline">dig 你的域名 +short</code> 确认解析到了那个 IP。</li>
+<li><b>国内服务器的域名需要备案</b>，这一步比技术麻烦得多——<b>没有备案的国内服务器，80 端口用域名访问会被拦。</b></li>
+</ol>
+<div class="danger"><b>「国内服务器必须备案」这一条是硬规定，不是建议。</b>如果你不想折腾备案，两条路：<b>① 用 IP 访问（个人练习完全够）</b>；② 用境外服务器（速度慢，且要注意合规）。<b>先别碰备案，你现在的目标是把 nginx 跑通。</b></div>
+<h3>HTTPS：certbot 一条命令</h3>
+<div class="codebox"><button class="copy">复制</button><pre>sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d 你的域名
+
+# 它会自动改 nginx 配置、申请证书、设好自动续期
+sudo certbot renew --dry-run</pre></div>
+<div class="note"><b><code class="inline">certbot --nginx</code> 会自动帮你做三件事</b>：申请证书、写进 nginx 配置、加一条「http 跳 https」的重写规则。<b>证书 90 天到期，certbot 装的时候已经加了自动续期的定时任务</b>，用 <code class="inline">--dry-run</code> 验证续期流程能不能跑通——<b>这一步别省，不然三个月后证书过期、网站报警，你早忘了当时怎么配的。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>部署自检脚本：把上面所有检查写成一条命令</h2>
+<p>D024 第 7 题那个 <code class="inline">check()</code> 函数，今天正好用。部署完跑一次，比手点五遍可靠。</p>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt; ~/deploy-check.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -uo pipefail      # 不加 -e：要跑完所有检查再汇总
+
+HOST="${1:-127.0.0.1}"
+fail=0
+
+check() {
+  local name="$1"; shift
+  if "$@" &gt;/dev/null 2&gt;&amp;1; then
+    printf '  OK    %s\n' "$name"
+  else
+    printf '  FAIL  %s\n' "$name"; fail=1
+  fi
+}
+
+echo "检查目标：$HOST"
+check "nginx 服务在跑"      systemctl is-active --quiet nginx
+check "配置语法正确"        nginx -t
+check "80 端口在监听"       bash -c "ss -lnt | grep -q ':80 '"
+check "站点根目录存在"      test -d /var/www/html
+check "首页文件存在"        test -f /var/www/html/index.html
+check "首页可被 www-data 读" sudo -u www-data test -r /var/www/html/index.html
+check "本机 HTTP 返回 200"  bash -c "curl -fsS -o /dev/null http://127.0.0.1"
+check "错误日志近 10 行无 error" bash -c "! sudo tail -n 10 /var/log/nginx/error.log | grep -qi '\[error\]'"
+
+if [[ $fail -eq 0 ]]; then
+  echo "全部通过"
+else
+  echo "有检查未通过，按第 5 节的顺序往下查"
+  exit 1
+fi
+EOF
+chmod 755 ~/deploy-check.sh
+~/deploy-check.sh</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">检查目标：127.0.0.1
+  OK    nginx 服务在跑
+  OK   配置语法正确
+  OK    80 端口在监听
+  OK    站点根目录存在
+  OK    首页文件存在
+  OK    首页可被 www-data 读
+  OK    本机 HTTP 返回 200
+  OK    错误日志近 10 行无 error
+全部通过</pre></div>
+<div class="note"><b>这个脚本的价值不在「跑一次」，在「以后每次部署完都跑一次」。</b>它会替你记住上次踩过的每一个坑：<b>服务忘了 enable、权限忘了给 www-data、首页名字写成了 index.htm</b>。<b>把踩过的坑写成检查项，是不重复踩同一个坑的唯一有效办法。</b></div>
+<div class="warn"><b>脚本里用了 <code class="inline">sudo -u www-data test -r</code>，这是「以那个用户的身份试读」。</b>它比看权限位更准——<b>因为权限位只能告诉你 644，不能告诉你上级目录有没有 x 位</b>。<b>排查 403 时这一条最好用。</b>注意脚本需要 sudo，所以要 <code class="inline">sudo ~/deploy-check.sh</code> 或者允许免密。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>练习八道</h2>
+<p>1–3 两条路线都能做，4–8 需要服务器（容器路线部分做不了，已标注）。</p>
+
+<h3>第 1 题 · 把页面换成一个带样式的版本，确认改动不用重启就生效</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre># 容器路线：直接改 Mac 上的文件（挂载是实时的）
+vim ~/site/index.html
+curl -s http://localhost:8080 | head -n 5
+
+# 云服务器路线：改完要重新同步
+vim ~/site/index.html
+rsync -avz ~/site/ myserver:~/site/
+ssh myserver "sudo cp -r ~/site/. /var/www/html/ &amp;&amp; sudo chown -R www-data:www-data /var/www/html"
+curl -s http://你的IP | head -n 5</pre></div>
+<p><b>差别在挂载和复制：容器是「同一个目录」，改了就变；服务器是「两份文件」，必须再传一次。</b><br><b>这就是为什么真实项目会用 CI/CD 或者 <code class="inline">rsync</code> 一键同步</b>——手工 <code class="inline">scp</code> 十几次之后一定会漏一次，然后你会对着旧页面怀疑人生。</p>
+</details>
+
+<h3>第 2 题 · 故意把首页改名，看错误码怎么变</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>sudo mv /var/www/html/index.html /var/www/html/index.html.bak
+curl -I http://127.0.0.1
+sudo mv /var/www/html/index.html.bak /var/www/html/index.html</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">HTTP/1.1 403 Forbidden</pre></div>
+<p><b>为什么是 403 不是 404：</b>因为 <code class="inline">try_files $uri $uri/ =404</code> 里，<code class="inline">$uri/</code> 匹配到了 <b>目录本身</b>，nginx 尝试列目录但没开 <code class="inline">autoindex</code>，于是拒绝。<b>如果目录里连文件都没有，就会走 <code class="inline">=404</code>。</b><br><b>这个区别在排错时很有用</b>：<b>看到 403 说明路径是对的、文件不见了；看到 404 说明路径本身就不对。</b></p>
+</details>
+
+<h3>第 3 题 · 让浏览器不缓存，看到最新文件</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>curl -I http://127.0.0.1/index.html
+# 浏览器里：强制刷新 Cmd+Shift+R（Mac）
+
+# 或者在 nginx 里对 html 关掉缓存
+location ~* \.html$ {
+    add_header Cache-Control "no-cache";
+}</pre></div>
+<p><b>先分清是「服务器没更新」还是「浏览器缓存」</b>：用 <code class="inline">curl</code> 直接取，看到的是服务器真实内容；<b>curl 是新内容而浏览器是旧内容 = 纯缓存问题</b>。<b>这一步能把「我明明改了」的怀疑消掉一半。</b></p>
+</details>
+
+<h3>第 4 题 · 用 systemd 查看 nginx 最近发生了什么</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>systemctl status nginx
+journalctl -u nginx -n 30 --no-pager
+
+# 只看今天的
+journalctl -u nginx --since today --no-pager | tail -n 20</pre></div>
+<p><b><code class="inline">journalctl -u 服务名</code> 是 systemd 的日志，记录「服务被启动、停止、失败」这类事件；<code class="inline">/var/log/nginx/error.log</code> 记录「请求处理出了什么问题」。</b>两者是不同的东西——<b>服务起不来查 journalctl，页面 403/404 查 error.log。</b></p>
+</details>
+
+<h3>第 5 题 · 把它配置成开机自启，并验证「真的会自启」</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>sudo systemctl enable nginx
+systemctl is-enabled nginx
+
+# 验证：重启（谨慎，会断 ssh 几十秒）
+sudo reboot
+# 等 30 秒后重新 ssh 进去
+systemctl is-active nginx</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">enabled
+active</pre></div>
+<p><b><code class="inline">is-enabled</code> 只说「配置里写了开机启动」，<code class="inline">is-active</code> 说「现在在跑」。</b>两个都要是肯定答案。<b>不过重启验证是最可靠的</b>——很多「设置了但没生效」的情况，只有真重启才暴露。<b>在云服务器上重启不会丢数据，但会中断几十秒，别在有用的时候做。</b></p>
+</details>
+
+<h3>第 6 题 · 只允许你的 IP ssh，其他人连 22 都摸不到</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre># ① 先查自己的出口 IP（在本地 Mac 上）
+curl -s https://api.ipify.org
+
+# ② 云控制台 → 安全组 → 把 22 的源地址从 0.0.0.0/0 改成本地 IP/32
+# ③ 验证：换手机热点（不同出口 IP）ssh 一下，应该连不上</pre></div>
+<p><b><code class="inline">/32</code> 表示「只有这一个 IP」。</b>安全组的规则是「允许」，所以要显式写来源。<b>验证一定要换一个网络试</b>——从同一个网络试，无论规则对不对都能连上，等于没验证。<br><b>副作用要知道：你的家庭宽带 IP 会变</b>，某天突然连不上，先想到这一条。</p>
+</details>
+
+<h3>第 7 题 · 加一个 404 页面</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>sudo vim /etc/nginx/sites-available/mysite
+# 在 server 块里加：
+#   error_page 404 /404.html;
+#   location = /404.html { internal; }
+
+sudo tee /var/www/mysite/404.html &gt;/dev/null &lt;&lt;'EOF'
+&lt;!DOCTYPE html&gt;&lt;html lang="zh-CN"&gt;&lt;meta charset="utf-8"&gt;
+&lt;title&gt;404&lt;/title&gt;&lt;h1&gt;这个页面不存在&lt;/h1&gt;&lt;p&gt;&lt;a href="/"&gt;回首页&lt;/a&gt;&lt;/p&gt;
+EOF
+sudo chown www-data:www-data /var/www/mysite/404.html
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+curl -I http://127.0.0.1/nope</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">HTTP/1.1 404 Not Found
+Server: nginx/1.24.0 (Ubuntu)
+Content-Type: text/html</pre></div>
+<p><b><code class="inline">location = /404.html { internal; }</code> 里的 <code class="inline">=</code> 是精确匹配，<code class="inline">internal</code> 表示「只能被 nginx 内部跳转，外部不能直接访问这个地址」。</b>不加 <code class="inline">internal</code> 也能用，但别人可以手动打开 <code class="inline">/404.html</code>，看着很怪。</p>
+</details>
+
+<h3>第 8 题 · 用一条命令把「部署 + 自检」连起来</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cat &gt; ~/deploy.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -euo pipefail
+HOST="${1:?用法: deploy.sh 服务器别名}"
+SITE="${2:-$HOME/site}"
+
+echo "== 同步文件 =="
+rsync -avz --delete "$SITE/" "$HOST":~/site/
+
+echo "== 上线 =="
+ssh "$HOST" "sudo cp -r ~/site/. /var/www/html/ && \
+             sudo chown -R www-data:www-data /var/www/html && \
+             sudo nginx -t && sudo systemctl reload nginx"
+
+echo "== 自检 =="
+ssh "$HOST" "bash ~/deploy-check.sh"
+EOF
+chmod 755 ~/deploy.sh
+~/deploy.sh myserver</pre></div>
+<p><b>这个脚本就三行有效内容，但它把「传文件、搬位置、改属主、查语法、重载、自检」六件事固定成了一条命令。</b>以后每次改页面只要 <code class="inline">./deploy.sh myserver</code>——<b>手动步骤越少，漏步骤的可能越小。</b><br><b>注意它用 <code class="inline">set -euo pipefail</code></b>：任何一步失败就停，<b>不会出现「文件没传上去但 nginx 已经 reload 了」这种半吊子状态。</b></p>
+</details>
+<div class="ok"><b>八题里 2、4、5 是排错的基本功。</b>真上线之后你会遇到的全部问题，几乎都能用「看错误码 → 看 error.log → 看服务状态」这三步定位。<b>今天练的是流程，不是配置记忆。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>笔记与必做三件事</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D027 部署笔记
+
+## 一、我的路线
+选了：（容器 / 云服务器）
+访问地址：
+踩到的第一个问题：
+
+## 二、nginx 五个关键位置
+- 配置：/etc/nginx/sites-available/ + sites-enabled/ 软链接
+- 网站根：/var/www/html
+- 访问日志：/var/log/nginx/access.log
+- 错误日志：/var/log/nginx/error.log
+- 属主：www-data:www-data，权限 755
+
+## 三、排错顺序（背下来）
+ping → nc -vz IP 80 → systemctl status nginx
+→ tail error.log → ls -l /var/www/html
+先在本机 curl -I http://127.0.0.1，能拿到 200 就说明问题在外面
+
+## 四、错误码对照
+403 → 权限没 r / 首页文件不在
+404 → root 路径对不上
+超时 → 安全组没开端口
+Connection refused → 服务没跑
+
+## 五、今天犯的错
+1.
+
+## 六、还没弄明白的
+1.</pre></div>
+<ol class="task">
+<li><b>走通至少一条路线</b>，让页面能被另一个设备打开（手机连同一 Wi-Fi 也算）。<b>截图存进 <code class="inline">day27/</code></b>，这是今天唯一的硬证据。</li>
+<li><b>把 <code class="inline">deploy-check.sh</code> 跑通</b>，八项全绿。有一项红了就顺着第 5 节查——<b>检查项红了不是脚本写错，是真有问题。</b></li>
+<li><b>写下你的访问地址和「我是怎么把它弄上线的」三条步骤</b>，放进笔记。<b>下周如果你要重做一次，这三条能让你十分钟完成，而不是重新摸索一遍。</b></li>
+</ol>
+<div class="warn"><b>今天不碰：</b>后端程序部署（D033 之后才做）、数据库（D029）、Docker 的深入用法（今天只把它当一次性工具）、域名备案。<b>目标锁定在「静态页面能访问」，多一样都不要加。</b></div>
+<div class="ok"><b>四小时后你应该能：</b>把一堆静态文件变成一个网址；看到 403/404/超时知道往哪查；用一条命令完成部署加自检。<b>从今天起，「我做了个东西」可以附带一个链接——这比任何说明都直接。</b></div>
+</section>
+
+<footer>
+  <p>📌 D027 的产出是 <b>一个能被其他设备打开的页面 + <code>deploy-check.sh</code> + 部署笔记</b>。</p>
+  <p>明天 D028：<b>第 4 周复盘</b>——Linux 与 Git 两份速查表，把这四天真正用得上的东西收成一页。</p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>

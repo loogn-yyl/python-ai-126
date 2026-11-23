@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D026 学习包 · Git 进阶与作品集上传</title>
+<style>
+  :root{
+    --primary:#2563eb; --primary-d:#1d4ed8; --primary-l:#eff6ff;
+    --text:#1e293b; --muted:#64748b; --bg:#f8fafc; --card:#fff;
+    --border:#e2e8f0; --green:#16a34a; --green-l:#f0fdf4;
+    --red:#dc2626; --red-l:#fef2f2; --amber:#d97706; --amber-l:#fffbeb;
+    --purple:#7c3aed; --purple-l:#f5f3ff; --code:#0f172a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;padding:32px 16px 80px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;
+         border-radius:16px;padding:34px;margin-bottom:20px}
+  header .day{font-size:13px;opacity:.85;letter-spacing:2px}
+  header h1{font-size:25px;margin:6px 0 10px}
+  header p{opacity:.93;font-size:14.5px}
+  .hmeta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;font-size:13px}
+  .hmeta span{background:rgba(255,255,255,.17);padding:6px 14px;border-radius:14px}
+
+  section{background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:26px 30px;margin-bottom:16px}
+  h2{font-size:18px;color:var(--primary-d);margin-bottom:14px;
+     display:flex;align-items:center;gap:9px}
+  h2 .n{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:7px;
+        display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  h3{font-size:15.5px;margin:20px 0 8px;color:#0f172a}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:5px 0}
+  code.inline{background:#eef2ff;color:#3730a3;padding:1px 6px;border-radius:4px;
+              font-family:"SF Mono",Consolas,monospace;font-size:13px}
+
+  .codebox{position:relative;margin:12px 0}
+  pre{background:var(--code);color:#e2e8f0;padding:15px 18px;border-radius:10px;
+      overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.7}
+  pre.out{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+  pre.out::before{content:"输出";display:block;font-size:11px;color:#94a3b8;margin-bottom:6px}
+  .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);
+        color:#cbd5e1;border:none;padding:4px 10px;border-radius:6px;
+        font-size:11.5px;cursor:pointer;font-family:inherit}
+  .copy:hover{background:rgba(255,255,255,.28);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+  th{background:var(--primary-l);color:var(--primary-d);padding:9px 12px;text-align:left;font-size:13px}
+  th,td{border:1px solid var(--border);padding:9px 12px;vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  td code{background:#eef2ff;color:#3730a3;padding:1px 5px;border-radius:3px;
+          font-family:"SF Mono",Consolas,monospace;font-size:12.5px}
+
+  .note{background:var(--primary-l);border-left:4px solid var(--primary);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .warn{background:var(--amber-l);border-left:4px solid var(--amber);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .danger{background:var(--red-l);border-left:4px solid var(--red);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .ok{background:var(--green-l);border-left:4px solid var(--green);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .purple{background:var(--purple-l);border-left:4px solid var(--purple);padding:13px 17px;
+        border-radius:8px;font-size:14px;margin:14px 0}
+  .tree{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+        padding:15px 18px;font-family:"SF Mono",Consolas,monospace;font-size:13px;
+        line-height:1.9;color:#334155;margin:12px 0;white-space:pre;overflow-x:auto}
+
+  .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:14px 0}
+  .tl{background:var(--primary-l);border-radius:10px;padding:14px 16px}
+  .tl b{display:block;color:var(--primary);font-size:14px;margin-bottom:3px}
+  .tl span{font-size:13px;color:var(--muted)}
+
+  .task{list-style:none;padding:0;counter-reset:t}
+  .task li{counter-increment:t;padding:10px 0 10px 34px;position:relative;
+           border-bottom:1px dashed #eef2f7}
+  .task li:last-child{border-bottom:none}
+  .task li::before{content:counter(t);position:absolute;left:0;top:10px;
+    background:var(--primary-l);color:var(--primary);width:22px;height:22px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  details{background:#f8fafc;border:1px solid var(--border);border-radius:10px;
+          padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--primary-d)}
+  details[open] summary{margin-bottom:8px}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px;line-height:2}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+  <div class="day">DAY 026 · Git 进阶</div>
+  <h1>远程、PR、rebase、tag：把作品集送到别人眼前</h1>
+  <p>昨天把本地仓库弄透了。今天跨出去：<b>和远端打交道</b>，并且做那个拖了三周的决定——<b>作品集到底放哪儿</b>。</p>
+  <div class="hmeta">
+    <span>⏱ 4 小时</span>
+    <span>🌍 remote / push / pull</span>
+    <span>🔀 rebase 与 PR</span>
+    <span>📦 产出：作品集仓库 + Profile</span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">0</span>时间分配</h2>
+<div class="timeline">
+<div class="tl"><b>30 分钟</b><span>第 1 节：remote 与跟踪分支</span></div>
+<div class="tl"><b>40 分钟</b><span>第 2、3 节：pull vs fetch、PR 流程</span></div>
+<div class="tl"><b>40 分钟</b><span>第 4、5 节：rebase、tag</span></div>
+<div class="tl"><b>60 分钟</b><span>第 6、7 节：作品集放到哪 + 落地</span></div>
+<div class="tl"><b>40 分钟</b><span>第 8 节：GitHub Profile README</span></div>
+<div class="tl"><b>30 分钟</b><span>第 9、10 节：练习 + 笔记</span></div>
+</div>
+<div class="note"><b>今天的产出有两件：</b>① 一个能对外的作品集仓库（或者明确决定留在子目录，并写清理由）；② 一个 Profile README。<b>第二件的效果比你想的大</b>——别人点进你的 GitHub，第一眼看到的就是它。</div>
+<div class="purple"><b>先回答一个问题：作品集是给谁看的？</b>如果是给自己存档，放在 <code class="inline">python-ai-126/portfolio</code> 完全没问题；<b>如果是给别人看（同学、面试、合作方），那它就不该和学习过程混在一起</b>——没人想在一堆 <code class="inline">day01</code>…<code class="inline">day28</code> 里找你的作品。<b>今天第 6 节给两条路，你选一条，然后做完。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>remote：本地仓库和远端的对照表</h2>
+<p><b>你的本地仓库和 GitHub 上那个仓库，是两个独立的仓库。</b>它们靠 <code class="inline">remote</code>（远端地址）和「跟踪分支」建立起对应关系，之后 push/pull 才有方向。</p>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+git remote -v
+git branch -vv</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">origin	git@github.com:loogn-yyl/python-ai-126.git (fetch)
+origin	git@github.com:loogn-yyl/python-ai-126.git (push)
+* main 8a3f2c1 [origin/main] 学习记录 11-22</pre></div>
+<table>
+<tr><th>东西</th><th>是什么</th><th>读法</th></tr>
+<tr><td><code>origin</code></td><td>远端地址的<b>别名</b>，不是特殊关键字</td><td>「origin」只是习惯叫法，你叫它 <code>github</code> 也行</td></tr>
+<tr><td><code>origin/main</code></td><td><b>远端 main 在你本地的快照</b>（只读）</td><td>不要直接改它，它由 fetch/pull 更新</td></tr>
+<tr><td><code>[origin/main]</code></td><td>当前分支<b>跟踪</b>哪个远端分支</td><td>有了它，<code>git push</code> 不用写参数</td></tr>
+</table>
+<div class="note"><b>第一次 push 时那个 <code class="inline">-u</code>，就是建立这个跟踪关系。</b><code class="inline">git push -u origin main</code> = 「推到 origin 的 main，并记住以后默认推这儿」。<b>忘了 <code class="inline">-u</code> 也能推上去，但下次 <code class="inline">git push</code> 会报「没有上游分支」</b>——不是出错，是它不知道该推哪儿。</div>
+<div class="codebox"><button class="copy">复制</button><pre># 加一个远端（一个仓库可以有多个）
+git remote add github git@github.com:loogn-yyl/xxx.git
+git remote -v
+
+# 改地址（仓库改名、从 HTTPS 换 SSH 时用）
+git remote set-url origin git@github.com:loogn-yyl/新名字.git</pre></div>
+<div class="warn"><b>换仓库名或从 HTTPS 换 SSH 时，<code class="inline">git remote set-url</code> 是最省事的做法</b>，不要 <code class="inline">remote remove</code> 再 <code class="inline">add</code>——那会丢掉跟踪关系，得重新 <code class="inline">-u</code>。<b>你的仓库走的是 SSH（<code class="inline">git@github.com:...</code>），这依赖昨天配的那把密钥</b>，所以 <code class="inline">ssh -T git@github.com</code> 能看到 <code class="inline">Hi</code>，是一切 push 的前提。</div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>pull 与 fetch：一个是「拿回来」，一个是「拿回来并合进来」</h2>
+<table>
+<tr><th>命令</th><th>做什么</th><th>动你的工作区吗</th></tr>
+<tr><td><code>git fetch</code></td><td>把远端的新提交下载到 <code>origin/main</code></td><td><b>不动</b></td></tr>
+<tr><td><code>git pull</code></td><td>= <code>fetch</code> + <code>merge</code></td><td><b>会合并，可能产生冲突</b></td></tr>
+<tr><td><code>git pull --rebase</code></td><td>= <code>fetch</code> + <code>rebase</code></td><td>会重放你的提交</td></tr>
+</table>
+<div class="codebox"><button class="copy">复制</button><pre>git fetch
+git log --oneline HEAD..origin/main     # 远端有、我没有的提交
+git log --oneline origin/main..HEAD     # 我有、远端没有的提交</pre></div>
+<div class="ok"><b>这两条 <code class="inline">..</code> 命令值得背下来。</b>push 之前跑一遍，<b>就知道「我要推几条上去」「远端有没有我不知道的东西」</b>——比 <code class="inline">git status</code> 那句模糊的「ahead 2, behind 1」具体得多。</div>
+<div class="note"><b>只在自己一个人用的仓库里，<code class="inline">pull</code> 和 <code class="inline">pull --rebase</code> 差别不大。</b>但一旦有协作，或者你在两台机器上推同一个仓库（<b>你的情况：Mac 写代码，Windows 可能也 commit</b>），差别就出来了：<br><b><code class="inline">pull</code> 会产生「Merge branch 'main' of github.com...」这种没信息量的合并提交</b>；<code class="inline">pull --rebase</code> 把你的本地提交接到远端最新提交后面，历史是一条直线。<b>你的 <code class="inline">gl</code> 用的就是这个，所以你的历史一直是干净的。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>PR：不是权限流程，是「请别人看一眼」的机制</h2>
+<p><b>一个人开发也需要 PR 吗？</b>需要，但目的不是审批，是<b>给自己留一个「这次改动范围是什么」的记录</b>，而且 PR 页面能并排看 diff、逐行评论，比在终端里翻强得多。</p>
+<div class="tree">① 从 main 开分支        git switch -c feat-login
+② 改代码、提交           git add -A; git commit -m "..."
+③ 推到远端               git push -u origin feat-login
+④ 在 GitHub 上开 PR      网页操作：base=main ← compare=feat-login
+⑤ 看 diff、写说明        自己 review 一遍，常常能发现误提交
+⑥ 合并                  三种方式，见下表
+⑦ 删掉分支               git switch main; git pull; git branch -d feat-login</div>
+<table>
+<tr><th>合并方式</th><th>结果</th><th>什么时候用</th></tr>
+<tr><td><b>Merge commit</b></td><td>保留全部分支提交 + 一个合并提交</td><td>功能分支有多条有意义的提交</td></tr>
+<tr><td><b>Squash and merge</b></td><td><b>把整个 PR 压成一个提交</b>接在 main 上</td><td><b>个人项目首选</b>：一个功能一个提交，历史最干净</td></tr>
+<tr><td><b>Rebase and merge</b></td><td>把每条提交依次接到 main 上，不产生合并提交</td><td>想要线性历史又不想丢提交粒度</td></tr>
+</table>
+<div class="warn"><b>Squash 的代价：分支上的提交历史没了。</b>如果那个分支里有「先写错再改对」的过程，squash 之后只剩最终结果——<b>对作品集来说是好事，对排查问题来说是坏事。</b>个人项目推荐 squash，因为你的提交信息往往写得随意（「改一下」「再改」），压成一条写清楚反而更好看。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>rebase：把你的提交「重放」到新的起点上</h2>
+<p><b>rebase 不是合并，是「撤销我的提交、在新的基础上重新提交一遍」。</b>因为重新提交，所以<b>提交号会变</b>——这一点很重要。</p>
+<div class="codebox"><button class="copy">复制</button><pre># 实测：main 上有一个 B，feat 从 A 分叉后有两个提交 C、D
+git log --oneline --graph --all</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">* 8c073cc D feat 上
+* df472d1 C feat 上
+| * 9f8a47c B main 上
+|/
+* fa3030f A 初始</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre>git rebase main
+git log --oneline --graph --all</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">* 0a3c6b7 D feat 上
+* e440d00 C feat 上
+* 9f8a47c B main 上
+* fa3030f A 初始</pre></div>
+<div class="ok"><b>对比两张图，只看三件事：</b><br>① 分叉消失了，变成一条直线；<br>② <b>C 和 D 的提交号变了</b>（df472d1 → e440d00，8c073cc → 0a3c6b7）——因为它们被「重新提交」了一遍；<br>③ <b>A 和 B 的提交号没变</b>——它们不在被重放的范围内。<br><b>这就是 rebase 的全部机制：把你的提交摘下来，接到新底座上，一个个重新贴上去。</b></div>
+<div class="danger"><b>铁律：不要 rebase 已经共享出去的分支。</b>因为提交号变了，别人手里的旧提交和你的新提交是两套历史，一 push 就会互相打架，然后你只能强推，而强推会把别人的工作覆盖掉。<br><b>判断标准：这个分支你 push 过吗？别人可能基于它工作吗？</b>两个都是「是」→ 用 <code class="inline">merge</code>；<b>只有你自己的本地分支 → 随便 rebase。</b></div>
+<h3>最常用的两个 rebase 场景</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 场景一：本地分支落后了，想接到最新的 main 上
+git switch feat-x
+git rebase main
+
+# 场景二：整理自己那几个乱七八糟的提交（还没 push）
+git rebase -i HEAD~4
+# 编辑器里把 pick 改成 squash 就能合并、改成 reword 就能改信息、drop 删掉</pre></div>
+<div class="note"><b><code class="inline">git rebase -i</code> 是「提交整理」的唯一工具，但今天不用深究。</b>记住它能做三件事就够：<b>合并几个提交（squash）、改提交信息（reword）、删掉某个提交（drop）</b>。<b>做之前先 <code class="inline">git log --oneline -5</code> 记下提交号</b>，搞砸了用 <code class="inline">git rebase --abort</code> 或 reflog 回来。</div>
+<div class="codebox"><button class="copy">复制</button><pre># rebase 卡在冲突里时
+git rebase --continue     # 解完一个冲突，继续
+git rebase --abort        # 整个放弃，回到 rebase 之前
+git rebase --skip         # 跳过这个提交（慎用，等于丢掉它）</pre></div>
+<div class="warn"><b>rebase 的冲突可能不止一次。</b>因为它逐个重放提交，<b>每个提交都可能冲突</b>——解完一个要 <code class="inline">git add</code> 再 <code class="inline">--continue</code>，可能重复好几次。<b>这是很多人「rebase 到一半放弃」的原因</b>：以为解完一次就结束了。<code class="inline">--abort</code> 随时可以全身而退。</div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>tag：给「能跑的那个版本」拍个记号</h2>
+<p><b>提交号是人类记不住的，tag 是给人看的名字。</b>作品集打一个 <code class="inline">v1.0</code>，别人点进去下载的就是那一刻的完整代码。</p>
+<div class="codebox"><button class="copy">复制</button><pre># 附注标签（推荐）：带作者、日期、说明
+git tag -a v1.0 -m "阶段一作品集：四个项目全部可运行"
+
+# 轻量标签：只是一个名字，没有额外信息
+git tag v1.0-lw
+
+git tag                      # 列出所有
+git show v1.0 | head -n 8    # 看标签信息
+
+# 推到远端（默认不推标签！）
+git push origin v1.0
+git push origin --tags       # 一次推全部</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre class="out">tag v1.0
+Tagger: loogn &lt;你的邮箱&gt;
+Date:   ...
+
+阶段一作品集：四个项目全部可运行</pre></div>
+<div class="warn"><b><code class="inline">git push</code> 不会自动推标签。</b>这是最容易忘的一步——<b>本地 <code class="inline">git tag</code> 看得见、GitHub 上没有</b>，然后你发给别人的 tag 链接是 404。<b>打完 tag 一定补一句 <code class="inline">git push origin v1.0</code>。</b></div>
+<div class="note"><b>版本号怎么起：<code class="inline">v主.次.修订</code>。</b>作品集不需要严格语义化，<b>你知道 v1.0 是「阶段一提交的那一版」就够了</b>。后面 D036 做完数据库项目打 <code class="inline">v2.0</code>，形成一条能看出来的成长线——<b>这比任何简历描述都直观。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>决定：作品集放哪儿</h2>
+<p><b>你现在的状态：<code class="inline">portfolio/</code> 已经在 <code class="inline">python-ai-126</code> 里，和 <code class="inline">daily-learn/</code>、<code class="inline">day01</code>–<code class="inline">day28</code> 混在一起。</b>这个决定不着急，但拖着不定会一直别扭。</p>
+<table>
+<tr><th></th><th>路线 A：留在子目录</th><th>路线 B：单开 <code>python-portfolio</code> 仓库</th></tr>
+<tr><td>要做什么</td><td>什么都不用做，已经这样了</td><td>新建仓库 + 搬文件 + 改 <code>gl</code></td></tr>
+<tr><td>外人看到什么</td><td><b>先是学习资料和 28 天的作业</b>，往下翻才找到 portfolio</td><td><b>一进来就是四个项目和一份 README</b></td></tr>
+<tr><td>README 效果</td><td>仓库首页是 <code>daily-learn</code> 的索引，与作品集无关</td><td><b>仓库首页就是作品集目录，可以直接 Pin 到 Profile</b></td></tr>
+<tr><td>日常成本</td><td>一条 <code>gl</code> 搞定</td><td>多一个 <code>glp()</code> 或每次 <code>cd</code> 过去</td></tr>
+<tr><td>缺点</td><td><b>作品被学习记录淹没</b>；clone 下来几十 MB</td><td>两个仓库要分别维护</td></tr>
+</table>
+<div class="ok"><b>建议走 B，理由只有一条：作品集的作用是「让人三十秒内看到你会什么」。</b>现在这个结构，别人得先理解你的学习计划，才能看到作品——<b>而没有人有义务理解你的学习计划。</b><br><b>学习记录留在 <code class="inline">python-ai-126</code></b>，那是你的过程；<b>作品集单独一个仓库</b>，那是你的结果。两者定位不同，混在一起对两边都不好。</div>
+<div class="warn"><b>但如果你现在不想多维护一个仓库，走 A 也完全可以</b>——<b>前提是做到两件事</b>：① 在 <code class="inline">python-ai-126</code> 的根 README 里<b>第一段就写清 portfolio 在哪</b>；② 给 portfolio 里的四份 README 写到位。<b>「结构不理想但内容扎实」远好过「结构漂亮但内容是空的」。</b></div>
+<h3>走 B 的落地步骤</h3>
+<div class="codebox"><button class="copy">复制</button><pre># ① 在 GitHub 网页新建空仓库 python-portfolio（不要勾选任何初始化文件）
+
+# ② 本地把 portfolio 复制出来，作为新仓库的起点
+mkdir -p ~/python-portfolio
+cp -R ~/python-learn/portfolio/. ~/python-portfolio/
+cd ~/python-portfolio
+git init
+
+# ③ 写 .gitignore（作品集也该挡掉缓存和本地数据）
+cat &gt; .gitignore &lt;&lt;'EOF'
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.log
+!*/sample_access.log
+.DS_Store
+EOF
+
+# ④ 提交并推到远端
+git add -A
+git commit -m "阶段一作品集：通讯录 v1/v3、批量下载器、日志工具"
+git branch -M main
+git remote add origin git@github.com:loogn-yyl/python-portfolio.git
+git push -u origin main</pre></div>
+<div class="note"><b>为什么用 <code class="inline">cp -R 源/. 目标/</code> 而不是 <code class="inline">cp -R 源 目标</code>：</b>前者把<b>目录里的内容</b>复制过去，后者会多套一层 <code class="inline">portfolio/</code>。<b>那个 <code class="inline">/.</code> 是「这个目录里面的所有东西」的意思</b>，复制目录内容时都用这个写法。</div>
+<div class="danger"><b>这条路线会丢掉 portfolio 在旧仓库里的提交历史。</b>如果你在意历史，可以在旧仓库里用 <code class="inline">git subtree split -P portfolio -b portfolio-only</code> 把子目录拆成独立分支再推送——<b>但那会引入一堆新概念，且容易出错。</b><br><b>我的建议：不要在这个阶段保留历史。</b>作品集的提交历史没有价值（里面只有「D021 收尾」这类信息），<b>从今天开始在新仓库里写清楚的提交信息，历史才有意义。</b></div>
+<h3>给新仓库配一个快捷命令</h3>
+<div class="codebox"><button class="copy">复制</button><pre># 加到 ~/.zshrc，然后 source ~/.zshrc
+glp() {
+  cd ~/python-portfolio || return 1
+  git add -A
+  git diff --cached --quiet &amp;&amp; { echo "没有改动"; cd - &gt;/dev/null; return 0; }
+  git commit -m "${1:-作品集更新 $(date +%m-%d)}"
+  git pull --rebase || return 1
+  git push
+  cd - &gt;/dev/null
+}</pre></div>
+<div class="note"><b>它和你现有的 <code class="inline">gl</code> 结构一样，多了两件事</b>：<code class="inline">cd</code> 进去再 <code class="inline">cd</code> 回来（所以你在任何目录都能用），以及「没有改动就早退」。<b><code class="inline">git diff --cached --quiet</code> 的退出码是「有没有差异」，用它当空提交守卫比看 <code class="inline">git status</code> 的输出可靠。</b></div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>Profile README：别人点进你主页看到的第一屏</h2>
+<p>GitHub 有个隐藏功能：<b>建一个和你用户名同名的仓库，里面的 README 会显示在你个人主页顶部。</b>你的用户名是 <code class="inline">loogn-yyl</code>，所以仓库名就叫 <code class="inline">loogn-yyl</code>。</p>
+<div class="codebox"><button class="copy">复制</button><pre># ① 新建仓库，名字必须是 loogn-yyl，勾选 Add a README
+# ② clone 下来改
+git clone git@github.com:loogn-yyl/loogn-yyl.git
+cd loogn-yyl</pre></div>
+<div class="codebox"><button class="copy">复制</button><pre># 你好，我是 loogn
+
+在用 126 天从 C 语言过渡到 AI 应用开发，每天 4 小时，进度公开在
+[python-ai-126](https://github.com/loogn-yyl/python-ai-126)。
+
+## 我在学什么
+- Python：类型、类、装饰器、异步、并发、命令行工具
+- 工程习惯：Linux、Shell、Git、SQL
+- 下一步：Web 后端、数据库、AI 应用
+
+## 作品集
+| 项目 | 一句话 |
+| --- | --- |
+| [通讯录 v3](https://github.com/loogn-yyl/python-portfolio/tree/main/02_contacts_v3) | 分层架构 + 20 个测试用例 |
+| [日志分析工具](https://github.com/loogn-yyl/python-portfolio/tree/main/04_logtool) | text/csv/json 三档输出，可直接进管道 |
+
+## 最近在做
+- 第 4 周：Linux 与 Git 工程习惯
+- 下一站：MySQL 与 Redis</pre></div>
+<div class="danger"><b>三条红线，比排版重要得多：</b><br>① <b>不写公司名、学校名、真实姓名、手机号、邮箱</b>（除非你确实想公开）；<br>② <b>不写「精通」「资深」「专家」</b>——你现在是学习者，写「在学」比写「精通」可信十倍；<br>③ <b>不承诺就业、薪资、月入</b>。<b>这份 README 的作用是「让人知道你在认真做什么」，不是推销。</b></div>
+<div class="ok"><b>Profile README 最值钱的一段是「最近在做」。</b>它告诉来访者「这个人是活的、还在推进」。<b>更新频率比排版漂亮重要</b>——每周花两分钟改一行「第 5 周：MySQL」，效果远超一次性的精美设计。</div>
+</section>
+
+<section>
+  <h2><span class="n">8</span>练习八道</h2>
+
+<h3>第 1 题 · 看当前分支跟踪谁、领先落后几条</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/python-learn
+git branch -vv
+git fetch
+git log --oneline HEAD..origin/main | wc -l    # 落后几条
+git log --oneline origin/main..HEAD | wc -l    # 领先几条</pre></div>
+<p><code class="inline">branch -vv</code> 里的 <code class="inline">[origin/main: ahead 1]</code> 就是答案，但<b>它不会主动去问远端</b>——所以要先 <code class="inline">git fetch</code>，否则看到的是上次 fetch 时的旧状态。<b>「明明推上去了，本地还说 ahead」就是没 fetch。</b></p>
+</details>
+
+<h3>第 2 题 · 建一个本地分支，rebase 到最新 main 上，看提交号变了没</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/git-lab/demo
+git switch -c try-rebase
+echo x &gt;&gt; two.txt &amp;&amp; git add -A &amp;&amp; git commit -m "try: 改 two"
+git log --oneline -1                # 记下提交号
+
+git switch main
+echo y &gt;&gt; README.md &amp;&amp; git add -A &amp;&amp; git commit -m "main 前进一条"
+
+git switch try-rebase
+git rebase main
+git log --oneline -1                # 提交号变了</pre></div>
+<p><b>两次 <code class="inline">git log --oneline -1</code> 的提交号不同，这就是 rebase 改写了历史。</b><b>这也是为什么「已经 push 的分支不能 rebase」</b>——远端还指着旧提交号，你一 push 就会被拒绝，然后只能强推。</p>
+</details>
+
+<h3>第 3 题 · 打一个 tag 并推到远端</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>git tag -a v1.0-练习 -m "练习用标签"
+git push origin v1.0-练习
+git ls-remote --tags origin</pre></div>
+<p><b><code class="inline">git ls-remote --tags origin</code> 是「远端到底有没有这个标签」的唯一可靠验证</b>——本地 <code class="inline">git tag</code> 只说明你打了，不说明推上去了。</p>
+</details>
+
+<h3>第 4 题 · 撤销一次已经 push 的提交（用 revert）</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>git log --oneline -3
+git revert 提交号            # 会打开编辑器让你确认信息
+git push</pre></div>
+<p><b>revert 会产生一个新提交</b>，内容是「把那个提交的改动反向应用」。<b>好处是不改写历史，所以不需要强推，也不会影响别人。</b><br><b>注意：revert 一个合并提交要加 <code class="inline">-m 1</code></b>（指定保留哪一边作主线），否则 git 不知道该按哪个父提交算。</p>
+</details>
+
+<h3>第 5 题 · 用 PR 流程合入一个小改动（哪怕只有你自己）</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre># 在作品集仓库里
+git switch -c docs/better-readme
+# 改 README
+git add -A &amp;&amp; git commit -m "docs: 补运行说明"
+git push -u origin docs/better-readme
+# 到 GitHub 上开 PR，选 Squash and merge
+git switch main
+git pull
+git branch -d docs/better-readme</pre></div>
+<p><b>重点在最后两步：合并之后本地 main 要 <code class="inline">pull</code> 一次</b>（squash 之后远端 main 多了一个你本地没有的新提交），<b>然后删掉本地分支</b>。<b>不 <code class="inline">pull</code> 就继续改，下次 push 会被拒绝。</b></p>
+</details>
+
+<h3>第 6 题 · 把 portfolio 复制成一个新仓库并推上去</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>mkdir -p ~/python-portfolio
+cp -R ~/python-learn/portfolio/. ~/python-portfolio/
+cd ~/python-portfolio
+git init
+git add -A
+git commit -m "阶段一作品集：四个项目"
+git branch -M main
+git remote add origin git@github.com:loogn-yyl/python-portfolio.git
+git push -u origin main
+git remote -v</pre></div>
+<p><b>推之前先确认远端仓库已经建好且是空的</b>——如果建的时候勾了 README，push 会被拒绝（远端有你本地没有的提交）。<b>那种情况先 <code class="inline">git pull --rebase</code> 再推。</b></p>
+</details>
+
+<h3>第 7 题 · 检查作品集里有没有不该上传的东西</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/python-portfolio
+git ls-files | head -40
+git ls-files | wc -l
+find . -name "*.json" -o -name "*.log" | grep -v ".git/"</pre></div>
+<p><b>三件事要查</b>：① <b>有没有本地数据文件</b>（<code class="inline">contacts.json</code> 这类，是运行时产物）；② <b>有没有 <code class="inline">__pycache__</code></b>（应该在 .gitignore 里）；③ <b>有没有截图/大文件</b>。<b><code class="inline">git ls-files</code> 列的是「将被别人看到的所有文件」，逐行扫一遍，比任何工具都可靠。</b></p>
+</details>
+
+<h3>第 8 题 · 在 Profile README 里加一条「当前进度」并做到能一键更新</h3>
+<details><summary>答案</summary>
+<div class="codebox"><button class="copy">复制</button><pre>cd ~/loogn-yyl
+# 手改那一行，或者用 sed（macOS 记得 sed -i ''）
+sed -i '' 's/第 4 周：.*/第 4 周：Linux 与 Git 工程习惯（已完成 D022–D026）/' README.md
+git add -A &amp;&amp; git commit -m "更新当前进度" &amp;&amp; git push</pre></div>
+<p><b>macOS 的 <code class="inline">sed -i</code> 必须跟一个空字符串</b>（D022 第 6 节那张表）。<b>更省心的做法是手改</b>——这行一周才改一次，为它写脚本不值。<br><b>但如果哪天想自动生成</b>（比如从学习进度清单里读天数），那就写成 Python 脚本 + 定时任务，这是 D024 的综合应用。</p>
+</details>
+<div class="ok"><b>八题里第 6、7 是今天的正事。</b>第 7 题那一步千万不要跳——<b>作品集里混进一个 <code class="inline">contacts.json</code> 或一份本地日志，别人 clone 下来就带着你的数据。</b>这类问题在公开仓库里是实打实的隐私事故。</div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>笔记与必做三件事</h2>
+<div class="codebox"><button class="copy">复制</button><pre># D026 Git 进阶笔记
+
+## 一、push / pull / fetch
+fetch 只更新 origin/main，不动工作区
+pull = fetch + merge；pull --rebase = fetch + rebase
+git log --oneline HEAD..origin/main   落后几条
+git log --oneline origin/main..HEAD   领先几条
+
+## 二、rebase 的本质
+摘下来 → 接到新底座 → 重新提交 → 提交号变了
+铁律：已共享的分支不 rebase
+
+## 三、tag
+git tag -a v1.0 -m "说明"
+git push origin v1.0        ← 不推等于没打
+
+## 四、作品集放在哪（我的决定）
+选了：（A 留在子目录 / B 单开仓库）
+理由：
+
+## 五、我今天犯的错
+1.
+
+## 六、还没弄明白的
+1.</pre></div>
+<ol class="task">
+<li><b>做完第 6 节那个决定</b>，然后把作品集仓库（或子目录）的可访问链接记在笔记里。<b>光决定不做，等于没决定。</b></li>
+<li><b>跑第 7 题那个检查</b>，把作品集里不该有的文件删掉再提交。<b>特别是 <code class="inline">contacts.json</code>、<code class="inline">*.log</code>、<code class="inline">__pycache__</code>。</b></li>
+<li><b>建 Profile README 并把作品集 Pin 上去</b>（GitHub 主页右上角 Customize your pins）。<b>Pin 比 README 更显眼</b>——它是第一屏就看到的六个方框。</li>
+</ol>
+<div class="warn"><b>今天最容易翻车的一步：新仓库第一次 push 被拒绝。</b>原因通常是远端建仓库时勾了「Add a README」或「.gitignore」。<b>解法：<code class="inline">git pull --rebase origin main</code> 再 <code class="inline">git push</code></b>，不要强推——强推会删掉远端那个 README。</div>
+<div class="ok"><b>四小时后你应该有：</b>一个可以发给别人的作品集链接、一个像样的 Profile 页、以及对 <code class="inline">gl</code> 每一行都清楚的理解。<b>从今天起，<code class="inline">git push</code> 不再是一个「求别报错」的动作。</b></div>
+</section>
+
+<footer>
+  <p>📌 D026 的产出是 <b>作品集仓库（或明确留下的子目录）+ Profile README + 一个 <code>v1.0</code> 标签</b>。</p>
+  <p>明天 D027：<b>服务器入门</b>——ssh 部署、nginx 托管静态页、安全组。<b>今天配好的密钥和 <code>~/.ssh/config</code> 明天直接用。</b></p>
+</footer>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(()=>btn.textContent = old, 1400);
+    }).catch(()=>{ btn.textContent = '请手动选中'; });
+  });
+});
+</script>
+</body>
+</html>
