@@ -9,6 +9,6 @@ find "$dir" -type f 2>/dev/null | while IFS= read -r f; do
   if [[ "$base" == *.* && "$base" != .* && -n "$ext" ]]; then
     echo "$ext"
   else
-    echo "（无拓展名）"
+    echo "（无扩展名）"
   fi
 done | sort | uniq -c | sort -k1,1nr -k2,2

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # for 循环
+shopt -s nullglob
 for f in ~/linux-lab/logs/*.log; do
   echo "$(basename "$f"): $(wc -l < "$f" | tr -d ' ') 行"
 done

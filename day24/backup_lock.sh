@@ -13,7 +13,8 @@ SRC="${1:-$HOME/python-learn}"
 DEST="${2:-$HOME/backups}"
 KEEP="${KEEP:-7}"
 STAMP=$(date +%Y%m%d-%H%M%S)
-NAME="backup-$(basename "$SRC")-$STAMP.tar.gz"
+base=$(basename "$SRC")
+NAME="backup-$base-$STAMP.tar.gz"
 
 log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 
@@ -29,15 +30,17 @@ tar -czf "$DEST/$NAME" \
     --exclude="__pycache__" \
     --exclude=".git" \
     --exclude="*.pyc" \
-    -C "$(dirname "$SRC")" "$(basename "$SRC")"
+    -C "$(dirname "$SRC")" "$base"
 
 log "完成：$DEST/$NAME ($(du -h "$DEST/$NAME" | cut -f1))"
 
-# 清理旧备份
-COUNT=$(ls -1 "$DEST"/backup-*.tar.gz 2>/dev/null | wc -l | tr -d ' ')
+# 清理旧备份：只清同一个来源的，别的来源不动
+shopt -s nullglob
+mine=("$DEST"/backup-"$base"-*.tar.gz)
+COUNT=${#mine[@]}
 if [[ "$COUNT" -gt "$KEEP" ]]; then
-  log "现有 $COUNT 个备份，保留最近 $KEEP 个"
-  ls -1t "$DEST"/backup-*.tar.gz | tail -n +$((KEEP + 1)) | while read -r old; do
+  log "来源 $base，现有 $COUNT 个备份，保留最近 $KEEP 个"
+  ls -1t "${mine[@]}" | tail -n +$((KEEP + 1)) | while read -r old; do
     rm -f "$old"
     log "删除旧备份 $(basename "$old")"
   done
