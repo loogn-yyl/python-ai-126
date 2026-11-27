@@ -60,7 +60,7 @@ set -euo pipefail
    - `f="a b"; for x in $f` → bash 循环两次，zsh 只循环一次
    - 想要两边一致：写 `for x in ${=f}`（zsh）或直接用数组
 
-4. **管道里改变变量: bash 会丢 zsh 不会丢**（写 while 循环时）
+4. **管道里改变变量：bash 会丢 zsh 不会丢**（写 while 循环时）
    - bash / ksh：管道每一段都 fork 子 shell。`while` 循环在子 shell 里跑，循环内部改动变量的是子 shell 的副本，循环结束副本销毁，父 shell 的变量不变。
    - zsh：多段管道的**最后一段**在当前 shell 里跑，不另起子 shell。所以循环里改的就是父 shell 的变量。
 
@@ -121,7 +121,7 @@ n=$(wc -l < access.log | tr -d ' ')
 ```
 
 ## 八、已解开的疑问
-1. `set -e` 在 `if` 条件里不生效，为什么？（还欠一个能说清的机制，不是背结论）  
+1. `set -e` 在 `if` 条件里不生效，为什么？  
    POSIX 规定：失败命令只要出现在 if/while/until 的条件位、&& || 的非末位、  
    用 ! 取反的、管道的非末段，就属于「控制流」而不是「错误」，不触发退出。  
    set -e 只管「没人接的错误」。如果条件位也退出，if/else 这个语法就没法写了。
