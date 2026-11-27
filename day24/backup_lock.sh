@@ -39,7 +39,7 @@ shopt -s nullglob
 mine=("$DEST"/backup-"$base"-*.tar.gz)
 COUNT=${#mine[@]}
 if [[ "$COUNT" -gt "$KEEP" ]]; then
-  log "来源 $base，现有 $COUNT 个备份，保留最近 $KEEP 个"
+  log "来源 ${base}，现有 $COUNT 个备份，保留最近 $KEEP 个"
   ls -1t "${mine[@]}" | tail -n +$((KEEP + 1)) | while read -r old; do
     rm -f "$old"
     log "删除旧备份 $(basename "$old")"
