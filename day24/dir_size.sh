@@ -1,9 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "用法：dir_size.sh 一组目录（空格隔开；无参数遍历当前目录）"
-
 if [[ $# -eq 0 ]]; then
+  echo "用法：dir_size.sh 一组目录（空格隔开；无参数遍历当前目录）"
   set -- .
 fi
 

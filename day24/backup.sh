@@ -4,7 +4,6 @@ set -euo pipefail
 # 用法：./backup.sh [源目录] [备份目录]
 #       KEEP=3 ./backup.sh ~/python-learn ~/backups
 
-
 SRC="${1:-$HOME/python-learn}"
 DEST="${2:-$HOME/backups}"
 KEEP="${KEEP:-7}"

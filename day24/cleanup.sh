@@ -5,7 +5,7 @@ FAIL_LINE=?
 TMPDIR_X=$(mktemp -d)
 echo "TMPDIR_X=$TMPDIR_X"
 
-on_err() { FAIL_LINE=${BASE_LINENO[0]}; }
+on_err() { FAIL_LINE=${BASH_LINENO[0]}; }
 trap on_err ERR
 
 cleanup() {
@@ -17,3 +17,4 @@ cleanup() {
   return 0
 }
 trap cleanup EXIT
+cat /not_exist_file_xyz

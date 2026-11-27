@@ -3,7 +3,7 @@ set -uo pipefail
 
 fail=0
 check() {
-  local name="$1"; shiift
+  local name="$1"; shift
   if "$@" >/dev/null 2>&1; then
     printf '  OK   %s\n' "$name"
   else
