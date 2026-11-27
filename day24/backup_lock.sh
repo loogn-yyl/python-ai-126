@@ -1,3 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+
 LOCK="/tmp/backup.lock"
 
 if ! mkdir "$LOCK" 2>/dev/null; then
