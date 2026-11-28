@@ -68,7 +68,6 @@ cat README.md
 printf '项目说明\n版本：v2\n新增：日志功能\n新增：缓存功能\n' > README.md
 git add README.md
 git commit -m "合并 feature2：保留日志与缓存两项"
-git log --oneline --graph
 ```
 
 ```
