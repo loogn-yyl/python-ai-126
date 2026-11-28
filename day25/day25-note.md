@@ -64,8 +64,7 @@ cat README.md
 `<<<<<<< HEAD` 到 `=======` 是我这边，`=======` 到 `>>>>>>> feature2` 是合进来的那边。
 两句都要，所以手写成合并版：
 
-```
-bash
+```bash
 printf '项目说明\n版本：v2\n新增：日志功能\n新增：缓存功能\n' > README.md
 git add README.md
 git commit -m "合并 feature2：保留日志与缓存两项"
@@ -80,14 +79,37 @@ git log --oneline --graph
 
 ### 4.2 对照：不想解也可以放弃
 
-```
-bash
+```bash
 git merge feat-2
 git merge --abort
 cat one.txt        # main 的版本
 ```
 
 `--abort` 只是把现场还原，标记会被丢掉。所以主记录是 4.1。
+
+### 4.3 分叉长什么样（no-ff 演示，非冲突）
+
+两边改不同文件也能产生 merge commit，只是不冲突：
+
+```bash
+git switch -c side
+echo "side" > side.txt && git add side.txt && git commit -m "side：加 side.txt"
+git switch main
+echo "main" > mainonly.txt && git add mainonly.txt && git commit -m "main：加 mainonly.txt"
+git merge side --no-ff -m "合并 side：non-ff 演示"
+git log --oneline --graph
+```
+
+```text
+*   5252872 (HEAD -> main) 合并 side：non-ff 演示
+|\
+| * 3524524 (side) side：加 side.txt
+* | 4d3a728 main：加 mainonly.txt
+|/
+* 17c530e 忽略 .DS_Store
+```
+
+`|\` 分开、`|/` 汇合，中间那几行就是两条线并行。**不加 `--no-ff` 会退化成快进，又变回一条直线**——这就是 17:09 那次全是 `*` 的原因。
 
 ## 五、reset 三档
 | 命令 | 意思 |
