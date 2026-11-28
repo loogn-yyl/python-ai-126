@@ -30,15 +30,25 @@
 
 ```bash
 git merge feature2
+```
+
+```
+自动合并 README.md
+冲突（内容）：合并冲突于 README.md
+自动合并失败，修正冲突然后提交修正的结果。
+```
+
+```bash
 git status --short
-cat README.md
 ```
 
 ```
 UU README.md
 ```
 
-冲突标记长这样：
+```bash
+cat README.md
+```
 
 ```text
 项目说明
@@ -54,7 +64,8 @@ UU README.md
 `<<<<<<< HEAD` 到 `=======` 是我这边，`=======` 到 `>>>>>>> feature2` 是合进来的那边。
 两句都要，所以手写成合并版：
 
-```bash
+```
+bash
 printf '项目说明\n版本：v2\n新增：日志功能\n新增：缓存功能\n' > README.md
 git add README.md
 git commit -m "合并 feature2：保留日志与缓存两项"
@@ -69,7 +80,8 @@ git log --oneline --graph
 
 ### 4.2 对照：不想解也可以放弃
 
-```bash
+```
+bash
 git merge feat-2
 git merge --abort
 cat one.txt        # main 的版本
@@ -85,7 +97,7 @@ cat one.txt        # main 的版本
 | --hard | 连工作区一起丢（先 stash！） |
 
 ## 六、踩到的坑
-1. .gitignore 对已跟踪文件无效 → git rm --cached
+1. .gitignore 对已跟踪文件无效 → git rm --cached 文件名，然后必须写 .gitignore
 2. 分支合并冲突 → git merge --abort 放弃合并，返回合并前  
    git diff --name-only --diff-filter=U 哪些文件冲突
 
